@@ -45,5 +45,12 @@ tk.Button(opts_frame, text="No").pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH,
 tk.Button(opts_frame, text="Not sure").pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
 tk.Label(opts_frame, text="NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?").pack(padx=5, pady=5,side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
+#Menubar
+menubar = tk.Menu(root)
+root.config(menu=menubar)
+
+fileMenu = tk.Menu(menubar)
+fileMenu.add_command(label="Exit", command=root.quit)
+menubar.add_cascade(label="File", menu=fileMenu)
 
 root.mainloop()
