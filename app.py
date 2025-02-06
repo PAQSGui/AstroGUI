@@ -8,6 +8,8 @@ data_frame = tk.Frame(root, bg="red")
 data_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
 
 tk.Label(data_frame, text="What is the DELTA-MAG of ±2 neighbors on the CCD").pack(padx=5, pady=5,side=tk.LEFT)
+
+# display info from the header in this button
 tk.Label(data_frame, text="Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal").pack(padx=5, pady=5,side=tk.RIGHT)
 
 vis_frame = tk.Frame(root, bg="skyblue")
