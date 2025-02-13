@@ -1,2 +1,3 @@
 /.venv/
 /spectra/
+/__pycache__/

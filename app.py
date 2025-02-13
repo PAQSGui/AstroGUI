@@ -22,6 +22,16 @@ def PrevBtn(msg):
 def BtnClick(msg):
     print("Button clicked: " + msg)
 
+def OpenFolder():
+    #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
+    global files
+    global cursor
+    directory=browse.askdirectory()
+    files=os.listdir(directory) 
+    cursor=0
+    print("Current File: " + files[cursor])
+
+
 root = tk.Tk()
 
 root.minsize(400, 400)
@@ -75,10 +85,9 @@ root.config(menu=menubar)
 
 fileMenu = tk.Menu(menubar)
 fileMenu.add_command(label="Exit", command=root.quit)
+fileMenu.add_command(label="Open Folder", command=OpenFolder)
 menubar.add_cascade(label="File", menu=fileMenu)
 
-directory=browse.askdirectory()
-files=os.listdir(directory)
-print(files[cursor])
+OpenFolder()
 
 root.mainloop()
