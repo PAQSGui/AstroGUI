@@ -1,7 +1,36 @@
 import tkinter as tk
+import os
+from tkinter import filedialog as browse
+
+files=[]
+cursor=0#cursor for which file the program is currently showing
+
+def NextBtn(msg):
+    #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
+    print("Button clicked: " + msg)
+    global cursor
+    cursor=cursor+1
+    print("Current File: " + files[cursor])
+
+def PrevBtn(msg):
+    #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
+    print("Button clicked: " + msg)
+    global cursor
+    cursor=cursor-1
+    print("Current File: " + files[cursor])
 
 def BtnClick(msg):
     print("Button clicked: " + msg)
+
+def OpenFolder():
+    #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
+    global files
+    global cursor
+    directory=browse.askdirectory()
+    files=os.listdir(directory) 
+    cursor=0
+    print("Current File: " + files[cursor])
+
 
 root = tk.Tk()
 
@@ -44,10 +73,10 @@ show_skyview = tk.Button(spectrum_buttons, text="Button to grab: Image cutout (D
 
 opts_frame = tk.Frame(root, bg="limegreen")
 opts_frame.pack(padx=5, pady=5, side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Go Back", command = lambda: BtnClick(msg="Go Back")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Yes", command = lambda: BtnClick(msg="Yes")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="No", command = lambda: BtnClick(msg="No")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Not sure", command = lambda: BtnClick(msg="Not sure")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Go Back", command = lambda: PrevBtn(msg="Go Back")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Yes", command = lambda: NextBtn(msg="Yes")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="No", command = lambda: NextBtn(msg="No")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Not sure", command = lambda: NextBtn(msg="Not sure")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
 tk.Label(opts_frame, text="NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?").pack(padx=5, pady=5,side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
 #Menubar
@@ -56,6 +85,9 @@ root.config(menu=menubar)
 
 fileMenu = tk.Menu(menubar)
 fileMenu.add_command(label="Exit", command=root.quit)
+fileMenu.add_command(label="Open Folder", command=OpenFolder)
 menubar.add_cascade(label="File", menu=fileMenu)
+
+OpenFolder()
 
 root.mainloop()
