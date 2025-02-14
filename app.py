@@ -1,5 +1,7 @@
 import tkinter as tk
+import Spec_tools as tool
 import os
+import matplotlib.pyplot as plt
 from tkinter import filedialog as browse
 
 files=[]
@@ -30,6 +32,19 @@ def OpenFolder():
     files=os.listdir(directory) 
     cursor=0
     print("Current File: " + files[cursor])
+    while True:
+        try:
+            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor])
+            print("Current File: " + files[cursor])
+            break
+        except OSError:
+            del files[cursor]
+            print("skipping bad file\n")
+            continue
+    os.environ["XDG_SESSION_TYPE"] = "xcb"
+    my_file.Plot()
+    plt.show() #not OS safe
+    
 
 
 root = tk.Tk()
