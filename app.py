@@ -6,19 +6,11 @@ from tkinter import filedialog as browse
 
 files=[]
 cursor=0#cursor for which file the program is currently showing
-
-def NextBtn(msg):
+def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
     global cursor
-    cursor=cursor+1
-    print("Current File: " + files[cursor])
-
-def PrevBtn(msg):
-    #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
-    print("Button clicked: " + msg)
-    global cursor
-    cursor=cursor-1
+    cursor=cursor+delta
     print("Current File: " + files[cursor])
 
 def BtnClick(msg):
@@ -34,7 +26,7 @@ def OpenFolder():
     print("Current File: " + files[cursor])
     while True:
         try:
-            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor])
+            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor]) #not OS safe
             print("Current File: " + files[cursor])
             break
         except OSError:
@@ -43,7 +35,7 @@ def OpenFolder():
             continue
     os.environ["XDG_SESSION_TYPE"] = "xcb"
     my_file.Plot()
-    plt.show() #not OS safe
+    plt.show()
     
 
 
@@ -88,10 +80,10 @@ show_skyview = tk.Button(spectrum_buttons, text="Button to grab: Image cutout (D
 
 opts_frame = tk.Frame(root, bg="limegreen")
 opts_frame.pack(padx=5, pady=5, side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Go Back", command = lambda: PrevBtn(msg="Go Back")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Yes", command = lambda: NextBtn(msg="Yes")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="No", command = lambda: NextBtn(msg="No")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Button(opts_frame, text="Not sure", command = lambda: NextBtn(msg="Not sure")).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Go Back", command = lambda: NavBtn(msg="Go Back",delta=-1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Yes", command = lambda: NavBtn(msg="Yes",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="No", command = lambda: NavBtn(msg="No",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
+tk.Button(opts_frame, text="Not sure", command = lambda: NavBtn(msg="Not sure",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH, expand=True)
 tk.Label(opts_frame, text="NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?").pack(padx=5, pady=5,side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
 #Menubar
