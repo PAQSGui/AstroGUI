@@ -2,6 +2,7 @@ import tkinter as tk
 import Spec_tools as tool
 import os
 import matplotlib.pyplot as plt
+import matplotlib.backends.backend_tkagg as tkplot
 from tkinter import filedialog as browse
 
 files=[]
@@ -12,9 +13,6 @@ def NavBtn (msg, delta):
     global cursor
     cursor=cursor+delta
     print("Current File: " + files[cursor])
-
-def BtnClick(msg):
-    print("Button clicked: " + msg)
 
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
@@ -35,8 +33,9 @@ def OpenFolder():
             continue
     os.environ["XDG_SESSION_TYPE"] = "xcb"
     my_file.Plot()
-    plt.show()
-    
+    fig=plt.gcf()#get current figure
+    canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
+    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
 
 
 root = tk.Tk()
@@ -55,9 +54,8 @@ vis_frame = tk.Frame(root, bg="skyblue")
 vis_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
 spectrum_frame = tk.Frame(vis_frame, bg="orange")
 spectrum_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-spectrum=tk.Label(spectrum_frame, text="L1J spectrum\nL2XP: best-fit template + Z_BEST (plus lines)\nL2CP: CLASS, PROB, CLASS2, PROB2, ...\nOverplot sky spectrum\nOverplot telluric abs.")
-spectrum.pack(padx=5, pady=5,side=tk.TOP)
-redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx=5, pady=5,side=tk.TOP)
+#spectrum=tk.Label(spectrum_frame, text="L1J spectrum\nL2XP: best-fit template + Z_BEST (plus lines)\nL2CP: CLASS, PROB, CLASS2, PROB2, ...\nOverplot sky spectrum\nOverplot telluric abs.")
+#spectrum.pack(padx=5, pady=5,side=tk.TOP)
 
 colors_frame = tk.Frame(spectrum_frame, bg="skyblue")
 colors_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
@@ -70,6 +68,8 @@ tk.Label(green_frame, text="L1G").place(relx=0.5, rely=0.5, anchor='center')
 blue_frame = tk.Frame(colors_frame, bg="blue")
 blue_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 tk.Label(blue_frame, text="L1B").place(relx=0.5, rely=0.5, anchor='center')
+
+redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx=5, pady=5,side=tk.BOTTOM)
 
 spectrum_buttons = tk.Frame(vis_frame, bg="yellow")
 spectrum_buttons.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
