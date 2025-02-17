@@ -4,39 +4,43 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 from tkinter import filedialog as browse
+from matplotlib.figure import Figure
 
 files=[]
-cursor=0#cursor for which file the program is currently showing
+cursor=0 #cursor for which file the program is currently showing
+directory = ""
+
 def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
     global cursor
     cursor=cursor+delta
     print("Current File: " + files[cursor])
+    DrawGraph(files[cursor])
+
+def DrawGraph (file):
+
+    try:
+        my_file = tool.SDSS_spectrum(directory + "/" + file) #not OS safe
+        print("Current File: " + files[cursor])
+        my_file.Plot()
+        fig=plt.gcf()#get current figure
+        canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
+        canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
+    except OSError:
+        del files[cursor]
+        print("skipping bad file\n")
 
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
     global files
     global cursor
-    directory=browse.askdirectory()
+    #directory=browse.askdirectory()
+    directory = "/home/sofus/Documents/bach/spectra"
     files=os.listdir(directory) 
     cursor=0
     print("Current File: " + files[cursor])
-    while True:
-        try:
-            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor]) #not OS safe
-            print("Current File: " + files[cursor])
-            break
-        except OSError:
-            del files[cursor]
-            print("skipping bad file\n")
-            continue
-    os.environ["XDG_SESSION_TYPE"] = "xcb" #is this still used?
-    my_file.Plot()
-    fig=plt.gcf()#get current figure
-    canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
-    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
-
+    DrawGraph(files[cursor])
 
 root = tk.Tk()
 
@@ -95,6 +99,10 @@ fileMenu.add_command(label="Exit", command=root.quit)
 fileMenu.add_command(label="Open Folder", command=OpenFolder)
 menubar.add_cascade(label="File", menu=fileMenu)
 
-OpenFolder()
+#OpenFolder()
+directory = "/home/sofus/Documents/bach/spectra"
+
+files=os.listdir(directory) 
+cursor=0
 
 root.mainloop()
