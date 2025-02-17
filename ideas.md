@@ -1,5 +1,5 @@
 Ideas:
-merge button functions into a single function that can both add and subtract
+Make plot update when changing to next file
 add cases for canceling browse-dialog
 make file path os safe
 

@@ -31,7 +31,7 @@ def OpenFolder():
             del files[cursor]
             print("skipping bad file\n")
             continue
-    os.environ["XDG_SESSION_TYPE"] = "xcb"
+    os.environ["XDG_SESSION_TYPE"] = "xcb" #is this still used?
     my_file.Plot()
     fig=plt.gcf()#get current figure
     canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
