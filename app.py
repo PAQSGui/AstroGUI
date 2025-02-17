@@ -11,6 +11,9 @@ def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
     global cursor
+    with open("data.csv", "a") as f:
+        # Replace 'files[cursor]' with the target name once we can extract that information
+        f.write(f"{files[cursor]}, {msg}\n")
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
