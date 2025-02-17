@@ -1,6 +1,19 @@
 from astropy.io import fits
 
-filename = fits.open("spectra/._spec-1222-52763-0091.fits", ignore_missing_simple=True)
+hdul = fits.open("data/spec-2237-53828-0531.fits", ignore_missing_simple=True)
 
-with fits.open(filename) as hdul:
-    hdul.info()
+# data = hdul[0].data
+# header = hdul[0].header
+# print(data)
+# print(header)
+#print(hdul.info())
+#print(hdul[0].header['NAME'])
+
+for k in hdul[0].header:
+    print(k)
+
+
+def getTargetData():
+    name = hdul[0].header['NAME']
+
+    return name
