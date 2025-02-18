@@ -14,6 +14,8 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
+
+
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
     global files
@@ -35,6 +37,12 @@ def OpenFolder():
     my_file.Plot()
     fig=plt.gcf()#get current figure
     canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
+    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
+    #Create red plot
+    my_file.Plot()
+    fig=plt.gcf()#get current figure
+    plt.xlim([6250, 7400])
+    canvas=tkplot.FigureCanvasTkAgg(fig,red_frame)
     canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
 
 
@@ -61,7 +69,7 @@ colors_frame = tk.Frame(spectrum_frame, bg="skyblue")
 colors_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 red_frame = tk.Frame(colors_frame, bg="red")
 red_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Label(red_frame, text="L1R").place(relx=0.5, rely=0.5, anchor='center')
+#tk.Label(red_frame, text="L1R").place(relx=0.5, rely=0.5, anchor='center')
 green_frame = tk.Frame(colors_frame, bg="green")
 green_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 tk.Label(green_frame, text="L1G").place(relx=0.5, rely=0.5, anchor='center')
