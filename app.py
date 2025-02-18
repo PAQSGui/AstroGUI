@@ -14,7 +14,13 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
-
+def CreatePlot(rootFrame,file,limitPlot=False, range=[6250, 7400]):
+    file.Plot()
+    fig=plt.gcf()#get current figure
+    if limitPlot:
+        plt.xlim(range)
+    canvas=tkplot.FigureCanvasTkAgg(fig,rootFrame)
+    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
 
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
@@ -34,16 +40,10 @@ def OpenFolder():
             print("skipping bad file\n")
             continue
     os.environ["XDG_SESSION_TYPE"] = "xcb" #is this still used?
-    my_file.Plot()
-    fig=plt.gcf()#get current figure
-    canvas=tkplot.FigureCanvasTkAgg(fig,spectrum_frame)
-    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
-    #Create red plot
-    my_file.Plot()
-    fig=plt.gcf()#get current figure
-    plt.xlim([6250, 7400])
-    canvas=tkplot.FigureCanvasTkAgg(fig,red_frame)
-    canvas.get_tk_widget().pack(padx=5, pady=5,side=tk.TOP)
+    CreatePlot(spectrum_frame,my_file)
+    CreatePlot(red_frame,my_file,limitPlot=True, range=[6250, 7400])
+    CreatePlot(green_frame,my_file,limitPlot=True, range=[4950, 5700])
+    CreatePlot(blue_frame,my_file,limitPlot=True, range=[4500, 4950])
 
 
 root = tk.Tk()
@@ -72,7 +72,7 @@ red_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 #tk.Label(red_frame, text="L1R").place(relx=0.5, rely=0.5, anchor='center')
 green_frame = tk.Frame(colors_frame, bg="green")
 green_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-tk.Label(green_frame, text="L1G").place(relx=0.5, rely=0.5, anchor='center')
+#tk.Label(green_frame, text="L1G").place(relx=0.5, rely=0.5, anchor='center')
 blue_frame = tk.Frame(colors_frame, bg="blue")
 blue_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 tk.Label(blue_frame, text="L1B").place(relx=0.5, rely=0.5, anchor='center')
