@@ -1,7 +1,5 @@
 Ideas:
-color the graphs according to their colors #Possibly requires creating own plot function, likely not hard
 scale the graphs correctly #More manageable scale, but ideally it should be relative to window size or smth
-order the graphs in correct wavelength #done
 divide the visible spectrum into 3 parts and equally between the 3 graphs #should they overlap?
 
 Make plot update when changing to next file

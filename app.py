@@ -15,12 +15,17 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
-def CreatePlot(rootFrame,file,limitPlot=False, title="Spectrum", range=[6250, 7400]):
-    file.Plot()
-    fig=plt.gcf()#get current figure
+def CreatePlot(rootFrame,file,limitPlot=False, graph='k', range=[6250, 7400]):
+    fig=plt.figure()
+    plt.step(file.Wavelength,file.Flux,color=graph)
+    plt.xlabel('Wavelength (Å)')
+    plt.ylabel('Flux (erg/s/cm2/Å)')
+    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
+    plt.legend()
     if limitPlot:
         plt.xlim(range)
-        plt.title(title)
+    else: 
+        plt.title(file.Objectname)
     canvas=tkplot.FigureCanvasTkAgg(fig,rootFrame).get_tk_widget()
     canvas.config(width=200,height=200)
     canvas.pack(padx=5, pady=5,side=tk.TOP)
@@ -45,9 +50,9 @@ def OpenFolder():
     #generate 4 steps in visible spectrum
     visrange=np.linspace(3800,7500,4)
     CreatePlot(spectrum_frame,my_file)
-    CreatePlot(blue_frame,my_file,limitPlot=True, title="Blue", range=[visrange[0], visrange[1]])
-    CreatePlot(green_frame,my_file,limitPlot=True, title="Green", range=[visrange[1], visrange[2]])
-    CreatePlot(red_frame,my_file,limitPlot=True, title="Red", range=[visrange[2], visrange[3]])
+    CreatePlot(blue_frame,my_file,limitPlot=True, graph='b', range=[visrange[0], visrange[1]])
+    CreatePlot(green_frame,my_file,limitPlot=True, graph='g', range=[visrange[1], visrange[2]])
+    CreatePlot(red_frame,my_file,limitPlot=True, graph='r', range=[visrange[2], visrange[3]])
 
 
 root = tk.Tk()
