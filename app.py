@@ -60,6 +60,12 @@ def OpenFolder():
     grnCanvas.update_idletasks()
     redCanvas.update_idletasks()
 
+def CreateCanvas(fig,rootFrame,place=tk.TOP):
+    canv=tkplot.FigureCanvasTkAgg(fig,rootFrame).get_tk_widget()
+    canv.config(width=200,height=200)
+    canv.pack(padx=5, pady=5,side=place, fill=tk.BOTH, expand=True)
+    return canv
+
 
 root = tk.Tk()
 
@@ -77,29 +83,15 @@ vis_frame = tk.Frame(root, bg="skyblue")
 vis_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
 spectrum_frame = tk.Frame(vis_frame, bg="orange")
 spectrum_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-canvas=tkplot.FigureCanvasTkAgg(bigFig,spectrum_frame).get_tk_widget()
-canvas.config(width=200,height=200)
-canvas.pack(padx=5, pady=5,side=tk.TOP)
+canvas=CreateCanvas(bigFig,spectrum_frame)
 #spectrum=tk.Label(spectrum_frame, text="L1J spectrum\nL2XP: best-fit template + Z_BEST (plus lines)\nL2CP: CLASS, PROB, CLASS2, PROB2, ...\nOverplot sky spectrum\nOverplot telluric abs.")
 #spectrum.pack(padx=5, pady=5,side=tk.TOP)
 
 colors_frame = tk.Frame(spectrum_frame, bg="skyblue")
 colors_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-red_frame = tk.Frame(colors_frame, bg="red")
-red_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-redCanvas=tkplot.FigureCanvasTkAgg(redFig,red_frame).get_tk_widget()
-redCanvas.config(width=200,height=200)
-redCanvas.pack(padx=5, pady=5,side=tk.TOP)
-green_frame = tk.Frame(colors_frame, bg="green")
-green_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-grnCanvas=tkplot.FigureCanvasTkAgg(grnFig,green_frame).get_tk_widget()
-grnCanvas.config(width=200,height=200)
-grnCanvas.pack(padx=5, pady=5,side=tk.TOP)
-blue_frame = tk.Frame(colors_frame, bg="blue")
-blue_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-bluCanvas=tkplot.FigureCanvasTkAgg(bluFig,blue_frame).get_tk_widget()
-bluCanvas.config(width=200,height=200)
-bluCanvas.pack(padx=5, pady=5,side=tk.TOP)
+redCanvas=CreateCanvas(redFig,colors_frame,tk.RIGHT)
+grnCanvas=CreateCanvas(grnFig,colors_frame,tk.RIGHT)
+bluCanvas=CreateCanvas(bluFig,colors_frame,tk.RIGHT)
 
 redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx=5, pady=5,side=tk.BOTTOM)
 
