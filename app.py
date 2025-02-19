@@ -8,6 +8,10 @@ from tkinter import filedialog as browse
 
 files=[]
 cursor=0#cursor for which file the program is currently showing
+bigFig=plt.figure()
+redFig=plt.figure()
+bluFig=plt.figure()
+grnFig=plt.figure()
 def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
@@ -15,9 +19,10 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
-def CreatePlot(rootFrame,file,limitPlot=False, graph='k', range=[6250, 7400]):
-    fig=plt.figure()
-    plt.step(file.Wavelength,file.Flux,color=graph)
+def CreatePlot(rootFrame,file,fig,clr,limitPlot=False, range=[6250, 7400]):
+    plt.figure(fig)
+    plt.clf() #clear figure
+    plt.step(file.Wavelength,file.Flux,color=clr)
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
@@ -49,10 +54,10 @@ def OpenFolder():
             continue
     #generate 4 steps in visible spectrum
     visrange=np.linspace(3800,7500,4)
-    CreatePlot(spectrum_frame,my_file)
-    CreatePlot(blue_frame,my_file,limitPlot=True, graph='b', range=[visrange[0], visrange[1]])
-    CreatePlot(green_frame,my_file,limitPlot=True, graph='g', range=[visrange[1], visrange[2]])
-    CreatePlot(red_frame,my_file,limitPlot=True, graph='r', range=[visrange[2], visrange[3]])
+    CreatePlot(spectrum_frame,my_file,bigFig,'k')
+    CreatePlot(blue_frame,my_file,bluFig,'b',limitPlot=True, range=[visrange[0], visrange[1]])
+    CreatePlot(green_frame,my_file,grnFig,'g',limitPlot=True, range=[visrange[1], visrange[2]])
+    CreatePlot(red_frame,my_file,redFig,'r',limitPlot=True, range=[visrange[2], visrange[3]])
 
 
 root = tk.Tk()

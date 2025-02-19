@@ -1,6 +1,7 @@
 Ideas:
 scale the graphs correctly #More manageable scale, but ideally it should be relative to window size or smth
 divide the visible spectrum into 3 parts and equally between the 3 graphs #should they overlap?
+Make error line a slightly paler version of the color
 
 Make plot update when changing to next file
 add cases for canceling browse-dialog
