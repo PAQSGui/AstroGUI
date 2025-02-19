@@ -8,10 +8,10 @@ from tkinter import filedialog as browse
 
 files=[]
 cursor=0#cursor for which file the program is currently showing
-bigFig=plt.figure()
-redFig=plt.figure()
-bluFig=plt.figure()
-grnFig=plt.figure()
+bigFig=plt.figure('k')#due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
+redFig=plt.figure('r')
+bluFig=plt.figure('b')
+grnFig=plt.figure('g')
 def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
@@ -19,10 +19,10 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     print("Current File: " + files[cursor])
 
-def CreatePlot(rootFrame,file,fig,clr,limitPlot=False, range=[6250, 7400]):
+def CreatePlot(file,fig,limitPlot=False, range=[6250, 7400]):
     plt.figure(fig)
     plt.clf() #clear figure
-    plt.step(file.Wavelength,file.Flux,color=clr)
+    plt.step(file.Wavelength,file.Flux,color=fig) #figure key is used for color
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
@@ -31,9 +31,6 @@ def CreatePlot(rootFrame,file,fig,clr,limitPlot=False, range=[6250, 7400]):
         plt.xlim(range)
     else: 
         plt.title(file.Objectname)
-    canvas=tkplot.FigureCanvasTkAgg(fig,rootFrame).get_tk_widget()
-    canvas.config(width=200,height=200)
-    canvas.pack(padx=5, pady=5,side=tk.TOP)
 
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
@@ -54,10 +51,14 @@ def OpenFolder():
             continue
     #generate 4 steps in visible spectrum
     visrange=np.linspace(3800,7500,4)
-    CreatePlot(spectrum_frame,my_file,bigFig,'k')
-    CreatePlot(blue_frame,my_file,bluFig,'b',limitPlot=True, range=[visrange[0], visrange[1]])
-    CreatePlot(green_frame,my_file,grnFig,'g',limitPlot=True, range=[visrange[1], visrange[2]])
-    CreatePlot(red_frame,my_file,redFig,'r',limitPlot=True, range=[visrange[2], visrange[3]])
+    CreatePlot(my_file,'k')
+    CreatePlot(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
+    CreatePlot(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
+    CreatePlot(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
+    canvas.update_idletasks() #this doesn't work, only resizing the window refreshes right now
+    bluCanvas.update_idletasks()
+    grnCanvas.update_idletasks()
+    redCanvas.update_idletasks()
 
 
 root = tk.Tk()
@@ -76,6 +77,9 @@ vis_frame = tk.Frame(root, bg="skyblue")
 vis_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
 spectrum_frame = tk.Frame(vis_frame, bg="orange")
 spectrum_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+canvas=tkplot.FigureCanvasTkAgg(bigFig,spectrum_frame).get_tk_widget()
+canvas.config(width=200,height=200)
+canvas.pack(padx=5, pady=5,side=tk.TOP)
 #spectrum=tk.Label(spectrum_frame, text="L1J spectrum\nL2XP: best-fit template + Z_BEST (plus lines)\nL2CP: CLASS, PROB, CLASS2, PROB2, ...\nOverplot sky spectrum\nOverplot telluric abs.")
 #spectrum.pack(padx=5, pady=5,side=tk.TOP)
 
@@ -83,10 +87,19 @@ colors_frame = tk.Frame(spectrum_frame, bg="skyblue")
 colors_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 red_frame = tk.Frame(colors_frame, bg="red")
 red_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+redCanvas=tkplot.FigureCanvasTkAgg(redFig,red_frame).get_tk_widget()
+redCanvas.config(width=200,height=200)
+redCanvas.pack(padx=5, pady=5,side=tk.TOP)
 green_frame = tk.Frame(colors_frame, bg="green")
 green_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+grnCanvas=tkplot.FigureCanvasTkAgg(grnFig,green_frame).get_tk_widget()
+grnCanvas.config(width=200,height=200)
+grnCanvas.pack(padx=5, pady=5,side=tk.TOP)
 blue_frame = tk.Frame(colors_frame, bg="blue")
 blue_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+bluCanvas=tkplot.FigureCanvasTkAgg(bluFig,blue_frame).get_tk_widget()
+bluCanvas.config(width=200,height=200)
+bluCanvas.pack(padx=5, pady=5,side=tk.TOP)
 
 redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx=5, pady=5,side=tk.BOTTOM)
 
