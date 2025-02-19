@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 from tkinter import filedialog as browse
 
+global directory
 files=[]
 cursor=0#cursor for which file the program is currently showing
 bigFig=plt.figure('k')#due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
@@ -17,7 +18,7 @@ def NavBtn (msg, delta):
     print("Button clicked: " + msg)
     global cursor
     cursor=cursor+delta
-    print("Current File: " + files[cursor])
+    LoadFile(delta)
 
 def CreatePlot(file,fig,limitPlot=False, range=[6250, 7400]):
     plt.figure(fig)
@@ -36,17 +37,23 @@ def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
     global files
     global cursor
+    global directory
     directory=browse.askdirectory()
     files=os.listdir(directory) 
     cursor=0
+    LoadFile()
+def LoadFile(delta=1):
+    global cursor
     print("Current File: " + files[cursor])
     while True:
         try:
-            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor]) #not OS safe
+            my_file = tool.SDSS_spectrum(directory+"/"+files[cursor]) #not OS safe I think
             print("Current File: " + files[cursor])
             break
         except OSError:
             del files[cursor]
+            if delta<0:
+                cursor=cursor-1
             print("skipping bad file\n")
             continue
     #generate 4 steps in visible spectrum
@@ -55,15 +62,15 @@ def OpenFolder():
     CreatePlot(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
     CreatePlot(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
     CreatePlot(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
-    canvas.update_idletasks() #this doesn't work, only resizing the window refreshes right now
-    bluCanvas.update_idletasks()
-    grnCanvas.update_idletasks()
-    redCanvas.update_idletasks()
+    canvas.draw() #this doesn't work, only resizing the window refreshes right now
+    bluCanvas.draw()
+    grnCanvas.draw()
+    redCanvas.draw()
 
 def CreateCanvas(fig,rootFrame,place=tk.TOP):
-    canv=tkplot.FigureCanvasTkAgg(fig,rootFrame).get_tk_widget()
-    canv.config(width=200,height=200)
-    canv.pack(padx=5, pady=5,side=place, fill=tk.BOTH, expand=True)
+    canv=tkplot.FigureCanvasTkAgg(fig,rootFrame)
+    canv.get_tk_widget().config(width=200,height=200)
+    canv.get_tk_widget().pack(padx=5, pady=5,side=place, fill=tk.BOTH, expand=True)
     return canv
 
 
