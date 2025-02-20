@@ -13,10 +13,12 @@ from urllib.request import urlretrieve
 from IPython.display import Image
 
 from tkinter import filedialog as browse
+from matplotlib.figure import Figure
 
 global directory
 files=[]
 cursor=0#cursor for which file the program is currently showing
+directory = ""
 bigFig=plt.figure('k')#due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
 redFig=plt.figure('r')
 bluFig=plt.figure('b')
@@ -28,7 +30,7 @@ def NavBtn (msg, delta):
     cursor=cursor+delta
     LoadFile(delta)
 
-def CreatePlot(file,fig,limitPlot=False, range=[6250, 7400]):
+def DrawGraph(file,fig,limitPlot=False, range=[6250, 7400]):
     plt.figure(fig)
     plt.clf() #clear figure
     plt.step(file.Wavelength,file.Flux,color=fig) #figure key is used for color
@@ -47,6 +49,7 @@ def OpenFolder():
     global cursor
     global directory
     directory=browse.askdirectory()
+    #directory = "/home/sofus/Documents/bach/spectra"
     files=os.listdir(directory) 
     cursor=0
     LoadFile()
@@ -66,10 +69,10 @@ def LoadFile(delta=1):
             continue
     #generate 4 steps in visible spectrum
     visrange=np.linspace(3800,7500,4)
-    CreatePlot(my_file,'k')
-    CreatePlot(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
-    CreatePlot(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
-    CreatePlot(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
+    DrawGraph(my_file,'k')
+    DrawGraph(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
+    DrawGraph(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
+    DrawGraph(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
     canvas.draw() #this doesn't work, only resizing the window refreshes right now
     bluCanvas.draw()
     grnCanvas.draw()
@@ -155,5 +158,9 @@ fileMenu.add_command(label="Open Folder", command=OpenFolder)
 menubar.add_cascade(label="File", menu=fileMenu)
 
 OpenFolder()
+#directory = "/home/sofus/Documents/bach/spectra"
+
+files=os.listdir(directory) 
+cursor=0
 
 root.mainloop()
