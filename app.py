@@ -4,6 +4,14 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
+
+from astropy import coordinates as coords
+from astropy.io.fits import getheader
+from astropy import units as u
+from urllib.parse import urlencode
+from urllib.request import urlretrieve
+from IPython.display import Image
+
 from tkinter import filedialog as browse
 
 global directory
@@ -73,6 +81,26 @@ def CreateCanvas(fig,rootFrame,place=tk.TOP):
     canv.get_tk_widget().pack(padx=5, pady=5,side=place, fill=tk.BOTH, expand=True)
     return canv
 
+def LoadPicture():
+    header=getheader(directory+"/"+files[cursor])
+    ra_u=header['RA']*u.deg
+    dec_u=header['DEC']*u.deg
+    pos = coords.SkyCoord(ra_u, dec_u)
+    print(pos)
+
+    im_size = 3*u.arcmin # get a 25 arcmin square
+    im_pixels = 1024
+    cutoutbaseurl = 'http://skyservice.pha.jhu.edu/DR12/ImgCutout/getjpeg.aspx'
+    query_string = urlencode(dict(ra=ra_u,
+                        dec=dec_u,
+                        width=im_pixels, height=im_pixels,
+                        scale=im_size.to(u.arcsec).value/im_pixels))
+    url = cutoutbaseurl + '?' + query_string
+
+    # this downloads the image
+    image_name = files[cursor]+'_cutout.jpg'
+    urlretrieve(url, image_name)
+    Image(image_name) #load the image into the notebook
 
 root = tk.Tk()
 
@@ -106,7 +134,7 @@ spectrum_buttons = tk.Frame(vis_frame, bg="yellow")
 spectrum_buttons.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 show_stack = tk.Button(spectrum_buttons, text="SHOW spectra of STACK").pack(padx=5, pady=5,side=tk.TOP, fill=tk.BOTH, expand=True)
 show_sn = tk.Button(spectrum_buttons, text="Show S/N spec").pack(padx=5, pady=5,side=tk.TOP, fill=tk.BOTH, expand=True)
-show_skyview = tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"").pack(padx=5, pady=5,side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+show_skyview = tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture()).pack(padx=5, pady=5,side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
 opts_frame = tk.Frame(root, bg="limegreen")
