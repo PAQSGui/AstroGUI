@@ -1,6 +1,19 @@
 from astropy.io import fits
 
-filename = fits.open("spectra/._spec-1222-52763-0091.fits", ignore_missing_simple=True)
+hdul = fits.open("data/spec-2237-53828-0531.fits", ignore_missing_simple=True)
 
-with fits.open(filename) as hdul:
-    hdul.info()
+for k in hdul[0].header:
+    print(k)
+
+
+def getTargetData():
+    name = hdul[0].header['NAME']
+    
+    # WHY IS THERE NO EBV CARD?
+    #ebv = hdul[0].header['EBV']
+
+    # WHERE IS THE MAGNITUDE? :(
+    #mag = hdul[0].header['*MAG*']
+
+
+    return name

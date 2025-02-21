@@ -1,3 +1,15 @@
 /.venv/
 /spectra/
 /__pycache__/
+/pyhammer/
+/gleam/
+/nestfit/
+/resources/
+PyHammerResults.csv
+RejectSpectra.csv
+spectralIndices.csv
+temp_input_*.txt
+sys
+astropy
+warnings
+glob
