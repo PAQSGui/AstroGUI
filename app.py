@@ -158,7 +158,6 @@ fileMenu.add_command(label="Open Folder", command=OpenFolder)
 menubar.add_cascade(label="File", menu=fileMenu)
 
 OpenFolder()
-#directory = "/home/sofus/Documents/bach/spectra"
 
 files=os.listdir(directory) 
 cursor=0
