@@ -16,13 +16,14 @@ from tkinter import filedialog as browse
 from matplotlib.figure import Figure
 
 global directory
-files=[]
-cursor=0#cursor for which file the program is currently showing
+files = []
+cursor = 0 #cursor for which file the program is currently showing
 directory = ""
-bigFig=plt.figure('k')#due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
-redFig=plt.figure('r')
-bluFig=plt.figure('b')
-grnFig=plt.figure('g')
+bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
+redFig = plt.figure('r')
+greenFig = plt.figure('g')
+blueFig = plt.figure('b')
+
 def NavBtn (msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
@@ -30,10 +31,10 @@ def NavBtn (msg, delta):
     with open("data.csv", "a") as f:
         # Replace 'files[cursor]' with the target name once we can extract that information
         f.write(f"{files[cursor]}, {msg}\n")
-    cursor=cursor+delta
+    cursor = cursor + delta
     LoadFile(delta)
 
-def DrawGraph(file,fig,limitPlot=False, range=[6250, 7400]):
+def DrawGraph(file, fig, limitPlot=False, range=[6250, 7400]):
     plt.figure(fig)
     plt.clf() #clear figure
     plt.step(file.Wavelength,file.Flux,color=fig) #figure key is used for color
@@ -51,11 +52,11 @@ def OpenFolder():
     global files
     global cursor
     global directory
-    directory=browse.askdirectory()
-    #directory = "/home/sofus/Documents/bach/spectra"
-    files=os.listdir(directory) 
-    cursor=0
+    directory = browse.askdirectory()
+    files = os.listdir(directory) 
+    cursor = 0
     LoadFile()
+
 def LoadFile(delta=1):
     global cursor
     print("Current File: " + files[cursor])
@@ -66,45 +67,45 @@ def LoadFile(delta=1):
             break
         except OSError:
             del files[cursor]
-            if delta<0:
-                cursor=cursor-1
+            if delta < 0:
+                cursor = cursor-1
             print("skipping bad file\n")
             continue
     #generate 4 steps in visible spectrum
-    visrange=np.linspace(3800,7500,4)
+    visrange = np.linspace(3800,7500,4)
     DrawGraph(my_file,'k')
     DrawGraph(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
     DrawGraph(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
     DrawGraph(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
-    canvas.draw() #this doesn't work, only resizing the window refreshes right now
-    bluCanvas.draw()
-    grnCanvas.draw()
+    canvas.draw() # this doesn't work, only resizing the window refreshes right now
     redCanvas.draw()
+    greenCanvas.draw()
+    blueCanvas.draw()
 
-def CreateCanvas(fig,rootFrame,place=tk.TOP):
-    canv=tkplot.FigureCanvasTkAgg(fig,rootFrame)
-    canv.get_tk_widget().config(width=200,height=200)
-    canv.get_tk_widget().pack(padx=5, pady=5,side=place, fill=tk.BOTH, expand=True)
+def CreateCanvas(fig,rootFrame, place = tk.TOP):
+    canv=tkplot.FigureCanvasTkAgg(fig, rootFrame)
+    canv.get_tk_widget().config(width = 200, height = 200)
+    canv.get_tk_widget().pack(padx = 5, pady = 5,side = place, fill = tk.BOTH, expand = True)
     return canv
 
 def LoadPicture():
-    header=getheader(directory+"/"+files[cursor])
-    ra_u=header['RA']*u.deg
-    dec_u=header['DEC']*u.deg
+    header = getheader(directory+"/"+files[cursor])
+    ra_u = header['RA']*u.deg
+    dec_u = header['DEC']*u.deg
     pos = coords.SkyCoord(ra_u, dec_u)
     print(pos)
 
-    im_size = 3*u.arcmin # get a 25 arcmin square
+    im_size = 3 * u.arcmin # get a 25 arcmin square
     im_pixels = 1024
     cutoutbaseurl = 'http://skyservice.pha.jhu.edu/DR12/ImgCutout/getjpeg.aspx'
-    query_string = urlencode(dict(ra=ra_u,
-                        dec=dec_u,
-                        width=im_pixels, height=im_pixels,
-                        scale=im_size.to(u.arcsec).value/im_pixels))
+    query_string = urlencode(dict(ra = ra_u,
+                        dec = dec_u,
+                        width = im_pixels, height = im_pixels,
+                        scale = im_size.to(u.arcsec).value/im_pixels))
     url = cutoutbaseurl + '?' + query_string
 
     # this downloads the image
-    image_name = files[cursor]+'_cutout.jpg'
+    image_name = files[cursor] + '_cutout.jpg'
     urlretrieve(url, image_name)
     Image(image_name) #load the image into the notebook
 
@@ -113,34 +114,34 @@ root = tk.Tk()
 root.minsize(400, 400)
 # Create two labels
 data_frame = tk.Frame(root, bg="red")
-data_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
+data_frame.pack(padx = 5, pady = 5, side = tk.TOP, fill = tk.BOTH, expand = True)
 
-tk.Label(data_frame, text="What is the DELTA-MAG of ±2 neighbors on the CCD").pack(padx=5, pady=5,side=tk.LEFT)
+tk.Label(data_frame, text = "What is the DELTA-MAG of ±2 neighbors on the CCD").pack(padx = 5, pady = 5, side = tk.LEFT)
 
 # display info from the header in this button
-tk.Label(data_frame, text="Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal").pack(padx=5, pady=5,side=tk.RIGHT)
+tk.Label(data_frame, text="Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal").pack(padx = 5, pady = 5,side = tk.RIGHT)
 
 vis_frame = tk.Frame(root, bg="skyblue")
-vis_frame.pack(padx=5, pady=5, side=tk.TOP, fill=tk.BOTH, expand=True)
-spectrum_frame = tk.Frame(vis_frame, bg="orange")
-spectrum_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-canvas=CreateCanvas(bigFig,spectrum_frame)
+vis_frame.pack(padx = 5, pady = 5, side = tk.TOP, fill = tk.BOTH, expand = True)
+spectrum_frame = tk.Frame(vis_frame, bg = "orange")
+spectrum_frame.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
+canvas = CreateCanvas(bigFig, spectrum_frame)
 #spectrum=tk.Label(spectrum_frame, text="L1J spectrum\nL2XP: best-fit template + Z_BEST (plus lines)\nL2CP: CLASS, PROB, CLASS2, PROB2, ...\nOverplot sky spectrum\nOverplot telluric abs.")
 #spectrum.pack(padx=5, pady=5,side=tk.TOP)
 
-colors_frame = tk.Frame(spectrum_frame, bg="skyblue")
-colors_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-redCanvas=CreateCanvas(redFig,colors_frame,tk.RIGHT)
-grnCanvas=CreateCanvas(grnFig,colors_frame,tk.RIGHT)
-bluCanvas=CreateCanvas(bluFig,colors_frame,tk.RIGHT)
+colors_frame = tk.Frame(spectrum_frame, bg = "skyblue")
+colors_frame.pack(side = tk.BOTTOM, fill = tk.BOTH, expand = True)
+redCanvas   = CreateCanvas(redFig,colors_frame, tk.RIGHT)
+greenCanvas = CreateCanvas(greenFig,colors_frame, tk.RIGHT)
+blueCanvas  = CreateCanvas(blueFig,colors_frame, tk.RIGHT)
 
-redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx=5, pady=5,side=tk.BOTTOM)
+redshift_slide = tk.Button(spectrum_frame, text="Redshift slide, template drop-down").pack(padx = 5, pady = 5,side = tk.BOTTOM)
 
-spectrum_buttons = tk.Frame(vis_frame, bg="yellow")
-spectrum_buttons.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-show_stack = tk.Button(spectrum_buttons, text="SHOW spectra of STACK").pack(padx=5, pady=5,side=tk.TOP, fill=tk.BOTH, expand=True)
-show_sn = tk.Button(spectrum_buttons, text="Show S/N spec").pack(padx=5, pady=5,side=tk.TOP, fill=tk.BOTH, expand=True)
-show_skyview = tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture()).pack(padx=5, pady=5,side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
+spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH, expand = True)
+show_stack = tk.Button(spectrum_buttons, text = "SHOW spectra of STACK").pack(padx = 5, pady = 5, side = tk.TOP, fill = tk.BOTH, expand = True)
+show_sn = tk.Button(spectrum_buttons, text = "Show S/N spec").pack(padx = 5, pady = 5, side = tk.TOP, fill = tk.BOTH, expand = True)
+show_skyview = tk.Button(spectrum_buttons, text = "Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture()).pack(padx=5, pady=5,side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
 opts_frame = tk.Frame(root, bg="limegreen")
