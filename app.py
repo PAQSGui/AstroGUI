@@ -14,6 +14,7 @@ from IPython.display import Image
 
 from tkinter import filedialog as browse
 from matplotlib.figure import Figure
+from plotter import PlotFile
 
 global directory
 files = []
@@ -73,7 +74,9 @@ def LoadFile(delta=1):
             continue
     #generate 4 steps in visible spectrum
     visrange = np.linspace(3800,7500,4)
-    DrawGraph(my_file,'k')
+
+    PlotFile(my_file, 'k')
+    #DrawGraph(my_file,'k')
     DrawGraph(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
     DrawGraph(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
     DrawGraph(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
