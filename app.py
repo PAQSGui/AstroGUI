@@ -35,19 +35,6 @@ def NavBtn (msg, delta):
     cursor = cursor + delta
     LoadFile(delta)
 
-def DrawGraph(file, fig, limitPlot=False, range=[6250, 7400]):
-    plt.figure(fig)
-    plt.clf() #clear figure
-    plt.step(file.Wavelength,file.Flux,color=fig) #figure key is used for color
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux (erg/s/cm2/Å)')
-    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
-    plt.legend()
-    if limitPlot:
-        plt.xlim(range)
-    else: 
-        plt.title(file.Objectname)
-
 def OpenFolder():
     #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
     global files
@@ -72,15 +59,12 @@ def LoadFile(delta=1):
                 cursor = cursor-1
             print("skipping bad file\n")
             continue
+
     #generate 4 steps in visible spectrum
     visrange = np.linspace(3800,7500,4)
 
-    PlotFile(my_file, 'k')
-    #DrawGraph(my_file,'k')
-    DrawGraph(my_file,'b',limitPlot=True, range=[visrange[0], visrange[1]])
-    DrawGraph(my_file,'g',limitPlot=True, range=[visrange[1], visrange[2]])
-    DrawGraph(my_file,'r',limitPlot=True, range=[visrange[2], visrange[3]])
-    canvas.draw() # this doesn't work, only resizing the window refreshes right now
+    PlotFile(my_file)
+    canvas.draw() 
     redCanvas.draw()
     greenCanvas.draw()
     blueCanvas.draw()
