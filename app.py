@@ -1,6 +1,5 @@
 import tkinter as tk
 import Spec_tools as tool
-import os
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 
@@ -14,14 +13,6 @@ bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure 
 redFig = plt.figure('r')
 greenFig = plt.figure('g')
 blueFig = plt.figure('b')
-
-def OpenFolder():
-    #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
-    global navigator
-    navigator.directory = browse.askdirectory()
-    navigator.files = os.listdir(navigator.directory) 
-    navigator.cursor = 0
-    LoadFile()
 
 def LoadFile(delta=1):
     global navigator
@@ -60,7 +51,7 @@ root.config(menu=menubar)
 
 fileMenu = tk.Menu(menubar)
 fileMenu.add_command(label="Exit", command=root.quit)
-fileMenu.add_command(label="Open Folder", command=OpenFolder)
+fileMenu.add_command(label="Open Folder", command=lambda: navigator.openFolder(LoadFile))
 menubar.add_cascade(label="File", menu=fileMenu)
 
 # Header with info about the file
@@ -98,9 +89,6 @@ tk.Button(opts_frame, text="No", command = lambda: NavBtn(navigator, LoadFile, m
 tk.Button(opts_frame, text="Not sure", command = lambda: NavBtn(navigator, LoadFile, msg="Not sure",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
 tk.Label(opts_frame, text="NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?").pack(padx=5, pady=5,side=tk.RIGHT, fill=tk.BOTH)
 
-OpenFolder()
-
-navigator.files = os.listdir(navigator.directory) 
-navigator.cursor = 0
+navigator.openFolder(LoadFile)
 
 root.mainloop()

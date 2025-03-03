@@ -1,3 +1,6 @@
+from tkinter import filedialog as browse
+import os
+
 class Navigator:
 
     cursor: int
@@ -20,6 +23,15 @@ class Navigator:
         if delta < 0:
             self.updateCursor(-1)
         print("skipping bad file\n")
+
+    def openFolder(self, loadfunc):
+        #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
+
+        self.directory = browse.askdirectory()
+        self.files = os.listdir(self.directory) 
+        self.cursor = 0
+        loadfunc()
+
 
 
 def NavBtn (navigator, loadfunc, msg, delta):
