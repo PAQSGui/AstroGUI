@@ -6,6 +6,7 @@ add cases for canceling browse-dialog
 make file path os safe
 
 Known Bugs:
+sometimes saves ._ files in csv
 Some versions of the program do not exit correctly when clicking the "X" in the top right
 Selecting a folder with no correct fits files crashes the program.
 Code for scaling is slightly different on mac and linux, it is important to test both

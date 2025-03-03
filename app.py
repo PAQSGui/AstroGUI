@@ -25,18 +25,15 @@ def OpenFolder():
 
 def LoadFile(delta=1):
     global navigator
-    print("Current File: " + navigator.files[navigator.cursor])
+    print("Current File: " + navigator.getCurrentFile())
 
     while True:
         try:
-            my_file = tool.SDSS_spectrum(navigator.directory+"/"+navigator.files[navigator.cursor]) #not OS safe I think
-            print("Current File: " + navigator.files[navigator.cursor])
+            my_file = tool.SDSS_spectrum(navigator.directory+"/"+navigator.getCurrentFile()) #not OS safe I think
+            print("Current File: " + navigator.getCurrentFile())
             break
         except OSError:
-            del navigator.files[navigator.cursor]
-            if delta < 0:
-                navigator.cursor = navigator.cursor-1
-            print("skipping bad file\n")
+            navigator.deleteFile(delta)
             continue
 
     PlotFile(my_file)
