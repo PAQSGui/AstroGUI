@@ -1,5 +1,6 @@
 from tkinter import filedialog as browse
 import os
+import Spec_tools as tool
 
 class Navigator:
 
@@ -30,7 +31,21 @@ class Navigator:
         self.directory = browse.askdirectory()
         self.files = os.listdir(self.directory) 
         self.cursor = 0
-        loadfunc()
+        self.loadFile(loadfunc)
+
+    
+    def loadFile(self, updatefunc, delta=1):
+        print("Current File: " + self.getCurrentFile())
+
+        while True:
+            try:
+                my_file = tool.SDSS_spectrum(self.directory+"/"+self.getCurrentFile()) #not OS safe I think
+                print("Current File: " + self.getCurrentFile())
+                break
+            except OSError:
+                self.deleteFile(delta)
+                continue
+        updatefunc(my_file)
 
 
 
@@ -41,4 +56,4 @@ def NavBtn (navigator, loadfunc, msg, delta):
         # Replace 'files[cursor]' waith the target name once we can extract that information
         f.write(f"{navigator.getCurrentFile()}, {msg}\n")
     navigator.updateCursor(delta)
-    loadfunc(delta)
+    navigator.loadFile(loadfunc,delta)

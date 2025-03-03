@@ -1,5 +1,4 @@
 import tkinter as tk
-import Spec_tools as tool
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 
@@ -14,24 +13,14 @@ redFig = plt.figure('r')
 greenFig = plt.figure('g')
 blueFig = plt.figure('b')
 
-def LoadFile(delta=1):
-    global navigator
-    print("Current File: " + navigator.getCurrentFile())
-
-    while True:
-        try:
-            my_file = tool.SDSS_spectrum(navigator.directory+"/"+navigator.getCurrentFile()) #not OS safe I think
-            print("Current File: " + navigator.getCurrentFile())
-            break
-        except OSError:
-            navigator.deleteFile(delta)
-            continue
-
-    PlotFile(my_file)
+def UpdateGraph(file):
+    PlotFile(file)
     canvas.draw() 
     redCanvas.draw()
     greenCanvas.draw()
     blueCanvas.draw()
+
+
 
 def CreateCanvas(fig,rootFrame, place = tk.TOP):
     canv=tkplot.FigureCanvasTkAgg(fig, rootFrame)
@@ -51,7 +40,7 @@ root.config(menu=menubar)
 
 fileMenu = tk.Menu(menubar)
 fileMenu.add_command(label="Exit", command=root.quit)
-fileMenu.add_command(label="Open Folder", command=lambda: navigator.openFolder(LoadFile))
+fileMenu.add_command(label="Open Folder", command=lambda: navigator.openFolder(UpdateGraph))
 menubar.add_cascade(label="File", menu=fileMenu)
 
 # Header with info about the file
@@ -83,12 +72,12 @@ show_skyview = tk.Button(spectrum_buttons, text = "Button to grab: Image cutout 
 # Navigation buttons in the bottom
 opts_frame = tk.Frame(root, bg="limegreen")
 opts_frame.pack(padx=5, pady=5, side=tk.BOTTOM, fill=tk.BOTH)
-tk.Button(opts_frame, text="Go Back", command = lambda: NavBtn(navigator, LoadFile, msg="Go Back",delta=-1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
-tk.Button(opts_frame, text="Yes", command = lambda: NavBtn(navigator, LoadFile, msg="Yes",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
-tk.Button(opts_frame, text="No", command = lambda: NavBtn(navigator, LoadFile, msg="No",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
-tk.Button(opts_frame, text="Not sure", command = lambda: NavBtn(navigator, LoadFile, msg="Not sure",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
+tk.Button(opts_frame, text="Go Back", command = lambda: NavBtn(navigator, UpdateGraph, msg="Go Back",delta=-1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
+tk.Button(opts_frame, text="Yes", command = lambda: NavBtn(navigator, UpdateGraph, msg="Yes",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
+tk.Button(opts_frame, text="No", command = lambda: NavBtn(navigator, UpdateGraph, msg="No",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
+tk.Button(opts_frame, text="Not sure", command = lambda: NavBtn(navigator, UpdateGraph, msg="Not sure",delta=1)).pack(padx=5, pady=5,side=tk.LEFT, fill=tk.BOTH)
 tk.Label(opts_frame, text="NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?").pack(padx=5, pady=5,side=tk.RIGHT, fill=tk.BOTH)
 
-navigator.openFolder(LoadFile)
+navigator.openFolder(UpdateGraph)
 
 root.mainloop()
