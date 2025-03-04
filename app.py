@@ -21,6 +21,11 @@ pack2=lambda el,s: el.pack(side = s, fill = tk.BOTH, expand = True)
 #temp ui elements
 tempLabel= lambda f,t,s: pack1(tk.Label(f, text = t),s)
 tempButton= lambda f,t: pack1(tk.Button(f, text = t),tk.TOP)
+def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
+    frame = tk.Frame(frameRoot, bg=color)
+    packfunc(frame,side)
+    return frame
+
 
 def UpdateGraph(file):
     PlotFile(file)
@@ -38,8 +43,7 @@ def CreateCanvas(fig,rootFrame, place = tk.TOP):
 # The UI elements
 root = tk.Tk()
 root.minsize(400, 400)
-data_frame = tk.Frame(root, bg="red")
-pack0(data_frame,tk.TOP)
+data_frame = SetUpFrame(root,pack0)
 
 # FileMenu Dropdown
 menubar = tk.Menu(root)
@@ -55,14 +59,11 @@ tempLabel(data_frame,"What is the DELTA-MAG of ±2 neighbors on the CCD",tk.LEFT
 tempLabel(data_frame,"Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal",tk.RIGHT)
 
 # The graphs
-vis_frame = tk.Frame(root, bg="skyblue")
-pack2(vis_frame, tk.TOP)
-spectrum_frame = tk.Frame(vis_frame, bg = "orange")
-pack2(spectrum_frame, tk.LEFT)
+vis_frame = SetUpFrame(root, pack2, color="skyblue")
+spectrum_frame = SetUpFrame(vis_frame, pack2, side=tk.LEFT, color="orange")
 canvas = CreateCanvas(bigFig, spectrum_frame)
 
-colors_frame = tk.Frame(spectrum_frame, bg = "skyblue")
-pack2(colors_frame, tk.BOTTOM)
+colors_frame = SetUpFrame(spectrum_frame, pack2, side=tk.BOTTOM, color="skyblue")
 redCanvas   = CreateCanvas(redFig,colors_frame, tk.RIGHT)
 greenCanvas = CreateCanvas(greenFig,colors_frame, tk.RIGHT)
 blueCanvas  = CreateCanvas(blueFig,colors_frame, tk.RIGHT)
@@ -77,8 +78,7 @@ tempButton(spectrum_buttons,"Show S/N spec")
 tempButton(spectrum_buttons,"Button to grab: Image cutout (DSS) 100\"x100\"")
 
 # Navigation buttons in the bottom
-opts_frame = tk.Frame(root, bg="limegreen")
-pack0(opts_frame,tk.BOTTOM)
+opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
 navButton = lambda t, d: tk.Button(opts_frame, text=t, command = lambda: NavBtn(navigator, UpdateGraph, msg=t,delta=d))
 pack0(navButton("Go Back",-1),tk.LEFT)
 pack0(navButton("Yes",1),tk.LEFT)
