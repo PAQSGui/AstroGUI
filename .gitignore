@@ -5,6 +5,7 @@
 /gleam/
 /nestfit/
 /resources/
+/simpaqs_l1_*/
 PyHammerResults.csv
 RejectSpectra.csv
 spectralIndices.csv
@@ -13,3 +14,4 @@ sys
 astropy
 warnings
 glob
+data.csv

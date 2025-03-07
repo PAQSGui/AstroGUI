@@ -1,26 +1,27 @@
-from astropy.io import fits
-import Spec_tools as tool
-import os
+import numpy as np
 import matplotlib.pyplot as plt
-from pyhamimports import *
-from spectrum import Spectrum
 
-from pathlib import Path
+def PlotFile(file):
 
-spectraPath="./spectra/spec-1222-52763-0091.fits"
+    visrange = np.linspace(3800, 7500, 4)
 
-
-#plot stuff
-my_file = tool.SDSS_spectrum(spectraPath)
-
-os.environ["XDG_SESSION_TYPE"] = "xcb"
-my_file.Plot()
-plt.show()
+    UpdateFigure(file, 'k')
+    UpdateFigure(file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
+    UpdateFigure(file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
+    UpdateFigure(file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
 
-#Pyhammer stuff
-spec = Spectrum()
+def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400]):
+    plt.figure(key)
+    plt.clf() #clear figure
+    plt.step(file.Wavelength, file.Flux, color = key) #figure key is used for color
+    plt.xlabel('Wavelength (Å)')
+    plt.ylabel('Flux (erg/s/cm2/Å)')
+    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
+    plt.legend()
 
-message, ftype = spec.readFile(spectraPath, 'fits')
+    if limitPlot:
+        plt.xlim(range)
+    else: 
+        plt.title(file.Objectname)  
 
-spec.calcSN()
