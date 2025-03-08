@@ -1,8 +1,11 @@
 from astropy.io.fits import getheader
 from matplotlib import pyplot as plt
 from sdss import Region
+import tkinter as tk
+import matplotlib.backends.backend_tkagg as tkplot
 
-def Show(region, band='all', figsize=None):
+def Show(region, rootFrame, band='all', figsize=None):
+    #Shamelessly copied from Behrouz' own implementation
     if region.data is None:
         region.download_data()
     if isinstance(figsize, tuple) and len(figsize)==2:
@@ -18,13 +21,18 @@ def Show(region, band='all', figsize=None):
     else:
         ax.imshow(region.data)
     plt.axis('off') # new
-    fig.show()
+    canv=tkplot.FigureCanvasTkAgg(fig, rootFrame)
+    canv.get_tk_widget().config(width = 200, height = 200)
+    canv.get_tk_widget().pack(side = tk.TOP, fill = tk.BOTH, expand = True)
 
-def LoadPicture(directory, files, cursor):
+def LoadPicture(tkroot, directory, files, cursor):
     header = getheader(directory+"/"+files[cursor])
     ra = header['RA']
     dec = header['DEC']
     #https://github.com/behrouzz/sdss
     reg = Region(ra, dec, fov=0.033)
     print(reg.nearest_objects())
-    plt.show(block=False)#Show(reg) does not work for some reason
+    
+    window = tk.Toplevel(tkroot)
+    window.title('SDSS Image')
+    Show(reg,window) #does not work for some reason

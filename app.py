@@ -75,7 +75,7 @@ spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 tempButton(spectrum_buttons,"Show S/N spec")
-pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(navigator.directory,navigator.files,navigator.cursor)),tk.TOP)
+pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(root, navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
