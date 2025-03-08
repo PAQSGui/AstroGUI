@@ -75,7 +75,7 @@ spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 tempButton(spectrum_buttons,"Show S/N spec")
-tempButton(spectrum_buttons,"Button to grab: Image cutout (DSS) 100\"x100\"")
+pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(navigator.directory,navigator.files,navigator.cursor)),tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
@@ -84,7 +84,7 @@ pack0(navButton("Go Back",-1),tk.LEFT)
 pack0(navButton("Yes",1),tk.LEFT)
 pack0(navButton("No",1),tk.LEFT)
 pack0(navButton("Not sure",1),tk.LEFT)
-tempLabel(data_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
+tempLabel(opts_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
 
 navigator.openFolder(UpdateGraph)
 
