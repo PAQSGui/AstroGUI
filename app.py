@@ -6,7 +6,9 @@ from tkinter import filedialog as browse
 from plotter import PlotFile
 from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
+from xpca.pipeline import Pipeline
 
+pipe=Pipeline()
 navigator = Navigator("",[],0)
 bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
 redFig = plt.figure('r')
@@ -28,6 +30,7 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 
 
 def UpdateGraph(file):
+    pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
     PlotFile(file)
     canvas.draw() 
     redCanvas.draw()
