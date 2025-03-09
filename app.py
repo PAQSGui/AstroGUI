@@ -32,8 +32,10 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 def UpdateGraph(file):
     pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
     #print(pipe.catalog_items)
-    CLASS=pipe.catalog_items[0]['zBestType']
+    ZBEST=pipe.catalog_items[0]['zBest']
+    CLASS=pipe.catalog_items[0]['zBestSubType']
     PROB=pipe.catalog_items[0]['zBestProb']
+    info_2xp.config(text = "2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
     info_2cp.config(text = "2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
     PlotFile(file)
     canvas.draw() 
