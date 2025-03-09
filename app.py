@@ -31,6 +31,10 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 
 def UpdateGraph(file):
     pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
+    #print(pipe.catalog_items)
+    CLASS=pipe.catalog_items[0]['zBestType']
+    PROB=pipe.catalog_items[0]['zBestProb']
+    info_2cp.config(text = "2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
     PlotFile(file)
     canvas.draw() 
     redCanvas.draw()
@@ -79,6 +83,10 @@ spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 tempButton(spectrum_buttons,"Show S/N spec")
 tempButton(spectrum_buttons,"Button to grab: Image cutout (DSS) 100\"x100\"")
+info_2xp=tk.Label(spectrum_buttons, text = "2XP: best-fit template + Z\_BEST (plus lines)")
+info_2cp=tk.Label(spectrum_buttons, text = "2CP: CLASS, PROB, CLASS2, PROB2")
+pack1(info_2xp,tk.TOP)
+pack1(info_2cp,tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
