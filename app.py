@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 
 from tkinter import filedialog as browse
-from plotter import PlotFile
+from plotter import PlotFile, ShowSN
 from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
 from xpca.pipeline import Pipeline
@@ -83,8 +83,8 @@ tempButton(spectrum_frame,"Redshift slide, template drop-down")
 spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
-tempButton(spectrum_buttons,"Show S/N spec")
-tempButton(spectrum_buttons,"Button to grab: Image cutout (DSS) 100\"x100\"")
+pack1(tk.Button(spectrum_buttons, text="Show S/N spec", command = lambda: ShowSN(navigator.current,root)),tk.TOP)
+pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(root, navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
 info_2xp=tk.Label(spectrum_buttons, text = "2XP: best-fit template + Z\_BEST (plus lines)")
 info_2cp=tk.Label(spectrum_buttons, text = "2CP: CLASS, PROB, CLASS2, PROB2")
 pack1(info_2xp,tk.TOP)
@@ -97,7 +97,7 @@ pack0(navButton("Go Back",-1),tk.LEFT)
 pack0(navButton("Yes",1),tk.LEFT)
 pack0(navButton("No",1),tk.LEFT)
 pack0(navButton("Not sure",1),tk.LEFT)
-tempLabel(data_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
+tempLabel(opts_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
 
 navigator.openFolder(UpdateGraph)
 

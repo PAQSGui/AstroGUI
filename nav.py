@@ -7,6 +7,7 @@ class Navigator:
     cursor: int
     files: list[str]
     directory: str
+    current: tool.SDSS_spectrum
 
     def __init__(self, dir, files, cursor):
         self.directory = dir
@@ -39,13 +40,13 @@ class Navigator:
 
         while True:
             try:
-                my_file = tool.SDSS_spectrum(self.directory+"/"+self.getCurrentFile()) #not OS safe I think
+                self.current = tool.SDSS_spectrum(self.directory+"/"+self.getCurrentFile()) #not OS safe I think
                 print("Current File: " + self.getCurrentFile())
                 break
             except OSError:
                 self.deleteFile(delta)
                 continue
-        updatefunc(my_file)
+        updatefunc(self.current)
 
 
 
