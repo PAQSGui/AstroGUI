@@ -6,7 +6,9 @@ from tkinter import filedialog as browse
 from plotter import PlotFile, ShowSN
 from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
+from xpca.pipeline import Pipeline
 
+pipe=Pipeline()
 navigator = Navigator("",[],0)
 bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
 redFig = plt.figure('r')
@@ -28,6 +30,13 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 
 
 def UpdateGraph(file):
+    pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
+    #print(pipe.catalog_items)
+    ZBEST=pipe.catalog_items[0]['zBest']
+    CLASS=pipe.catalog_items[0]['zBestSubType']
+    PROB=pipe.catalog_items[0]['zBestProb']
+    info_2xp.config(text = "2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
+    info_2cp.config(text = "2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
     PlotFile(file)
     canvas.draw() 
     redCanvas.draw()
@@ -76,6 +85,10 @@ spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 pack1(tk.Button(spectrum_buttons, text="Show S/N spec", command = lambda: ShowSN(navigator.current,root)),tk.TOP)
 pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(root, navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
+info_2xp=tk.Label(spectrum_buttons, text = "2XP: best-fit template + Z\_BEST (plus lines)")
+info_2cp=tk.Label(spectrum_buttons, text = "2CP: CLASS, PROB, CLASS2, PROB2")
+pack1(info_2xp,tk.TOP)
+pack1(info_2cp,tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
