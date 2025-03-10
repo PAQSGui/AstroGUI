@@ -13,13 +13,13 @@ def PlotFile(file):
     UpdateFigure(file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
 
-def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400]):
+def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400], width = 0.5):
     plt.figure(key)
     plt.clf() #clear figure
-    plt.step(file.Wavelength, file.Flux, color = key) #figure key is used for color
+    plt.step(file.Wavelength, file.Flux, color = key, linewidth=width) #figure key is used for color
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
-    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
+    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5', linewidth=width)
     plt.legend()
 
     if limitPlot:

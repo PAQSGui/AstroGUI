@@ -24,7 +24,7 @@ pack2=lambda el,s: el.pack(side = s, fill = tk.BOTH, expand = True)
 tempLabel= lambda f,t,s: pack1(tk.Label(f, text = t),s)
 tempButton= lambda f,t: pack1(tk.Button(f, text = t),tk.TOP)
 def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
-    frame = tk.Frame(frameRoot, bg=color)
+    frame = tk.Frame(frameRoot)
     packfunc(frame,side)
     return frame
 
@@ -80,7 +80,7 @@ blueCanvas  = CreateCanvas(blueFig,colors_frame, tk.RIGHT)
 tempButton(spectrum_frame,"Redshift slide, template drop-down")
 
 # Sidepanel with buttons
-spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
+spectrum_buttons = tk.Frame(vis_frame)
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 pack1(tk.Button(spectrum_buttons, text="Show S/N spec", command = lambda: ShowSN(navigator.current,root)),tk.TOP)
