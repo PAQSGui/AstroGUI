@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.backends.backend_tkagg as tkplot
 
 from tkinter import filedialog as browse
-from plotter import PlotFile
+from plotter import PlotFile, ShowSN
 from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
 
@@ -74,7 +74,7 @@ tempButton(spectrum_frame,"Redshift slide, template drop-down")
 spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
-tempButton(spectrum_buttons,"Show S/N spec")
+pack1(tk.Button(spectrum_buttons, text="Show S/N spec", command = lambda: ShowSN(navigator.current,root)),tk.TOP)
 pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(root, navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
 
 # Navigation buttons in the bottom

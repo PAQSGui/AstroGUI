@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import tkinter as tk
+import matplotlib.backends.backend_tkagg as tkplot
 
 def PlotFile(file):
 
@@ -25,3 +27,14 @@ def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400]):
     else: 
         plt.title(file.Objectname)  
 
+
+def ShowSN(file,tkroot):
+    rootFrame = tk.Toplevel(tkroot)
+    rootFrame.title('S/N Spectrum')
+    fig = plt.figure()
+    plt.step(file.Wavelength, file.Flux/file.Noise)
+    plt.xlabel('Wavelength (Å)')
+    plt.ylabel('Flux/Noise Ratio')
+    plt.title(file.Objectname+" S/N Spectrum")
+    canv=tkplot.FigureCanvasTkAgg(fig, rootFrame)
+    canv.get_tk_widget().pack(side = tk.TOP, fill = tk.BOTH, expand = True)
