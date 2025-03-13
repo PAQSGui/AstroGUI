@@ -1,6 +1,7 @@
 from tkinter import filedialog as browse
 import os
 import Spec_tools as tool
+from pathlib import Path
 
 class Navigator:
 
@@ -40,7 +41,7 @@ class Navigator:
 
         while True:
             try:
-                self.current = tool.SDSS_spectrum(self.directory+"/"+self.getCurrentFile()) #not OS safe I think
+                self.current = tool.SDSS_spectrum(Path(self.directory) / Path(self.getCurrentFile()))
                 print("Current File: " + self.getCurrentFile())
                 break
             except OSError:
