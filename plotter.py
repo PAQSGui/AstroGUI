@@ -52,9 +52,15 @@ def DrawTemplate(key, template): # add filename
 
 
 def GetFileName(template):
-    if template == 'QSO-MIDZ':
-        return "templates/template-new-qso-midz.fits"
+    if template == 'GALAXY':
+        return "templates/template-galaxy-pass.fits"
+    elif template == 'GALAXY-PASS':
+        return "templates/template-galaxy.fits"
     elif template == 'QSO-LOWZ':
         return  "templates/template-new-qso-lowz.fits"
-    else:
+    elif template == 'QSO-MIDZ':
+        return "templates/template-new-qso-midz.fits"
+    elif template == 'QSO':
         return "templates/template-qso.fits"
+    else:
+        return "templates/template-star-A.fits"
