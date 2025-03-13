@@ -37,7 +37,7 @@ def UpdateGraph(file):
     PROB=pipe.catalog_items[0]['zBestProb']
     info_2xp.config(text = "2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
     info_2cp.config(text = "2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
-    PlotFile(file)
+    PlotFile(file, CLASS)
     canvas.draw() 
     redCanvas.draw()
     greenCanvas.draw()

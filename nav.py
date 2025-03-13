@@ -49,7 +49,6 @@ class Navigator:
         updatefunc(self.current)
 
 
-
 def NavBtn (navigator, loadfunc, msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
