@@ -7,12 +7,17 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     )
 from PySide6.QtGui import (
+    #QFileDialog,
     QPalette,
     QColor,
 )
 from PySide6.QtCore import (
     QSize,
+    QDir,
+    QDirIterator,
 )
+
+from nav import NavigatorLayout
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -32,12 +37,12 @@ class MainWindow(QMainWindow):
         mainLayout = QVBoxLayout()
         topLayout = QHBoxLayout()
         midLayout = QHBoxLayout()
-        botLayout = QHBoxLayout()
+        botLayout = NavigatorLayout()
 
         plotLayout = QVBoxLayout()
         rightButtons = QVBoxLayout()
 
-        topLayout.addWidget(Color('red'))
+        topLayout.addWidget(Color('green'))
         topLayout.addWidget(Color('yellow'))
         topLayout.addWidget(Color('purple'))
 
@@ -56,9 +61,6 @@ class MainWindow(QMainWindow):
         #midLayout.addWidget(Color('teal'))
 
         mainLayout.addLayout(midLayout, 4)
-
-        botLayout.addWidget(Color('red'))
-        botLayout.addWidget(Color('purple'))
 
         mainLayout.addLayout(botLayout, 2)
 
@@ -80,5 +82,7 @@ app = QApplication([])
 
 window = MainWindow()
 window.show()
+
+
 
 app.exec()

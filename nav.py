@@ -2,6 +2,55 @@ from tkinter import filedialog as browse
 import os
 import Spec_tools as tool
 
+from PySide6.QtCore import (
+    QSize,
+    QDir,
+    QDirIterator,
+)
+
+from PySide6.QtWidgets import (
+    QApplication, 
+    QMainWindow, 
+    QPushButton,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    )
+
+class NavigatorLayout(QHBoxLayout):
+    cursor: int
+    files: list[str]
+    directory = QDir
+
+    def __init__(self):
+        super().__init__()
+
+        self.directory = QDir("../spectra")
+        self.directory.setNameFilters(["([^.]*)","*.fits"])
+
+        self.files = self.directory.entryList()
+        self.cursor = 0
+
+        backButton = QPushButton("Back")
+        backButton.clicked.connect(lambda: self.navigate(-1))
+
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(lambda: self.Navigate(1))
+
+        noButton = QPushButton("No")
+        noButton.clicked.connect(lambda: self.Navigate(1))
+
+        unsureButton = QPushButton("Unsure")
+        unsureButton.clicked.connect(lambda: self.Navigate(1))
+
+        self.addWidget(yesButton)
+        self.addWidget(noButton)
+        self.addWidget(unsureButton)
+
+    def Navigate(self, delta):
+        print(self.files[self.cursor])
+        self.cursor += delta
+
 class Navigator:
 
     cursor: int
