@@ -17,7 +17,7 @@ from PySide6.QtCore import (
     QDirIterator,
 )
 
-from nav import NavigatorLayout
+from nav import Navigator
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -25,7 +25,7 @@ from nav import NavigatorLayout
 # Bottom is the 'Yes', 'No' etc buttons
 
 class MainWindow(QMainWindow):
-
+    navigator : Navigator
     def __init__(self):
         super().__init__()
 
@@ -33,11 +33,12 @@ class MainWindow(QMainWindow):
 
         #layout1.setContentsMargins(0,0,0,0)
         #layout1.setSpacing(20)
+        self.navigator = Navigator(0)
 
         mainLayout = QVBoxLayout()
         topLayout = QHBoxLayout()
         midLayout = QHBoxLayout()
-        botLayout = NavigatorLayout()
+        botLayout = self.navigator.layout
 
         plotLayout = QVBoxLayout()
         rightButtons = QVBoxLayout()
@@ -62,12 +63,15 @@ class MainWindow(QMainWindow):
 
         mainLayout.addLayout(midLayout, 4)
 
+        plotLayout.addWidget(self.navigator.bigFig)
+
         mainLayout.addLayout(botLayout, 2)
 
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
         self.setMinimumSize(QSize(600, 400))
+        self.navigator.openFolder()
 
 class Color(QWidget):
     def __init__(self, color):

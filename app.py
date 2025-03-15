@@ -8,8 +8,14 @@ from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
 from xpca.pipeline import Pipeline
 
+from PySide6.QtWidgets import (
+    QApplication, 
+)
+
+app = QApplication([])
+
 pipe=Pipeline()
-navigator = Navigator("",[],0)
+navigator = Navigator(0)
 bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
 redFig = plt.figure('r')
 greenFig = plt.figure('g')
@@ -30,7 +36,7 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 
 
 def UpdateGraph(file):
-    pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
+    pipe.run(navigator.directory.absoluteFilePath(navigator.getCurrentFile()),source='sdss')
     #print(pipe.catalog_items)
     ZBEST=pipe.catalog_items[0]['zBest']
     CLASS=pipe.catalog_items[0]['zBestSubType']
@@ -92,13 +98,13 @@ pack1(info_2cp,tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
-navButton = lambda t, d: tk.Button(opts_frame, text=t, command = lambda: NavBtn(navigator, UpdateGraph, msg=t,delta=d))
+navButton = lambda t, d: tk.Button(opts_frame, text=t, command = lambda: NavBtn(navigator, msg=t,delta=d))
 pack0(navButton("Go Back",-1),tk.LEFT)
 pack0(navButton("Yes",1),tk.LEFT)
 pack0(navButton("No",1),tk.LEFT)
 pack0(navButton("Not sure",1),tk.LEFT)
 tempLabel(opts_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
 
-navigator.openFolder(UpdateGraph)
+navigator.openFolder()
 
 root.mainloop()
