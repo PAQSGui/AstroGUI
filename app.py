@@ -8,12 +8,20 @@ from nav import NavBtn, Navigator
 from ssPicture import LoadPicture
 from xpca.pipeline import Pipeline
 
+from PySide6.QtWidgets import (
+    QApplication, 
+)
+
+app = QApplication([])
+
 pipe=Pipeline()
-navigator = Navigator("",[],0)
+navigator = Navigator(0)
 bigFig = plt.figure('k') #due to matplotlib stupid, you have to give the figure a key, and it cannot be its own key
 redFig = plt.figure('r')
 greenFig = plt.figure('g')
 blueFig = plt.figure('b')
+
+# check check
 
 #pack functions
 pack0=lambda el,s: el.pack(padx=5, pady=5, side=s, fill=tk.BOTH)
@@ -30,7 +38,7 @@ def SetUpFrame(frameRoot,packfunc,side=tk.TOP, color="red"):
 
 
 def UpdateGraph(file):
-    pipe.run(navigator.directory+"/"+navigator.getCurrentFile(),source='sdss')
+    pipe.run(navigator.directory.absoluteFilePath(navigator.getCurrentFile()),source='sdss')
     #print(pipe.catalog_items)
     ZBEST=pipe.catalog_items[0]['zBest']
     CLASS=pipe.catalog_items[0]['zBestSubType']
@@ -84,7 +92,7 @@ spectrum_buttons = tk.Frame(vis_frame, bg = "yellow")
 spectrum_buttons.pack(side = tk.RIGHT, fill = tk.BOTH)
 tempButton(spectrum_buttons,"SHOW spectra of STACK")
 pack1(tk.Button(spectrum_buttons, text="Show S/N spec", command = lambda: ShowSN(navigator.current,root)),tk.TOP)
-pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(root, navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
+pack1(tk.Button(spectrum_buttons, text="Button to grab: Image cutout (DSS) 100\"x100\"", command = lambda: LoadPicture(navigator.directory, navigator.files, navigator.cursor)),tk.TOP)
 info_2xp=tk.Label(spectrum_buttons, text = "2XP: best-fit template + Z\_BEST (plus lines)")
 info_2cp=tk.Label(spectrum_buttons, text = "2CP: CLASS, PROB, CLASS2, PROB2")
 pack1(info_2xp,tk.TOP)
@@ -92,13 +100,13 @@ pack1(info_2cp,tk.TOP)
 
 # Navigation buttons in the bottom
 opts_frame = SetUpFrame(root, pack0, side=tk.BOTTOM, color="limegreen")
-navButton = lambda t, d: tk.Button(opts_frame, text=t, command = lambda: NavBtn(navigator, UpdateGraph, msg=t,delta=d))
+navButton = lambda t, d: tk.Button(opts_frame, text=t, command = lambda: NavBtn(navigator, msg=t,delta=d))
 pack0(navButton("Go Back",-1),tk.LEFT)
 pack0(navButton("Yes",1),tk.LEFT)
 pack0(navButton("No",1),tk.LEFT)
 pack0(navButton("Not sure",1),tk.LEFT)
 tempLabel(opts_frame,"NO, but why:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?",tk.RIGHT)
 
-navigator.openFolder(UpdateGraph)
+navigator.openFolder()
 
 root.mainloop()
