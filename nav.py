@@ -1,4 +1,4 @@
-from tkinter import filedialog as browse
+#from tkinter import filedialog as browse
 import os
 import Spec_tools as tool
 from xpca.pipeline import Pipeline
@@ -34,7 +34,7 @@ class Navigator:
     def __init__(self, cursor):
         self.pipe=Pipeline()
         self.layout = QHBoxLayout()
-        self.directory = QDir("../spectra")
+        self.directory = QDir("./spectra")
         self.directory.setNameFilters(["([^.]*)","*.fits"])
         self.files = self.directory.entryList()
         self.cursor = cursor
@@ -74,8 +74,8 @@ class Navigator:
 
     def openFolder(self):
         #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
-
-        self.directory = QDir(browse.askdirectory())
+        
+        #self.directory = QDir(browse.askdirectory())
         self.files = self.directory.entryList()
         self.cursor = 0
         self.loadFile()
