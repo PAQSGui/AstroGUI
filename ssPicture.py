@@ -23,8 +23,8 @@ def Show(region, band='all', figsize=None):
     canv=FigureCanvasQTAgg(fig)
     canv.show()
 
-def LoadPicture(directory, files, cursor):
-    header = getheader(directory+"/"+files[cursor])
+def LoadPicture(dir, file):
+    header = getheader(dir.absoluteFilePath(file))
     ra = header['RA']
     dec = header['DEC']
     #https://github.com/behrouzz/sdss
