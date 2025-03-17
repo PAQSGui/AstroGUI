@@ -19,6 +19,9 @@ from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QFileDialog as browse,
+    QTextEdit,
+    QLabel,
     )
 
 class Navigator:
@@ -52,6 +55,12 @@ class Navigator:
         unsureButton = QPushButton("Unsure")
         unsureButton.clicked.connect(lambda: NavBtn(self, msg="Unsure",delta=1))
 
+        whyLayout = QVBoxLayout()
+        whyInput = QTextEdit()
+        whyLayout.addWidget(QLabel("Why, or why not:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?"))
+        whyLayout.addWidget(whyInput)
+
+        self.layout.addWidget(backButton)
         self.layout.addWidget(yesButton)
         self.layout.addWidget(noButton)
         self.layout.addWidget(unsureButton)
@@ -75,7 +84,9 @@ class Navigator:
     def openFolder(self):
         #Tests: What if you cancel selecting a folder? What if the folder does not exist? What if it is the first time you select a folder?
         
-        #self.directory = QDir(browse.askdirectory())
+        folder_path = browse.getExistingDirectory(None, "Select Folder")
+        if folder_path:
+            self.directory = QDir(folder_path)
         self.files = self.directory.entryList()
         self.cursor = 0
         self.loadFile()
