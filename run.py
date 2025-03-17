@@ -61,7 +61,6 @@ class MainWindow(QMainWindow):
 
         mainLayout.addLayout(topLayout)
         
-        plotLayout.addWidget(Color('green'))
         midLayout.addLayout(plotLayout)
 
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))

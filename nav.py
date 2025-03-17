@@ -61,7 +61,7 @@ class Navigator:
         whyInput = QTextEdit()
         whyLayout.addWidget(QLabel("Why, or why not:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?"))
         whyLayout.addWidget(whyInput)
-        #self.layout.addLayout(whyLayout) #way too f'ing big
+        self.layout.addLayout(whyLayout)
 
         self.info_2xp=QLabel("2XP: best-fit template + Z\_BEST (plus lines)")
         self.info_2cp=QLabel("2CP: CLASS, PROB, CLASS2, PROB2")
