@@ -73,8 +73,8 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(skygrabButton)
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
         
-        rightButtons.addWidget(QPushButton("2XP: best-fit template + 1.542..."))
-        rightButtons.addWidget(QPushButton("2CP: QSO-MDZ, 0.69..."))
+        rightButtons.addWidget(self.navigator.info_2cp)
+        rightButtons.addWidget(self.navigator.info_2xp)
         midLayout.addLayout(rightButtons)
         #midLayout.addWidget(Color('green'))
         #midLayout.addWidget(Color('teal'))

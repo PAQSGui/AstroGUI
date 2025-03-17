@@ -33,6 +33,8 @@ class Navigator:
     layout: QHBoxLayout
     pipe: Pipeline
     bigFig : FigureCanvasQTAgg
+    info_2xp : QLabel
+    info_2cp : QLabel
 
     def __init__(self, cursor):
         self.pipe=Pipeline()
@@ -59,6 +61,10 @@ class Navigator:
         whyInput = QTextEdit()
         whyLayout.addWidget(QLabel("Why, or why not:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?"))
         whyLayout.addWidget(whyInput)
+        #self.layout.addLayout(whyLayout) #way too f'ing big
+
+        self.info_2xp=QLabel("2XP: best-fit template + Z\_BEST (plus lines)")
+        self.info_2cp=QLabel("2CP: CLASS, PROB, CLASS2, PROB2")
 
         self.layout.addWidget(backButton)
         self.layout.addWidget(yesButton)
@@ -114,8 +120,8 @@ class Navigator:
         ZBEST=self.pipe.catalog_items[0]['zBest']
         CLASS=self.pipe.catalog_items[0]['zBestSubType']
         PROB=self.pipe.catalog_items[0]['zBestProb']
-        #info_2xp.config(text = "2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
-        #info_2cp.config(text = "2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
+        self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
+        self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
         plotter.PlotFile(file)
         self.bigFig.draw()
 
