@@ -21,6 +21,7 @@ from PySide6.QtCore import (
 
 from nav import Navigator
 from ssPicture import LoadPicture
+from plotter import ShowSN
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -64,12 +65,16 @@ class MainWindow(QMainWindow):
         midLayout.addLayout(plotLayout)
 
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
-        rightButtons.addWidget(QPushButton("Show S/N spec"))
+        signoiseButton = QPushButton("Show S/N spec")
+        rightButtons.addWidget(signoiseButton)
+        signoiseButton.clicked.connect(lambda: ShowSN(self.navigator.current))
+        
         skygrabButton = QPushButton('Button to grab: Image cutout (DSS) 100\"x100\"')
         rightButtons.addWidget(skygrabButton)
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.files, self.navigator.cursor))
-        rightButtons.addWidget(QPushButton("2XP: best-fit template + 1.542..."))
-        rightButtons.addWidget(QPushButton("2CP: QSO-MDZ, 0.69..."))
+        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
+        
+        rightButtons.addWidget(self.navigator.info_2cp)
+        rightButtons.addWidget(self.navigator.info_2xp)
         midLayout.addLayout(rightButtons)
         #midLayout.addWidget(Color('green'))
         #midLayout.addWidget(Color('teal'))
