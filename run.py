@@ -61,6 +61,7 @@ class MainWindow(QMainWindow):
 
         mainLayout.addLayout(topLayout)
         
+        plotLayout.addWidget(Color('green'),5)
         midLayout.addLayout(plotLayout)
 
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
@@ -78,7 +79,7 @@ class MainWindow(QMainWindow):
         #midLayout.addWidget(Color('green'))
         #midLayout.addWidget(Color('teal'))
 
-        mainLayout.addLayout(midLayout, 4)
+        mainLayout.addLayout(midLayout)
 
         plotLayout.addWidget(self.navigator.bigFig) #should bigFig be in a Plotter instead of the Navigator?
         redshiftLayout = QHBoxLayout()
@@ -93,13 +94,14 @@ class MainWindow(QMainWindow):
         templateDropdown.addItem('star-A')#add dropdown with templates
         redshiftLayout.addWidget(templateDropdown)
 
-        mainLayout.addLayout(botLayout, 2)
+        mainLayout.addLayout(botLayout)
 
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
         self.setMinimumSize(QSize(600, 400))
         self.navigator.openFolder()
+
 
 class Color(QWidget):
     def __init__(self, color):
