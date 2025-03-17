@@ -34,23 +34,18 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("AstroGUI")
-
-        #layout1.setContentsMargins(0,0,0,0)
-        #layout1.setSpacing(20)
         self.navigator = Navigator(0)
 
         mainLayout = QVBoxLayout()
+
+        # configure the top layout
         topLayout = QHBoxLayout()
         topLayout.setContentsMargins(0,0,0,0)
         topLayout.setSpacing(0)
-        midLayout = QHBoxLayout()
-        botLayout = self.navigator.layout
-
-        plotLayout = QVBoxLayout()
-        rightButtons = QVBoxLayout()
 
         magLabel = QLabel("What is the DELTA-MAG of -+2 neighbors on the CCD", self)
         magLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
         metaLabel = QLabel("Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal")
         metaLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         metaLabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -58,32 +53,13 @@ class MainWindow(QMainWindow):
         topLayout.addWidget(magLabel)
         topLayout.addWidget(metaLabel)
         
+        # configure the middle layout
+        midLayout = QHBoxLayout()
 
-        mainLayout.addLayout(topLayout)
-        
-        plotLayout.addWidget(Color('green'),5)
-        midLayout.addLayout(plotLayout)
+        plotLayout = QVBoxLayout()
 
-        rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
-        signoiseButton = QPushButton("Show S/N spec")
-        rightButtons.addWidget(signoiseButton)
-        signoiseButton.clicked.connect(lambda: ShowSN(self.navigator.current))
-        
-        skygrabButton = QPushButton('Button to grab: Image cutout (DSS) 100\"x100\"')
-        rightButtons.addWidget(skygrabButton)
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
-        
-        rightButtons.addWidget(self.navigator.info_2cp)
-        rightButtons.addWidget(self.navigator.info_2xp)
-        midLayout.addLayout(rightButtons)
-        #midLayout.addWidget(Color('green'))
-        #midLayout.addWidget(Color('teal'))
-
-        mainLayout.addLayout(midLayout)
-
-        plotLayout.addWidget(self.navigator.bigFig) #should bigFig be in a Plotter instead of the Navigator?
         redshiftLayout = QHBoxLayout()
-        plotLayout.addLayout(redshiftLayout)
+        
         redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
         templateDropdown = QComboBox()
         templateDropdown.addItem('galaxy-pass')
@@ -91,11 +67,37 @@ class MainWindow(QMainWindow):
         templateDropdown.addItem('new-qso-lowz')
         templateDropdown.addItem('new-qso-midz')
         templateDropdown.addItem('qso')
-        templateDropdown.addItem('star-A')#add dropdown with templates
+        templateDropdown.addItem('star-A')
         redshiftLayout.addWidget(templateDropdown)
 
-        mainLayout.addLayout(botLayout)
+        plotLayout.addWidget(Color('green'),5)
+        plotLayout.addLayout(redshiftLayout)
+        plotLayout.addWidget(self.navigator.bigFig)
 
+        rightButtons = QVBoxLayout()
+
+        signoiseButton = QPushButton("Show S/N spec")
+        signoiseButton.clicked.connect(lambda: ShowSN(self.navigator.current))
+
+        skygrabButton = QPushButton('Button to grab: Image cutout (DSS) 100\"x100\"')        
+        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
+
+        rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
+        rightButtons.addWidget(signoiseButton)
+        rightButtons.addWidget(skygrabButton)
+        rightButtons.addWidget(self.navigator.info_2cp)
+        rightButtons.addWidget(self.navigator.info_2xp)
+
+        midLayout.addLayout(plotLayout)
+        midLayout.addLayout(rightButtons)     
+
+        # configure the bottom layout
+        botLayout = self.navigator.layout
+
+        mainLayout.addLayout(topLayout)
+        mainLayout.addLayout(midLayout)
+        mainLayout.addLayout(botLayout)
+        
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
