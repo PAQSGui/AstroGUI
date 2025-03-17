@@ -21,6 +21,8 @@ redFig = plt.figure('r')
 greenFig = plt.figure('g')
 blueFig = plt.figure('b')
 
+# check check
+
 #pack functions
 pack0=lambda el,s: el.pack(padx=5, pady=5, side=s, fill=tk.BOTH)
 pack1=lambda el,s: el.pack(padx=5, pady=5, side=s)
