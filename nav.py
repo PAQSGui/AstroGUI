@@ -44,6 +44,7 @@ class Navigator:
         self.files = self.directory.entryList()
         self.cursor = cursor
         self.bigFig = FigureCanvasQTAgg(figure('k'))
+        self.whyInput = QTextEdit()
 
         backButton = QPushButton("Back")
         backButton.clicked.connect(lambda: NavBtn(self, msg="Back",delta=-1))
@@ -58,9 +59,8 @@ class Navigator:
         unsureButton.clicked.connect(lambda: NavBtn(self, msg="Unsure",delta=1))
 
         whyLayout = QVBoxLayout()
-        whyInput = QTextEdit()
         whyLayout.addWidget(QLabel("Why, or why not:\nWrong template; wrong redshift (4XP);\nwrong class (4CP);\nBad data (L1); Maybe sat.?"))
-        whyLayout.addWidget(whyInput)
+        whyLayout.addWidget(self.whyInput)
         self.layout.addLayout(whyLayout)
 
         self.info_2xp=QLabel("2XP: best-fit template + Z\_BEST (plus lines)")
@@ -125,11 +125,23 @@ class Navigator:
         plotter.PlotFile(file)
         self.bigFig.draw()
 
+    def getUserInput(self):
+        text = self.whyInput.toPlainText()
+        self.whyInput.clear()
+        return text
+
+
 def NavBtn (navigator, msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
     print("Button clicked: " + msg)
     with open("data.csv", "a") as f:
         # Replace 'files[cursor]' waith the target name once we can extract that information
-        f.write(f"{navigator.getCurrentFile()}, {msg}\n")
+        data = f"{navigator.getCurrentFile()},{msg}"
+        usrinput = navigator.getUserInput()
+        if usrinput != "":
+            data += f",{usrinput}\n"
+        else:
+            data += ",NO_INPUT\n"
+        f.write(data)
     navigator.updateCursor(delta)
     navigator.loadFile(delta)
