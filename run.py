@@ -21,7 +21,8 @@ from PySide6.QtCore import (
 
 from nav import Navigator
 from ssPicture import LoadPicture
-from plotter import ShowSN
+from plotter import Plotter
+from fitter import Fitter
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -29,12 +30,17 @@ from plotter import ShowSN
 # Bottom is the 'Yes', 'No' etc buttons
 
 class MainWindow(QMainWindow):
-    navigator : Navigator
+    navigator:  Navigator
+    plotter:    Plotter
+    fitter:     Fitter
+
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("AstroGUI")
-        self.navigator = Navigator(0)
+        self.plotter = Plotter()
+        self.fitter = Fitter()
+        self.navigator = Navigator(0, self.plotter, self.fitter)
 
         mainLayout = QVBoxLayout()
 
@@ -72,12 +78,12 @@ class MainWindow(QMainWindow):
 
         plotLayout.addWidget(Color('green'),5)
         plotLayout.addLayout(redshiftLayout)
-        plotLayout.addWidget(self.navigator.bigFig)
+        plotLayout.addLayout(self.plotter.layout)
 
         rightButtons = QVBoxLayout()
 
         signoiseButton = QPushButton("Show S/N spec")
-        signoiseButton.clicked.connect(lambda: ShowSN(self.navigator.current))
+        signoiseButton.clicked.connect(lambda: Plotter(self.navigator.current).showSN())
 
         skygrabButton = QPushButton('Button to grab: Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
@@ -85,8 +91,8 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addWidget(self.navigator.info_2cp)
-        rightButtons.addWidget(self.navigator.info_2xp)
+        rightButtons.addWidget(QLabel(self.fitter.info_2cp))
+        rightButtons.addWidget(QLabel(self.fitter.info_2xp))
 
         midLayout.addLayout(plotLayout)
         midLayout.addLayout(rightButtons)     
@@ -102,6 +108,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
         self.setMinimumSize(QSize(600, 400))
+
         self.navigator.openFolder()
 
 

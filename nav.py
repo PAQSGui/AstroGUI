@@ -3,6 +3,7 @@ import os
 import Spec_tools as tool
 from xpca.pipeline import Pipeline
 import plotter
+from fitter import Fitter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 
@@ -32,19 +33,19 @@ class Navigator:
     current: tool.SDSS_spectrum
     layout: QHBoxLayout
     pipe: Pipeline
-    bigFig : FigureCanvasQTAgg
-    info_2xp : QLabel
-    info_2cp : QLabel
+    fitter: Fitter
 
-    def __init__(self, cursor):
+    def __init__(self, cursor, plotter, fitter):
         self.pipe=Pipeline()
         self.layout = QHBoxLayout()
         self.directory = QDir("./spectra")
         self.directory.setNameFilters(["([^.]*)","*.fits"])
         self.files = self.directory.entryList()
         self.cursor = cursor
-        self.bigFig = FigureCanvasQTAgg(figure('k'))
+        self.plotter = plotter
+        self.fitter = fitter
         self.whyInput = QTextEdit()
+
 
         backButton = QPushButton("Back")
         backButton.clicked.connect(lambda: NavBtn(self, msg="Back",delta=-1))
@@ -63,9 +64,6 @@ class Navigator:
         whyLayout.addWidget(self.whyInput)
         self.layout.addLayout(whyLayout)
 
-        self.info_2xp=QLabel("2XP: best-fit template + Z\_BEST (plus lines)")
-        self.info_2cp=QLabel("2CP: CLASS, PROB, CLASS2, PROB2")
-
         self.layout.addWidget(backButton)
         self.layout.addWidget(yesButton)
         self.layout.addWidget(noButton)
@@ -77,6 +75,9 @@ class Navigator:
     
     def getCurrentFile(self):
         return self.files[self.cursor]
+    
+    def getCurrentFilePath(self):
+        return self.directory.absoluteFilePath(self.getCurrentFile())  
         
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta
@@ -97,7 +98,6 @@ class Navigator:
         self.cursor = 0
         self.loadFile()
 
-    
     def loadFile(self, delta=1):
         print("Current File: " + self.getCurrentFile())
 
@@ -112,18 +112,9 @@ class Navigator:
                 continue
         self.UpdateGraph(self.current)
 
-
-
     def UpdateGraph(self, file):
-        self.pipe.run(self.directory.absoluteFilePath(self.getCurrentFile()),source='sdss')
-        #print(pipe.catalog_items)
-        ZBEST=self.pipe.catalog_items[0]['zBest']
-        CLASS=self.pipe.catalog_items[0]['zBestSubType']
-        PROB=self.pipe.catalog_items[0]['zBestProb']
-        self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
-        self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
-        plotter.PlotFile(file)
-        self.bigFig.draw()
+        self.plotter.addFile(file)
+        self.fitter.fitFile(self.getCurrentFilePath())
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
