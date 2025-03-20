@@ -110,12 +110,7 @@ class Navigator:
 
     def UpdateGraph(self, file):
         self.plotter.addFile(file)
-        self.pipe.run(self.directory.absoluteFilePath(self.getCurrentFile()),source='sdss')
-        ZBEST=self.pipe.catalog_items[0]['zBest']
-        CLASS=self.pipe.catalog_items[0]['zBestSubType']
-        PROB=self.pipe.catalog_items[0]['zBestProb']
-        #self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
-        #self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
+        self.fitter.fitFile(file)
 
 def NavBtn (navigator, msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?

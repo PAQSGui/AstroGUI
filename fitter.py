@@ -19,3 +19,5 @@ class Fitter:
         ZBEST=self.pipe.catalog_items[0]['zBest']
         CLASS=self.pipe.catalog_items[0]['zBestSubType']
         PROB=self.pipe.catalog_items[0]['zBestProb']
+        self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
+        self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
