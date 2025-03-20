@@ -74,6 +74,9 @@ class Navigator:
     
     def getCurrentFile(self):
         return self.files[self.cursor]
+    
+    def getCurrentFilePath(self):
+        return self.directory.absoluteFilePath(self.getCurrentFile())  
         
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta
@@ -110,7 +113,7 @@ class Navigator:
 
     def UpdateGraph(self, file):
         self.plotter.addFile(file)
-        self.fitter.fitFile(file)
+        self.fitter.fitFile(self.getCurrentFilePath())
 
 def NavBtn (navigator, msg, delta):
     #Tests: Can you go out of bounds? Is the selected file a FITS? Is it the correct format of FITS?
