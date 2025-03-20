@@ -6,6 +6,7 @@ import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
+    QLabel,
     )
 
 class Plotter:
@@ -13,13 +14,12 @@ class Plotter:
     layout: QHBoxLayout 
     file: tool.SDSS_spectrum
     bigFig : FigureCanvasQTAgg
-    info_2xp : str
-    info_2cp : str
 
     def __init__(self):
         self.layout = QHBoxLayout()
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.layout.addWidget(self.bigFig)
+
 
     def addFile(self, file):
         self.file = file

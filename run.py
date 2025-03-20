@@ -22,6 +22,7 @@ from PySide6.QtCore import (
 from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
+from fitter import Fitter
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -29,15 +30,17 @@ from plotter import Plotter
 # Bottom is the 'Yes', 'No' etc buttons
 
 class MainWindow(QMainWindow):
-    navigator : Navigator
+    navigator:  Navigator
     plotter:    Plotter
+    fitter:     Fitter
 
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("AstroGUI")
         self.plotter = Plotter()
-        self.navigator = Navigator(0, self.plotter)
+        self.fitter = Fitter()
+        self.navigator = Navigator(0, self.plotter, self.fitter)
 
         mainLayout = QVBoxLayout()
 
@@ -88,8 +91,8 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addWidget(self.navigator.info_2cp)
-        rightButtons.addWidget(self.navigator.info_2xp)
+        rightButtons.addWidget(QLabel(self.fitter.info_2cp))
+        rightButtons.addWidget(QLabel(self.fitter.info_2xp))
 
         midLayout.addLayout(plotLayout)
         midLayout.addLayout(rightButtons)     
