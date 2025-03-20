@@ -36,7 +36,7 @@ class Navigator:
     info_2xp : QLabel
     info_2cp : QLabel
 
-    def __init__(self, cursor):
+    def __init__(self, cursor, plotter):
         self.pipe=Pipeline()
         self.layout = QHBoxLayout()
         self.directory = QDir("./spectra")
@@ -44,6 +44,7 @@ class Navigator:
         self.files = self.directory.entryList()
         self.cursor = cursor
         self.bigFig = FigureCanvasQTAgg(figure('k'))
+        self.plotter = plotter
 
         backButton = QPushButton("Back")
         backButton.clicked.connect(lambda: NavBtn(self, msg="Back",delta=-1))
@@ -115,6 +116,7 @@ class Navigator:
 
 
     def UpdateGraph(self, file):
+        self.plotter.addFile(file)
         self.pipe.run(self.directory.absoluteFilePath(self.getCurrentFile()),source='sdss')
         #print(pipe.catalog_items)
         ZBEST=self.pipe.catalog_items[0]['zBest']
@@ -122,7 +124,7 @@ class Navigator:
         PROB=self.pipe.catalog_items[0]['zBestProb']
         self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
         self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
-        plotter.PlotFile(file)
+        #plotter.PlotFile(file)
         self.bigFig.draw()
 
 def NavBtn (navigator, msg, delta):
