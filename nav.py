@@ -2,6 +2,7 @@
 import os
 import Spec_tools as tool
 from xpca.pipeline import Pipeline
+from xpca.targets import Target
 import plotter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
@@ -122,7 +123,7 @@ class Navigator:
         PROB=self.pipe.catalog_items[0]['zBestProb']
         self.info_2xp.setText("2XP: best-fit template + "+ str(ZBEST) +" (plus lines)")
         self.info_2cp.setText("2CP: "+ CLASS +", "+ str(PROB) +", CLASS2, PROB2")
-        plotter.PlotFile(file)
+        plotter.PlotFile(file,fit=self.pipe.catalog_items[0])
         self.bigFig.draw()
 
 def NavBtn (navigator, msg, delta):
@@ -133,3 +134,9 @@ def NavBtn (navigator, msg, delta):
         f.write(f"{navigator.getCurrentFile()}, {msg}\n")
     navigator.updateCursor(delta)
     navigator.loadFile(delta)
+
+
+#XPCA error with sdss
+#File "/home/artemis/Documents/AstroGUI/AstroGUI/.venv/lib/python3.12/site-packages/xpca/targets.py", line 140, in read_sdss_spectrum
+#    row = QTable.read(filename, 1)
+#astropy.io.registry.base.IORegistryError: Format could not be identified based on the file name or contents, please provide a 'format' argument.
