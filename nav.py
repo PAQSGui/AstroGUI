@@ -113,8 +113,8 @@ class Navigator:
         self.UpdateGraph(self.current)
 
     def UpdateGraph(self, file):
-        self.plotter.addFile(file)
         self.fitter.fitFile(self.getCurrentFilePath())
+        self.plotter.addFile(file, self.fitter.getBestGuess())
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()

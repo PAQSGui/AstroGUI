@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
+import templater
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -21,11 +22,11 @@ class Plotter:
         self.layout.addWidget(self.bigFig)
 
 
-    def addFile(self, file):
+    def addFile(self, file, template):
         self.file = file
-        self.PlotFile()
+        self.PlotFile(template)
 
-    def PlotFile(self):
+    def PlotFile(self, template = 'EMPTY'):
 
         visrange = np.linspace(3800, 7500, 4)
 
@@ -34,6 +35,9 @@ class Plotter:
         #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
         self.bigFig.draw()
+
+        if template != 'EMPTY':
+            templater.DrawTemplate(template, 'k')
 
 
     def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):

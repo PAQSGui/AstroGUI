@@ -6,7 +6,7 @@ from astropy.io.fits import getdata
 from astropy.io.fits import getheader
 from astropy.io import fits
 
-def DrawTemplate(template):
+def DrawTemplate(template, key):
 
     fileName = GetFileName(template)
 
@@ -27,13 +27,12 @@ def DrawTemplate(template):
         Wavelength.append(startwavelength + totalDispersion)
 
     Wavelength = np.array(Wavelength) #convert from list to numpy array
-
-    plt.figure()
+    plt.figure(key)
     plt.step(Wavelength, Flux, label = 'Flux')
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.title('test')
-    plt.show()
+    #plt.show()
 
 
 def GetFileName(template):
@@ -48,5 +47,6 @@ def GetFileName(template):
     elif template == 'QSO':
         return "templates/template-qso.fits"
     else:
-        return "templates/template-star-A.fits"
+        return "templates/template-qso.fits"
+
     
