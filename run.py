@@ -9,10 +9,12 @@ from PySide6.QtWidgets import (
     QSlider,
     QComboBox,
     QSizePolicy,
+    QMenuBar,
     )
 from PySide6.QtGui import (
     QPalette,
     QColor,
+    QAction,
     Qt,
 )
 from PySide6.QtCore import (
@@ -43,6 +45,26 @@ class MainWindow(QMainWindow):
         self.navigator = Navigator(0, self.plotter, self.fitter)
 
         mainLayout = QVBoxLayout()
+
+        # add toolbar
+        menu = self.menuBar()
+        file_menu = menu.addMenu("&File")
+
+        button_open = QAction("Open Folder", self)
+        button_open.setStatusTip("Open a folder and plot FITS files inside")
+        button_open.triggered.connect(lambda: self.navigator.openFolder())
+        file_menu.addAction(button_open)
+
+        button_options = QAction("Options", self)
+        button_options.setStatusTip("Open a window to configure the program")
+        button_options.triggered.connect(lambda: self.plotter.optionsWindow())
+        file_menu.addAction(button_options)
+
+        button_quit = QAction("Exit", self)
+        button_quit.setStatusTip("Exit program")
+        button_quit.triggered.connect(lambda: app.quit())
+        file_menu.addAction(button_quit)
+
 
         # configure the top layout
         topLayout = QHBoxLayout()
