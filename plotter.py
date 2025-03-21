@@ -20,7 +20,7 @@ def PlotFile(file,fit=None):
 
 def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400],targetId=0,targetName="Unknown",fit=None):
     #Unsupported array type
-    #targetSpec=Spectrum(u.Quantity(file.Wavelength,u.Angstrom),u.Quantity(file.Flux,u.erg/(u.s*u.cm**2*u.Angstrom)),u.Quantity(file.Noise,u.erg/(u.s*u.cm**2*u.Angstrom)))
+    #targetSpec=Spectrum(u.Quantity(file.Wavelength,u.Unit('AA')),u.Quantity(file.Flux,u.Unit('erg/(s cm2 AA)')),u.Quantity(file.Noise,u.Unit('erg/(s cm2 AA)')))
     #target=Target(uid=targetId,name=targetName,spectrum=targetSpec)
     #fig=plotting.plot_target(target,fit)
     fig=plt.figure(key)
@@ -29,10 +29,13 @@ def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400],targetId=0,t
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
-    create_PCA_model(file,fit)
+    try:
+        create_PCA_model(file,fit)
+    except TypeError:
+        print(fit)
     plt.legend()
-    canv=FigureCanvasQTAgg(fig)
-    canv.show()
+    #canv=FigureCanvasQTAgg(fig)
+    #canv.show()
 
     if limitPlot:
         plt.xlim(range)
