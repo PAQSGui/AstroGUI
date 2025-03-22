@@ -1,52 +1,64 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from xpca import plotting
-from xpca.targets import Target
-from xpca.spectrum import Spectrum
-from astropy import units as u
+from matplotlib.pyplot import figure
+import Spec_tools as tool
+import templater
 
-from temppplot import plotTemplate
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    )
 
-def PlotFile(file,fit=None):
+class Plotter:
 
-    visrange = np.linspace(3800, 7500, 4)
+    layout: QHBoxLayout 
+    file: tool.SDSS_spectrum
+    bigFig : FigureCanvasQTAgg
 
-    UpdateFigure(file, 'k', fit=fit)
-    UpdateFigure(file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
-    UpdateFigure(file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
-    UpdateFigure(file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
+    def __init__(self):
+        self.layout = QHBoxLayout()
+        self.bigFig = FigureCanvasQTAgg(figure('k'))
+        self.layout.addWidget(self.bigFig)
 
 
-def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400],targetId=0,targetName="Unknown",fit=None):
-    #Unsupported array type
-    #targetSpec=Spectrum(u.Quantity(file.Wavelength,u.Unit('AA')),u.Quantity(file.Flux,u.Unit('erg/(s cm2 AA)')),u.Quantity(file.Noise,u.Unit('erg/(s cm2 AA)')))
-    #target=Target(uid=targetId,name=targetName,spectrum=targetSpec)
-    #fig=plotting.plot_target(target,fit)
-    fig=plt.figure(key)
-    plt.clf() #clear figure
-    plt.step(file.Wavelength, file.Flux, color = key) #figure key is used for color
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux (erg/s/cm2/Å)')
-    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
-    try:
-        plotTemplate(file,fit)
-    except TypeError:
-        print(fit)
-    plt.legend()
-    #canv=FigureCanvasQTAgg(fig)
-    #canv.show()
+    def addFile(self, file, template):
+        self.file = file
+        self.PlotFile(template)
 
-    if limitPlot:
-        plt.xlim(range)
-    else: 
-        plt.title(file.Objectname)  
+    def PlotFile(self, template = 'EMPTY'):
 
-def ShowSN(file):
-    fig = plt.figure()
-    plt.step(file.Wavelength, file.Flux/file.Noise)
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux/Noise Ratio')
-    plt.title(file.Objectname+" S/N Spectrum")
-    canv=FigureCanvasQTAgg(fig)
-    canv.show()
+        visrange = np.linspace(3800, 7500, 4)
+
+        self.UpdateFigure('k')
+        #self.UpdateFigure(self.file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
+        #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
+        #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
+
+        if template != 'EMPTY':
+            templater.plotTemplate(self.file,fit)
+        plt.legend()
+        self.bigFig.draw()
+
+
+    def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):
+        plt.figure(key)
+        plt.clf() #clear figure
+        plt.step(self.file.Wavelength, self.file.Flux, color = key) #figure key is used for color
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux (erg/s/cm2/Å)')
+        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5')
+
+        if limitPlot:
+            plt.xlim(range)
+        else: 
+            plt.title(self.file.Objectname)  
+
+    def ShowSN(file):
+        fig = plt.figure()
+        plt.step(file.Wavelength, file.Flux/file.Noise)
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux/Noise Ratio')
+        plt.title(file.Objectname+" S/N Spectrum")
+        canv=FigureCanvasQTAgg(fig)
+        canv.show()
