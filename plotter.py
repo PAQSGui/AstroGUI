@@ -34,10 +34,11 @@ class Plotter:
         #self.UpdateFigure(self.file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
         #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
-        self.bigFig.draw()
 
         if template != 'EMPTY':
             templater.DrawTemplate(template, 'k')
+        plt.legend()
+        self.bigFig.draw()
 
 
     def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):
@@ -47,7 +48,6 @@ class Plotter:
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5')
-        plt.legend()
 
         if limitPlot:
             plt.xlim(range)

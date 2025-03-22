@@ -28,7 +28,7 @@ def DrawTemplate(template, key):
 
     Wavelength = np.array(Wavelength) #convert from list to numpy array
     plt.figure(key)
-    plt.step(Wavelength, Flux, label = 'Flux')
+    plt.step(Wavelength, Flux, label = 'Template')
     plt.xlabel('Wavelength (Å)')
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.title('test')
