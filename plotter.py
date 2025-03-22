@@ -6,7 +6,7 @@ from xpca.targets import Target
 from xpca.spectrum import Spectrum
 from astropy import units as u
 
-from temppplot import create_PCA_model
+from temppplot import plotTemplate
 
 def PlotFile(file,fit=None):
 
@@ -30,7 +30,7 @@ def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400],targetId=0,t
     plt.ylabel('Flux (erg/s/cm2/Å)')
     plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
     try:
-        create_PCA_model(file,fit)
+        plotTemplate(file,fit)
     except TypeError:
         print(fit)
     plt.legend()

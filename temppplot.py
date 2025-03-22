@@ -11,6 +11,10 @@ from astropy import units as u
 from xpca import config
 from xpca.template import PCATemplate
 
+from xpca.targets import Target
+from xpca.spectrum import Spectrum
+from xpca import plotting as template
+
 def DrawTemplate(template):
     fileName = GetFileName(template)
 
@@ -38,38 +42,15 @@ def GetFileName(template):
         return "templates/template-star-A.fits"
     
 
-def create_PCA_model(spectrum, l2_product):
-    """
-    stolen from xpca
-    """
-    wavelength = spectrum.Wavelength*u.Unit("AA")
-    name = l2_product['zBestSubType']
-    z = l2_product['zBest']
-    coeffs = l2_product['zBestPars']
-    if '--' in name:
-        name = name.replace('--', '-')
-    fname = config.TEMPLATE_PATH / f'template-{name.lower()}.fits'
-    coeffs = coeffs[coeffs.nonzero()[0]]
+def plotTemplate(spec, l2_product):
+    target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*u.Unit("AA"),spec.Flux*u.Unit("erg/(s cm2 AA)"),spec.Noise*u.Unit("erg/(s cm2 AA)")))
     try:
-        best_fit = PCATemplate.read(fname)
+        wave, model = template.create_PCA_model(target,l2_product)
     except FileNotFoundError:
-        try:
-            fname = config.TEMPLATE_PATH / f'template-new-{name.lower()}.fits'
-            best_fit = PCATemplate.read(fname)
-        except FileNotFoundError:
-            fname = config.TEMPLATE_PATH / f'template-{l2_product['zBestType'].lower()}.fits'
-            best_fit = PCATemplate.read(fname)
-    best_fit = best_fit.rebin(wavelength, z=z, N=config.MAX_COEFFS)
-
-    # Prepare Chebyshev polynomials:
-    x = np.linspace(-1, 1, len(wavelength))
-    cheb = []
-    for n_cheb in range(0, config.CHEB_ORDER):
-        C_i = np.polynomial.Chebyshev([0] * n_cheb + [1])(x)
-        cheb.append(C_i)
-    cheb = np.array(cheb)
-    best_fit.flux = np.vstack([best_fit.flux, cheb]) #ValueError: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 13637 and the array at index 1 has size 4605
-    wave, model = best_fit(coeffs)
+        print("not found, trying by appending new, this is a bad solution tho")
+        name = l2_product['zBestSubType']
+        l2_product['zBestSubType']=f'new-{name}'
+        wave, model = template.create_PCA_model(target,l2_product)
 
     chi2 = l2_product['zBestChi2'] / l2_product['zBestNfree']
     #title_str += f"\n z = {z:.5f}  Class: {name}  $\\chi^2 = {chi2:.2f}$"
