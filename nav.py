@@ -104,7 +104,7 @@ class Navigator:
 
         while True:
             try:
-                print(str(self.directory))
+                #print(str(self.directory))
                 self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile())) #not OS safe I think
                 print("Current File: " + self.getCurrentFile())
                 break
