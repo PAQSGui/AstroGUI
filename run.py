@@ -113,11 +113,14 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addWidget(QLabel(self.fitter.info_2cp))
-        rightButtons.addWidget(QLabel(self.fitter.info_2xp))
+        rightButtons.addLayout(self.fitter.layout)
+        #rightButtons.addWidget(QLabel("Class, probability:"))
+        #rightButtons.addWidget(self.fitter.info_1cp)
+        #rightButtons.addWidget(self.fitter.info_2cp)
+        #rightButtons.addWidget(self.fitter.info_2xp)
 
         midLayout.addLayout(plotLayout)
-        midLayout.addLayout(rightButtons)     
+        midLayout.addLayout(rightButtons) 
 
         # configure the bottom layout
         botLayout = self.navigator.layout
