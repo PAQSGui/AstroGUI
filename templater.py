@@ -23,6 +23,8 @@ from xpca import config
 #https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
 from os import listdir
 
+import re
+
 class Templater:
 
     layout: QHBoxLayout 
@@ -36,6 +38,8 @@ class Templater:
             if file.endswith(".fits"):
                 self.dropdown.addItem(file)
         self.layout.addWidget(self.dropdown)
+
+        self.dropdown.currentTextChanged.connect(self.text_changed)
 
     def plotTemplate(self, spec, l2_product):
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
@@ -54,5 +58,12 @@ class Templater:
         #set combobox text:
         print(l2_product['zBestSubType']) 
         self.dropdown.setCurrentText(f'template-{l2_product['zBestSubType'].lower()}.fits') 
+        self.l2_current=l2_product
+    
 
+    def text_changed(self, s):
+
+        print("Text changed:", s)
+        result = re.search(f'template-(.+).fits', s)
+        print(result.group(1))
     
