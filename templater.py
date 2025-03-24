@@ -24,6 +24,7 @@ from xpca import config
 from os import listdir
 
 import re
+#from shutil import copyfile
 
 class Templater:
 
@@ -79,4 +80,10 @@ class Templater:
                     self.plotter.PlotFile(self.l2_current)
                     break
         
-    
+    #except FileNotFoundError:
+    #        for file in listdir(config.TEMPLATE_PATH):
+    #            result = re.search(f'template-(?:new-)?(.+).fits', file)
+    #            if result!=None and result.group(1).lower()==l2_product['zBestSubType'].lower:
+    #                copyfile(config.TEMPLATE_PATH / file, config.TEMPLATE_PATH / l2_product['zBestSubType'].lower)
+    #                wave, model = template.create_PCA_model(target,l2_product)
+    #                break
