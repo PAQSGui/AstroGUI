@@ -26,11 +26,6 @@ from ssPicture import LoadPicture
 from plotter import Plotter
 from fitter import Fitter
 
-from xpca import config
-#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
-from os import listdir
-from glob import glob
-
 # Layout should be top, middle, bottom
 # Top is just meta data etc
 # Middle is the plots and 'show' buttons
@@ -89,22 +84,7 @@ class MainWindow(QMainWindow):
         # configure the middle layout
         midLayout = QHBoxLayout()
 
-        plotLayout = QVBoxLayout()
 
-        redshiftLayout = QHBoxLayout()
-        
-        redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
-        #print(listdir(config.TEMPLATE_PATH))
-        templateDropdown = QComboBox()
-        #dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
-        for file in listdir(config.TEMPLATE_PATH):
-            # check the files which are end with specific extension
-            if file.endswith(".fits"):
-                templateDropdown.addItem(file)
-        redshiftLayout.addWidget(templateDropdown)
-
-        plotLayout.addLayout(redshiftLayout)
-        plotLayout.addLayout(self.plotter.layout)
 
         rightButtons = QVBoxLayout()
 
@@ -123,7 +103,7 @@ class MainWindow(QMainWindow):
         #rightButtons.addWidget(self.fitter.info_2cp)
         #rightButtons.addWidget(self.fitter.info_2xp)
 
-        midLayout.addLayout(plotLayout)
+        midLayout.addLayout(self.plotter.layout)
         midLayout.addLayout(rightButtons) 
 
         # configure the bottom layout

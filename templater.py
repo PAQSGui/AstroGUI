@@ -11,6 +11,32 @@ from xpca.targets import Target
 from xpca.spectrum import Spectrum
 from xpca import plotting as template
 
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QComboBox,
+    QSlider,
+    )
+from PySide6.QtGui import (
+    Qt,
+)
+from xpca import config
+#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
+from os import listdir
+
+class Templater:
+
+        layout: QHBoxLayout 
+        dropdown: QComboBox
+        def __init__(self):
+            self.layout = QHBoxLayout()
+            
+            self.layout.addWidget(QSlider(Qt.Orientation.Horizontal))
+            self.dropdown = QComboBox()
+            for file in listdir(config.TEMPLATE_PATH):
+                if file.endswith(".fits"):
+                    self.dropdown.addItem(file)
+            self.layout.addWidget(self.dropdown)
+
 def DrawTemplate(template, key):
 
     fileName = GetFileName(template)
