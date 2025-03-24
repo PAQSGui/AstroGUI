@@ -2,6 +2,7 @@
 from xpca.pipeline import Pipeline
 from PySide6.QtWidgets import (
     QLabel,
+    QVBoxLayout,
     )
 
 class Fitter:
@@ -9,36 +10,41 @@ class Fitter:
     pipe: Pipeline
     l2_product: dict
     best : str
-    info_2xp : QLabel
-    info_1cp : QLabel
-    info_2cp : QLabel
-    info1 : QLabel
+    layout: QVBoxLayout
+    templateInfo: QLabel
 
     def __init__(self):
         self.pipe = Pipeline()
-
-        self.info_2xp = QLabel()
-        self.info_1cp = QLabel()
-        self.info_2cp = QLabel()
-        self.info1 = QLabel("testing") 
+        self.layout = QVBoxLayout()
 
     def fitFile(self, filePath):
+        self.clearLayout()
         self.pipe.run(filePath, source='sdss')
-        self.l2_product = self.pipe.catalog_items[0]
-        ZBEST  = self.l2_product['zBest']
-        CLASS  = self.l2_product['zBestSubType']
-        PROB   = self.l2_product['zBestProb'] * 100
-        CLASS2 = self.l2_product['zAltSubType'][0]
-        PROB2  = self.l2_product['zAltProb'][0] * 100
-        self.best = str(CLASS)
-        self.info_2xp.setText(CLASS + ": " + str(ZBEST) +" (plus lines)")
-        self.info_1cp.setText(CLASS + ', %.2f %%' % PROB)
-        self.info_2cp.setText(CLASS2 + ', %.2f %%' % PROB2)
+        l2_product = self.pipe.catalog_items[0]
+        self.l2_product = l2_product
 
-        self.info1.setText("updated")
+        ZBEST  = self.l2_product['zBest']
+        self.best = l2_product['zBestSubType']
+        self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
+
+        self.layout.addWidget(QLabel("Class, Probability"))
+
+        classification = l2_product['zBestSubType']
+        probability    = l2_product['zBestProb'] * 100
+
+        self.layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
+
+        for i in range(len(l2_product['zAltSubType'])):
+            probability = l2_product['zAltProb'][i] * 100
+            if probability > 10:
+                text = l2_product['zAltSubType'][i] + ': %.2f %%' % probability
+                self.layout.addWidget(QLabel(text))
 
     def getBestGuess(self):
         return self.best
 
     def getl2_product(self):
         return self.l2_product
+    
+    def clearLayout(self):
+        for i in range(self.layout.count()): self.layout.itemAt(i).widget().close()
