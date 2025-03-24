@@ -1,3 +1,9 @@
+
+## Saves the follwing fields in a csv file:
+#  name, boolean indicating wheter the object has been categorized, category if applicable else none, notes, redshift if applicable else 0
+
+#  should also save:
+# the date
 class Database():
     dataFile = ""
 
