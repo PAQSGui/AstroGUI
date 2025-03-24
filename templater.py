@@ -29,7 +29,8 @@ class Templater:
 
     layout: QHBoxLayout 
     dropdown: QComboBox
-    def __init__(self):
+    def __init__(self, plotter):
+        self.plotter = plotter
         self.layout = QHBoxLayout()
         
         self.layout.addWidget(QSlider(Qt.Orientation.Horizontal))
@@ -39,7 +40,7 @@ class Templater:
                 self.dropdown.addItem(file)
         self.layout.addWidget(self.dropdown)
 
-        self.dropdown.currentTextChanged.connect(self.text_changed)
+        self.dropdown.textActivated.connect(self.text_changed)
 
     def plotTemplate(self, spec, l2_product):
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
@@ -48,19 +49,19 @@ class Templater:
         except FileNotFoundError:
             print("not found, trying by appending new, this is a bad solution tho")
             name = l2_product['zBestSubType']
+            print(name)
             l2_product['zBestSubType']=f'new-{name}'
             wave, model = template.create_PCA_model(target,l2_product)
 
         chi2 = l2_product['zBestChi2'] / l2_product['zBestNfree']
         #title_str += f"\n z = {z:.5f}  Class: {name}  $\\chi^2 = {chi2:.2f}$"
-        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = 'Template')
+        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = l2_product['zBestSubType'])
 
         #set combobox text:
         #print(l2_product['zBestSubType']) 
         self.dropdown.setCurrentText(f'template-{l2_product['zBestSubType'].lower()}.fits') 
         self.spec_current=spec
         self.l2_current=l2_product
-        print(plt.gcf)
     
 
     def text_changed(self, s):
@@ -69,12 +70,13 @@ class Templater:
         self.l2_current['zBestSubType']=result.group(1)
         
         try:
-            self.plotTemplate(self.spec_current, self.l2_current)
+            self.plotter.PlotFile(self.l2_current)
         except FileNotFoundError:
             for file in listdir(config.TEMPLATE_PATH):
                 if file.lower()==s:
                     result = re.search(f'template-(.+).fits', file)
                     self.l2_current['zBestSubType']=result.group(1)
-                    self.plotTemplate(self.spec_current, self.l2_current)
+                    self.plotter.PlotFile(self.l2_current)
+                    break
         
     

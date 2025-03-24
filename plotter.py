@@ -30,14 +30,16 @@ class Plotter:
     def __init__(self):
         self.layout = QVBoxLayout()
 
-        self.templater = templater.Templater()
-        self.layout.addLayout(self.templater.layout)
 
         plotLayout = QHBoxLayout()
 
         self.lineThickness=0.5
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.bigFig.setMinimumSize(QSize(560, 560))
+
+        self.templater = templater.Templater(self)
+        self.layout.addLayout(self.templater.layout)
+        
         plotLayout.addWidget(self.bigFig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
