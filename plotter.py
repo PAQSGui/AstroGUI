@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QLayout,
     )
 
+from PySide6.QtCore import QSize
+
 class Plotter:
 
     layout: QHBoxLayout 
