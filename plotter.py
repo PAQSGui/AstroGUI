@@ -7,6 +7,7 @@ import templater
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
+    QLayout,
     QVBoxLayout,
     QSlider,
     QLabel,
@@ -16,6 +17,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import (
     Qt,
 )
+
+from PySide6.QtCore import QSize
 
 class Plotter:
 
@@ -27,6 +30,8 @@ class Plotter:
         self.layout = QHBoxLayout()
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.layout.addWidget(self.bigFig)
+        self.bigFig.setMinimumSize(QSize(560, 560))
+        self.layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
         self.lineThickness=0.5
 
     def optionsWindow(self):
