@@ -6,6 +6,7 @@ import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
+    QLayout,
     )
 
 class Plotter:
@@ -18,6 +19,8 @@ class Plotter:
         self.layout = QHBoxLayout()
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.layout.addWidget(self.bigFig)
+        self.bigFig.setMinimumSize(QSize(560, 560))
+        self.layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
 
     def addFile(self, file):

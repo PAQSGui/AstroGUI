@@ -104,8 +104,7 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        self.setMinimumSize(QSize(600, 400))
-
+        #self.setMinimumSize(QSize(800, 800))
         self.navigator.openFolder()
 
 app = QApplication([])
