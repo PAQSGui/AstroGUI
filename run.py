@@ -100,9 +100,6 @@ class MainWindow(QMainWindow):
 
         rightButtons = QVBoxLayout()
 
-        label_2cp = QLabel(self.fitter.info_2cp, wordWrap=True)
-        label_2xp = QLabel(self.fitter.info_2xp, wordWrap=True)
-
         signoiseButton = QPushButton("Show S/N spec")
         signoiseButton.clicked.connect(lambda: Plotter(self.navigator.current).showSN())
 
