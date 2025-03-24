@@ -26,6 +26,11 @@ from ssPicture import LoadPicture
 from plotter import Plotter
 from fitter import Fitter
 
+from xpca import config
+#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
+from os import listdir
+from glob import glob
+
 # Layout should be top, middle, bottom
 # Top is just meta data etc
 # Middle is the plots and 'show' buttons
@@ -89,19 +94,19 @@ class MainWindow(QMainWindow):
         redshiftLayout = QHBoxLayout()
         
         redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
+        #print(listdir(config.TEMPLATE_PATH))
         templateDropdown = QComboBox()
-        dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
-        for opt in dropdown_opts:
-            templateDropdown.addItem(opt)
+        #dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
+        for file in listdir(config.TEMPLATE_PATH):
+            # check the files which are end with specific extension
+            if file.endswith(".fits"):
+                templateDropdown.addItem(file)
         redshiftLayout.addWidget(templateDropdown)
 
         plotLayout.addLayout(redshiftLayout)
         plotLayout.addLayout(self.plotter.layout)
 
         rightButtons = QVBoxLayout()
-
-        label_2cp = QLabel(self.fitter.info_2cp, wordWrap=True)
-        label_2xp = QLabel(self.fitter.info_2xp, wordWrap=True)
 
         signoiseButton = QPushButton("Show S/N spec")
         signoiseButton.clicked.connect(lambda: Plotter(self.navigator.current).showSN())
