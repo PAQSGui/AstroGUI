@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
+import templater
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -42,11 +43,11 @@ class Plotter:
     def setThickness(self,newValue):
         self.lineThickness=float(newValue)/10.0
 
-    def addFile(self, file):
+    def addFile(self, file, l2_product):
         self.file = file
-        self.PlotFile()
+        self.PlotFile(l2_product)
 
-    def PlotFile(self):
+    def PlotFile(self, l2_product = None):
 
         visrange = np.linspace(3800, 7500, 4)
 
@@ -54,6 +55,10 @@ class Plotter:
         #self.UpdateFigure(self.file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
         #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
+
+        if l2_product != None:
+            templater.plotTemplate(self.file,l2_product)
+        plt.legend()
         self.bigFig.draw()
 
 
@@ -64,7 +69,6 @@ class Plotter:
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
-        plt.legend()
 
         if limitPlot:
             plt.xlim(range)
@@ -76,6 +80,6 @@ class Plotter:
         plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=self.lineThickness)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux/Noise Ratio')
-        plt.title(file.Objectname+" S/N Spectrum")
+        plt.title(file.Objectname+"S/N Spectrum")
         canv=FigureCanvasQTAgg(fig)
         canv.show()
