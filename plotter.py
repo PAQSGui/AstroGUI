@@ -6,7 +6,6 @@ import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
-    QLabel,
     )
 
 class Plotter:

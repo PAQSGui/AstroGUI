@@ -11,7 +11,7 @@ class Fitter:
     def __init__(self):
         self.pipe = Pipeline()
 
-        self.info_2xp = "2XP: best-fit template + Z\_BEST (plus lines)"
+        self.info_2xp = "2XP: best-fit template + Z_BEST (plus lines)"
         self.info_2cp = "2CP: CLASS, PROB, CLASS2, PROB2"
 
     def fitFile(self, filePath):

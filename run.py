@@ -11,8 +11,6 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     )
 from PySide6.QtGui import (
-    QPalette,
-    QColor,
     Qt,
 )
 from PySide6.QtCore import (
@@ -68,31 +66,30 @@ class MainWindow(QMainWindow):
         
         redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
         templateDropdown = QComboBox()
-        templateDropdown.addItem('galaxy-pass')
-        templateDropdown.addItem('galaxy')
-        templateDropdown.addItem('new-qso-lowz')
-        templateDropdown.addItem('new-qso-midz')
-        templateDropdown.addItem('qso')
-        templateDropdown.addItem('star-A')
+        dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
+        for opt in dropdown_opts:
+            templateDropdown.addItem(opt)
         redshiftLayout.addWidget(templateDropdown)
 
-        plotLayout.addWidget(Color('green'),5)
         plotLayout.addLayout(redshiftLayout)
         plotLayout.addLayout(self.plotter.layout)
 
         rightButtons = QVBoxLayout()
 
+        label_2cp = QLabel(self.fitter.info_2cp, wordWrap=True)
+        label_2xp = QLabel(self.fitter.info_2xp, wordWrap=True)
+
         signoiseButton = QPushButton("Show S/N spec")
         signoiseButton.clicked.connect(lambda: Plotter(self.navigator.current).showSN())
 
-        skygrabButton = QPushButton('Button to grab: Image cutout (DSS) 100\"x100\"')        
+        skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
 
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addWidget(QLabel(self.fitter.info_2cp))
-        rightButtons.addWidget(QLabel(self.fitter.info_2xp))
+        rightButtons.addWidget(label_2cp)
+        rightButtons.addWidget(label_2xp)
 
         midLayout.addLayout(plotLayout)
         midLayout.addLayout(rightButtons)     
@@ -110,16 +107,6 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(QSize(600, 400))
 
         self.navigator.openFolder()
-
-
-class Color(QWidget):
-    def __init__(self, color):
-        super().__init__()
-        self.setAutoFillBackground(True)
-
-        palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(color))
-        self.setPalette(palette)
 
 app = QApplication([])
 
