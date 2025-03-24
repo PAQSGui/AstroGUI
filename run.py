@@ -113,8 +113,10 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addWidget(QLabel(self.fitter.info_2cp))
-        rightButtons.addWidget(QLabel(self.fitter.info_2xp))
+        rightButtons.addWidget(QLabel("Class, probability:"))
+        rightButtons.addWidget(self.fitter.info_1cp)
+        rightButtons.addWidget(self.fitter.info_2cp)
+        rightButtons.addWidget(self.fitter.info_2xp)
 
         midLayout.addLayout(plotLayout)
         midLayout.addLayout(rightButtons)     
