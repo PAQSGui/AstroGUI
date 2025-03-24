@@ -56,14 +56,25 @@ class Templater:
         plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = 'Template')
 
         #set combobox text:
-        print(l2_product['zBestSubType']) 
+        #print(l2_product['zBestSubType']) 
         self.dropdown.setCurrentText(f'template-{l2_product['zBestSubType'].lower()}.fits') 
+        self.spec_current=spec
         self.l2_current=l2_product
+        print(plt.gcf)
     
 
     def text_changed(self, s):
 
-        print("Text changed:", s)
         result = re.search(f'template-(.+).fits', s)
-        print(result.group(1))
+        self.l2_current['zBestSubType']=result.group(1)
+        
+        try:
+            self.plotTemplate(self.spec_current, self.l2_current)
+        except FileNotFoundError:
+            for file in listdir(config.TEMPLATE_PATH):
+                if file.lower()==s:
+                    result = re.search(f'template-(.+).fits', file)
+                    self.l2_current['zBestSubType']=result.group(1)
+                    self.plotTemplate(self.spec_current, self.l2_current)
+        
     
