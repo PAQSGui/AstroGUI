@@ -77,7 +77,7 @@ class Plotter:
 
     def ShowSN(file):
         fig = plt.figure()
-        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=self.lineThickness)
+        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux/Noise Ratio')
         plt.title(file.Objectname+"S/N Spectrum")
