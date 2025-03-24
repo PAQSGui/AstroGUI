@@ -2,6 +2,7 @@
 import os
 import Spec_tools as tool
 from xpca.pipeline import Pipeline
+from xpca.targets import Target
 import plotter
 from fitter import Fitter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -103,7 +104,7 @@ class Navigator:
 
         while True:
             try:
-                print(str(self.directory))
+                #print(str(self.directory))
                 self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile())) #not OS safe I think
                 print("Current File: " + self.getCurrentFile())
                 break
@@ -113,8 +114,8 @@ class Navigator:
         self.UpdateGraph(self.current)
 
     def UpdateGraph(self, file):
-        self.plotter.addFile(file)
         self.fitter.fitFile(self.getCurrentFilePath())
+        self.plotter.addFile(file, self.fitter.getl2_product())
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
@@ -136,3 +137,9 @@ def NavBtn (navigator, msg, delta):
         f.write(data)
     navigator.updateCursor(delta)
     navigator.loadFile(delta)
+
+
+#XPCA error with sdss
+#File "/home/artemis/Documents/AstroGUI/AstroGUI/.venv/lib/python3.12/site-packages/xpca/targets.py", line 140, in read_sdss_spectrum
+#    row = QTable.read(filename, 1)
+#astropy.io.registry.base.IORegistryError: Format could not be identified based on the file name or contents, please provide a 'format' argument.
