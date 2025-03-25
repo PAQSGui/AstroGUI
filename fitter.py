@@ -20,24 +20,23 @@ class Fitter:
     def fitFile(self, filePath):
         self.clearLayout()
         self.pipe.run(filePath, source='sdss')
-        l2_product = self.pipe.catalog_items[0]
-        self.l2_product = l2_product
+        self.l2_product = self.pipe.catalog_items[0]
 
         ZBEST  = self.l2_product['zBest']
-        self.best = l2_product['zBestSubType']
+        self.best = self.l2_product['zBestSubType']
         self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
 
         self.layout.addWidget(QLabel("Class, Probability"))
 
-        classification = l2_product['zBestSubType']
-        probability    = l2_product['zBestProb'] * 100
+        classification = self.l2_product['zBestSubType']
+        probability    = self.l2_product['zBestProb'] * 100
 
         self.layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
 
-        for i in range(len(l2_product['zAltSubType'])):
-            probability = l2_product['zAltProb'][i] * 100
+        for i in range(len(self.l2_product['zAltSubType'])):
+            probability = self.l2_product['zAltProb'][i] * 100
             if probability > 10:
-                text = l2_product['zAltSubType'][i] + ': %.2f %%' % probability
+                text = self.l2_product['zAltSubType'][i] + ': %.2f %%' % probability
                 self.layout.addWidget(QLabel(text))
 
     def getBestGuess(self):

@@ -6,7 +6,7 @@ from xpca.targets import Target
 import plotter
 from fitter import Fitter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.pyplot import figure
+from matplotlib.pyplot import figure, legend
 
 from PySide6.QtCore import (
     QSize,
@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
     QTextEdit,
     QLabel,
     )
+import templater
 
 class Navigator:
 
@@ -35,6 +36,7 @@ class Navigator:
     layout: QHBoxLayout
     pipe: Pipeline
     fitter: Fitter
+    templater : templater.Templater
 
     def __init__(self, cursor, plotter, fitter):
         self.pipe=Pipeline()
@@ -46,6 +48,8 @@ class Navigator:
         self.plotter = plotter
         self.fitter = fitter
         self.whyInput = QTextEdit()
+        self.templater = templater.Templater(self.plotter)
+        self.plotter.layout.addLayout(self.templater.layout)
 
 
         backButton = QPushButton("Back")
@@ -115,7 +119,15 @@ class Navigator:
 
     def UpdateGraph(self, file):
         self.fitter.fitFile(self.getCurrentFilePath())
-        self.plotter.addFile(file, self.fitter.getl2_product())
+        l2_product = self.fitter.getl2_product()
+        
+        self.plotter.addFile(file, l2_product)
+
+        if l2_product != None:
+            self.templater.plotTemplate(file, l2_product)
+        legend()
+        self.plotter.bigFig.draw()
+        
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
