@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
+import templater
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -24,6 +25,7 @@ class Plotter:
     layout: QHBoxLayout 
     file: tool.SDSS_spectrum
     bigFig : FigureCanvasQTAgg
+    templater : templater.Templater
 
     def __init__(self):
         self.layout = QVBoxLayout()
@@ -34,6 +36,9 @@ class Plotter:
         self.lineThickness=0.5
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.bigFig.setMinimumSize(QSize(560, 560))
+
+        self.templater = templater.Templater(self)
+        self.layout.addLayout(self.templater.layout)
         
         plotLayout.addWidget(self.bigFig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
@@ -67,6 +72,10 @@ class Plotter:
         #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
+        if l2_product != None:
+            self.templater.plotTemplate(self.file,l2_product)
+        plt.legend()
+        self.bigFig.draw()
 
 
     def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):
