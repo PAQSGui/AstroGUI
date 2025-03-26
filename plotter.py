@@ -66,8 +66,8 @@ class Plotter:
         #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
-        if self.l2_product != None:
-            templater.plotTemplate(self.file, self.l2_product)
+        #if self.l2_product != None:
+        #    templater.plotTemplate(self.file, self.l2_product)
         plt.legend()
         self.bigFig.draw()
 
