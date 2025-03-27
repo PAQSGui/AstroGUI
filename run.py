@@ -6,21 +6,12 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
-    QSlider,
-    QComboBox,
     QSizePolicy,
-    QMenuBar,
     )
 from PySide6.QtGui import (
-    QPalette,
-    QColor,
     QAction,
     Qt,
 )
-from PySide6.QtCore import (
-    QSize,
-)
-
 from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
@@ -84,8 +75,6 @@ class MainWindow(QMainWindow):
         # configure the middle layout
         midLayout = QHBoxLayout()
 
-
-
         rightButtons = QVBoxLayout()
 
         signoiseButton = QPushButton("Show S/N spec")
@@ -98,10 +87,6 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
         rightButtons.addLayout(self.fitter.layout)
-        #rightButtons.addWidget(QLabel("Class, probability:"))
-        #rightButtons.addWidget(self.fitter.info_1cp)
-        #rightButtons.addWidget(self.fitter.info_2cp)
-        #rightButtons.addWidget(self.fitter.info_2xp)
 
         midLayout.addLayout(self.plotter.layout)
         midLayout.addLayout(rightButtons) 
@@ -116,14 +101,11 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        #self.setMinimumSize(QSize(800, 800))
         self.navigator.openFolder()
 
 app = QApplication([])
 
 window = MainWindow()
 window.show()
-
-
 
 app.exec()
