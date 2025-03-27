@@ -63,8 +63,7 @@ class Templater:
         if firstLoad:
             self.setMiddle(l2_product)
             
-        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = 'Template')
-        
+
     def sliderrelease(self):
         self.l2_current['zBest']=float(self.zSlider.value())/100
         self.setMiddle(self.l2_current)

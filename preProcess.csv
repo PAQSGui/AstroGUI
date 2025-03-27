@@ -26,3 +26,6 @@ OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBe
 10247-58162-0834,0.13110723819640585,0.8678917548289722,QSO,QSO,[0.05030082 0.04322261 0.01502941 0.01375802],['STAR' 'GALAXY' 'STAR' 'STAR'],['STAR-K' 'GALAXY-PASS' 'STAR-A' 'STAR-CV'],"[ 6.53068994e-02  8.68470158e-03  4.44979354e-03 -5.37010035e-02
  -4.31717814e+00  8.32030208e+00 -3.16356198e+00  0.00000000e+00
   0.00000000e+00  0.00000000e+00  0.00000000e+00]"
+OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBestPars
+OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBestPars
+OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBestPars
