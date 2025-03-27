@@ -6,25 +6,17 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
-    QSlider,
-    QComboBox,
     QSizePolicy,
-    QMenuBar,
     )
 from PySide6.QtGui import (
-    QPalette,
-    QColor,
     QAction,
     Qt,
 )
-from PySide6.QtCore import (
-    QSize,
-)
-
 from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
 from fitter import Fitter
+from file_handling import TargetData
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -35,6 +27,7 @@ class MainWindow(QMainWindow):
     navigator:  Navigator
     plotter:    Plotter
     fitter:     Fitter
+    targetData: TargetData
 
     def __init__(self):
         super().__init__()
@@ -42,7 +35,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
         self.plotter = Plotter()
         self.fitter = Fitter()
-        self.navigator = Navigator(0, self.plotter, self.fitter)
+        self.targetData = TargetData()
+        self.navigator = Navigator(0, self.plotter, self.fitter, self.targetData)
 
         mainLayout = QVBoxLayout()
 
@@ -65,38 +59,9 @@ class MainWindow(QMainWindow):
         button_quit.triggered.connect(lambda: app.quit())
         file_menu.addAction(button_quit)
 
-
-        # configure the top layout
-        topLayout = QHBoxLayout()
-        topLayout.setContentsMargins(0,0,0,0)
-        topLayout.setSpacing(0)
-
-        magLabel = QLabel("What is the DELTA-MAG of -+2 neighbors on the CCD", self)
-        magLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        metaLabel = QLabel("Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal")
-        metaLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        metaLabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-
-        topLayout.addWidget(magLabel)
-        topLayout.addWidget(metaLabel)
         
         # configure the middle layout
         midLayout = QHBoxLayout()
-
-        plotLayout = QVBoxLayout()
-
-        redshiftLayout = QHBoxLayout()
-        
-        redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
-        templateDropdown = QComboBox()
-        dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
-        for opt in dropdown_opts:
-            templateDropdown.addItem(opt)
-        redshiftLayout.addWidget(templateDropdown)
-
-        plotLayout.addLayout(redshiftLayout)
-        plotLayout.addLayout(self.plotter.layout)
 
         rightButtons = QVBoxLayout()
 
@@ -110,32 +75,25 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
         rightButtons.addLayout(self.fitter.layout)
-        #rightButtons.addWidget(QLabel("Class, probability:"))
-        #rightButtons.addWidget(self.fitter.info_1cp)
-        #rightButtons.addWidget(self.fitter.info_2cp)
-        #rightButtons.addWidget(self.fitter.info_2xp)
 
-        midLayout.addLayout(plotLayout)
+        midLayout.addLayout(self.plotter.layout)
         midLayout.addLayout(rightButtons) 
 
         # configure the bottom layout
         botLayout = self.navigator.layout
 
-        mainLayout.addLayout(topLayout)
+        mainLayout.addLayout(self.targetData.layout)
         mainLayout.addLayout(midLayout)
         mainLayout.addLayout(botLayout)
         
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        #self.setMinimumSize(QSize(800, 800))
         self.navigator.openFolder()
 
 app = QApplication([])
 
 window = MainWindow()
 window.show()
-
-
 
 app.exec()

@@ -1,68 +1,97 @@
 import matplotlib.pyplot as plt
-from Spec_tools import Fies_spectrum
-import numpy as np
-
-from astropy.io.fits import getdata
-from astropy.io.fits import getheader
-from astropy.io import fits
 from astropy.units import Unit
 
 from xpca.targets import Target
 from xpca.spectrum import Spectrum
 from xpca import plotting as template
 
-def DrawTemplate(template, key):
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QComboBox,
+    QSlider,
+    )
+from PySide6.QtGui import (
+    Qt,
+)
+from xpca import config
+#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
+from os import listdir
 
-    fileName = GetFileName(template)
+import re
+#from shutil import copyfile
 
-    HDU = fits.open(fileName)
-    data = HDU[0].data
-    Flux = data[:].flatten()
-    Header = HDU[0].header
+class Templater:
 
-    Wavelength = []
-    startwavelength = Header['CRVAL1']
-    dispersion = 10**Header['CDELT1']
+    layout: QHBoxLayout 
+    dropdown: QComboBox
 
-    totalDispersion = dispersion
-    Wavelength.append(startwavelength)
+    def __init__(self, plotter):
+        self.plotter = plotter
+        self.layout = QHBoxLayout()
+        
+        self.zSlider = QSlider(Qt.Orientation.Horizontal)
+        self.zSlider.setSingleStep(1)
+        self.zSlider.sliderMoved.connect(self.slider_changed)
+        self.zSlider.sliderReleased.connect(self.sliderrelease)
+        self.layout.addWidget(self.zSlider)
+        self.dropdown = QComboBox()
+        for file in listdir(config.TEMPLATE_PATH):
+            if file.endswith(".fits"):
+                self.dropdown.addItem(file)
+        self.layout.addWidget(self.dropdown)
 
-    for _ in range(1, len(Flux)):
-        totalDispersion = totalDispersion + dispersion 
-        Wavelength.append(startwavelength + totalDispersion)
+        self.dropdown.textActivated.connect(self.text_changed)
 
-    Wavelength = np.array(Wavelength) #convert from list to numpy array
-    plt.figure(key)
-    plt.step(Wavelength, Flux, label = 'Template')
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux (erg/s/cm2/Å)')
-    plt.title('test')
-    #plt.show()
+    def plotTemplate(self, spec, l2_product, firstLoad = False):
+        target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
+        try:
+            wave, model = template.create_PCA_model(target,l2_product)
+        except FileNotFoundError:
+            print("not found, trying by appending new, this is a bad solution tho")
+            name = l2_product['zBestSubType']
+            print(name)
+            l2_product['zBestSubType']=f'new-{name}'
+            wave, model = template.create_PCA_model(target,l2_product)
+        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = l2_product['zBestSubType'])
 
-def plotTemplate(spec, l2_product):
-    target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
-    try:
-        wave, model = template.create_PCA_model(target,l2_product)
-    except FileNotFoundError:
-        print("not found, trying by appending new, this is a bad solution tho")
-        name = l2_product['zBestSubType']
-        l2_product['zBestSubType']=f'new-{name}'
-        wave, model = template.create_PCA_model(target,l2_product)
-
-    plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = 'Template')
-
-def GetFileName(template):
-    if template == 'GALAXY':
-        return "templates/template-galaxy-pass.fits"
-    elif template == 'GALAXY-PASS':
-        return "templates/template-galaxy.fits"
-    elif template == 'QSO-LOWZ':
-        return  "templates/template-new-qso-lowz.fits"
-    elif template == 'QSO-MIDZ':
-        return "templates/template-new-qso-midz.fits"
-    elif template == 'QSO':
-        return "templates/template-qso.fits"
-    else:
-        return "templates/template-qso.fits"
-
+        #set combobox text:
+        best = l2_product['zBestSubType'].lower()
+        print(f'template-%s' % best)
+        self.dropdown.setCurrentText(f'template-%s.fits' % best)
+        self.spec_current=spec
+        self.l2_current=l2_product
+        if firstLoad:
+            self.setMiddle(l2_product)
+            
+        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = 'Template')
+        
+    def sliderrelease(self):
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+        self.setMiddle(self.l2_current)
+        self.plotter.PlotFile(self.l2_current)
+        
+    def setMiddle(self,l2_product):
+        newMiddle = l2_product['zBest']*100
+        self.zSlider.setMinimum(newMiddle-100)
+        self.zSlider.setMaximum(newMiddle+100)
+        self.zSlider.setValue(newMiddle)
     
+    def slider_changed(self,s):
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+
+        self.plotter.PlotFile(self.l2_current, first = False)
+
+    def text_changed(self, s):
+
+        result = re.search(f'template-(.+).fits', s)
+        self.l2_current['zBestSubType']=result.group(1)
+        
+        try:
+            self.plotter.PlotFile(self.l2_current)
+        except FileNotFoundError:
+            for file in listdir(config.TEMPLATE_PATH):
+                if file.lower()==s:
+                    result = re.search(f'template-(.+).fits', file)
+                    self.l2_current['zBestSubType']=result.group(1)
+                    self.plotter.PlotFile(self.l2_current)
+                    break

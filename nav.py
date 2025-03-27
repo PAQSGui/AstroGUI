@@ -1,30 +1,18 @@
-#from tkinter import filedialog as browse
-import os
+
 import Spec_tools as tool
 from xpca.pipeline import Pipeline
-from xpca.targets import Target
-import plotter
 from fitter import Fitter
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.pyplot import figure
 from database import Database
 
 from PySide6.QtCore import (
-    QSize,
     QDir,
-    QDirIterator,
 )
 
 from PySide6.QtWidgets import (
-    QApplication, 
-    QMainWindow, 
     QPushButton,
-    QWidget,
-    QVBoxLayout,
     QHBoxLayout,
     QFileDialog as browse,
     QPlainTextEdit,
-    QLabel,
     )
 
 class Navigator:
@@ -38,7 +26,7 @@ class Navigator:
     fitter: Fitter
     database: Database
 
-    def __init__(self, cursor, plotter, fitter):
+    def __init__(self, cursor, plotter, fitter, targetData):
         self.pipe=Pipeline()
         self.layout = QHBoxLayout()
         self.directory = QDir("./spectra")
@@ -47,6 +35,7 @@ class Navigator:
         self.cursor = cursor
         self.plotter = plotter
         self.fitter = fitter
+        self.targetData = targetData
         self.database = Database("data.csv")
 
         whyInput = QPlainTextEdit()
@@ -106,7 +95,6 @@ class Navigator:
 
         while True:
             try:
-                #print(str(self.directory))
                 self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile())) #not OS safe I think
                 print("Current File: " + self.getCurrentFile())
                 break
@@ -114,6 +102,7 @@ class Navigator:
                 self.deleteFile(delta)
                 continue
         self.UpdateGraph(self.current)
+        self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
         l2_product = self.fitter.fitFile(self.getCurrentFilePath())
