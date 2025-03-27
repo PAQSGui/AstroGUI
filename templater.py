@@ -62,6 +62,7 @@ class Templater:
         self.l2_current=l2_product
         if firstLoad:
             self.setMiddle(l2_product)
+            
 
     def sliderrelease(self):
         self.l2_current['zBest']=float(self.zSlider.value())/100

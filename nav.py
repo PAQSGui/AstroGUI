@@ -105,8 +105,8 @@ class Navigator:
         self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
-        self.fitter.fitFile(self.getCurrentFilePath())
-        self.plotter.addFile(file, self.fitter.getl2_product())
+        l2_product = self.fitter.fitFile(self.getCurrentFilePath())
+        self.plotter.addFile(file, l2_product)
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
