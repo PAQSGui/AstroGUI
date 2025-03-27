@@ -29,7 +29,11 @@ class Templater:
         self.plotter = plotter
         self.layout = QHBoxLayout()
         
-        self.layout.addWidget(QSlider(Qt.Orientation.Horizontal))
+        self.zSlider = QSlider(Qt.Orientation.Horizontal)
+        self.zSlider.setSingleStep(1)
+        self.zSlider.sliderMoved.connect(self.slider_changed)
+        self.zSlider.sliderReleased.connect(self.sliderrelease)
+        self.layout.addWidget(self.zSlider)
         self.dropdown = QComboBox()
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
@@ -52,10 +56,26 @@ class Templater:
 
         #set combobox text:
         best = l2_product['zBestSubType'].lower()
-        self.dropdown.setCurrentText(f'template-%s' % best) 
+        self.dropdown.setCurrentText(f'template-%s' % best)
         self.spec_current=spec
         self.l2_current=l2_product
+
+    def sliderrelease(self):
+        newMiddle = self.l2_current['zBest']*100
+        self.zSlider.setMinimum(newMiddle-100)
+        self.zSlider.setMaximum(newMiddle+100)
+        self.zSlider.setValue(newMiddle)
+        
+    def setMiddle(self,l2_product):
+        newMiddle = l2_product['zBest']*100
+        self.zSlider.setMinimum(newMiddle-100)
+        self.zSlider.setMaximum(newMiddle+100)
+        self.zSlider.setValue(newMiddle)
     
+    def slider_changed(self,s):
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+
+        self.plotter.PlotFile(self.l2_current)
 
     def text_changed(self, s):
 

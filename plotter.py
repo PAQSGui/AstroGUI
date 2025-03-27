@@ -81,6 +81,7 @@ class Plotter:
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
         if l2_product != None:
+            #self.templater.setMiddle(l2_product) # for some
             self.templater.plotTemplate(self.file, l2_product)
         plt.legend()
         self.bigFig.draw()
