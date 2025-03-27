@@ -42,7 +42,7 @@ class Templater:
 
         self.dropdown.textActivated.connect(self.text_changed)
 
-    def plotTemplate(self, spec, l2_product):
+    def plotTemplate(self, spec, l2_product, firstLoad = False):
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         try:
             wave, model = template.create_PCA_model(target,l2_product)
@@ -56,15 +56,17 @@ class Templater:
 
         #set combobox text:
         best = l2_product['zBestSubType'].lower()
-        self.dropdown.setCurrentText(f'template-%s' % best)
+        print(f'template-%s' % best)
+        self.dropdown.setCurrentText(f'template-%s.fits' % best)
         self.spec_current=spec
         self.l2_current=l2_product
+        if firstLoad:
+            self.setMiddle(l2_product)
 
     def sliderrelease(self):
-        newMiddle = self.l2_current['zBest']*100
-        self.zSlider.setMinimum(newMiddle-100)
-        self.zSlider.setMaximum(newMiddle+100)
-        self.zSlider.setValue(newMiddle)
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+        self.setMiddle(self.l2_current)
+        self.plotter.PlotFile(self.l2_current)
         
     def setMiddle(self,l2_product):
         newMiddle = l2_product['zBest']*100
@@ -75,7 +77,7 @@ class Templater:
     def slider_changed(self,s):
         self.l2_current['zBest']=float(self.zSlider.value())/100
 
-        self.plotter.PlotFile(self.l2_current)
+        self.plotter.PlotFile(self.l2_current, first = False)
 
     def text_changed(self, s):
 

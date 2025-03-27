@@ -67,7 +67,7 @@ class Plotter:
         self.l2_product = l2_product
         self.PlotFile()
 
-    def PlotFile(self, l2 = None):
+    def PlotFile(self, l2 = None, first = True):
         if l2 == None:
             l2_product = self.l2_product
         else:
@@ -82,7 +82,7 @@ class Plotter:
 
         if l2_product != None:
             #self.templater.setMiddle(l2_product) # for some
-            self.templater.plotTemplate(self.file, l2_product)
+            self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
         plt.legend()
         self.bigFig.draw()
 
