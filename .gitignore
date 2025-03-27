@@ -16,3 +16,4 @@ astropy
 warnings
 glob
 data.csv
+.DS_store

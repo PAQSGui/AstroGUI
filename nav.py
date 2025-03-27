@@ -26,7 +26,7 @@ class Navigator:
     fitter: Fitter
     database: Database
 
-    def __init__(self, cursor, plotter, fitter):
+    def __init__(self, cursor, plotter, fitter, targetData):
         self.pipe=Pipeline()
         self.layout = QHBoxLayout()
         self.directory = QDir("./spectra")
@@ -35,6 +35,7 @@ class Navigator:
         self.cursor = cursor
         self.plotter = plotter
         self.fitter = fitter
+        self.targetData = targetData
         self.database = Database("data.csv")
 
         whyInput = QPlainTextEdit()
@@ -101,6 +102,7 @@ class Navigator:
                 self.deleteFile(delta)
                 continue
         self.UpdateGraph(self.current)
+        self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
         self.fitter.fitFile(self.getCurrentFilePath())

@@ -16,6 +16,7 @@ from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
 from fitter import Fitter
+from file_handling import TargetData
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -26,6 +27,7 @@ class MainWindow(QMainWindow):
     navigator:  Navigator
     plotter:    Plotter
     fitter:     Fitter
+    targetData: TargetData
 
     def __init__(self):
         super().__init__()
@@ -33,7 +35,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
         self.plotter = Plotter()
         self.fitter = Fitter()
-        self.navigator = Navigator(0, self.plotter, self.fitter)
+        self.targetData = TargetData()
+        self.navigator = Navigator(0, self.plotter, self.fitter, self.targetData)
 
         mainLayout = QVBoxLayout()
 
@@ -56,21 +59,6 @@ class MainWindow(QMainWindow):
         button_quit.triggered.connect(lambda: app.quit())
         file_menu.addAction(button_quit)
 
-
-        # configure the top layout
-        topLayout = QHBoxLayout()
-        topLayout.setContentsMargins(0,0,0,0)
-        topLayout.setSpacing(0)
-
-        magLabel = QLabel("What is the DELTA-MAG of -+2 neighbors on the CCD", self)
-        magLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        metaLabel = QLabel("Target metadata:\nMAG, MAG_TYPE, target name,\nE(B-V)_gal")
-        metaLabel.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        metaLabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-
-        topLayout.addWidget(magLabel)
-        topLayout.addWidget(metaLabel)
         
         # configure the middle layout
         midLayout = QHBoxLayout()
@@ -94,7 +82,7 @@ class MainWindow(QMainWindow):
         # configure the bottom layout
         botLayout = self.navigator.layout
 
-        mainLayout.addLayout(topLayout)
+        mainLayout.addLayout(self.targetData.layout)
         mainLayout.addLayout(midLayout)
         mainLayout.addLayout(botLayout)
         

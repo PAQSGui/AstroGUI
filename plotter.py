@@ -21,7 +21,7 @@ from PySide6.QtCore import QSize
 
 class Plotter:
 
-    layout: QHBoxLayout 
+    layout: QVBoxLayout 
     file: tool.SDSS_spectrum
     bigFig : FigureCanvasQTAgg
     templater : Templater
