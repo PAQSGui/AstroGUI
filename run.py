@@ -6,21 +6,12 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
-    QSlider,
-    QComboBox,
     QSizePolicy,
-    QMenuBar,
     )
 from PySide6.QtGui import (
-    QPalette,
-    QColor,
     QAction,
     Qt,
 )
-from PySide6.QtCore import (
-    QSize,
-)
-
 from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
@@ -84,20 +75,6 @@ class MainWindow(QMainWindow):
         # configure the middle layout
         midLayout = QHBoxLayout()
 
-        plotLayout = QVBoxLayout()
-
-        redshiftLayout = QHBoxLayout()
-        
-        redshiftLayout.addWidget(QSlider(Qt.Orientation.Horizontal, self))
-        templateDropdown = QComboBox()
-        dropdown_opts = ['galaxy-pass', 'galaxy', 'new-qso-lowz', 'new-qso-midz', 'qso', 'star-A']
-        for opt in dropdown_opts:
-            templateDropdown.addItem(opt)
-        redshiftLayout.addWidget(templateDropdown)
-
-        plotLayout.addLayout(redshiftLayout)
-        plotLayout.addLayout(self.plotter.layout)
-
         rightButtons = QVBoxLayout()
 
         signoiseButton = QPushButton("Show S/N spec")
@@ -110,12 +87,8 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
         rightButtons.addLayout(self.fitter.layout)
-        #rightButtons.addWidget(QLabel("Class, probability:"))
-        #rightButtons.addWidget(self.fitter.info_1cp)
-        #rightButtons.addWidget(self.fitter.info_2cp)
-        #rightButtons.addWidget(self.fitter.info_2xp)
 
-        midLayout.addLayout(plotLayout)
+        midLayout.addLayout(self.plotter.layout)
         midLayout.addLayout(rightButtons) 
 
         # configure the bottom layout
@@ -128,14 +101,11 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        #self.setMinimumSize(QSize(800, 800))
         self.navigator.openFolder()
 
 app = QApplication([])
 
 window = MainWindow()
 window.show()
-
-
 
 app.exec()
