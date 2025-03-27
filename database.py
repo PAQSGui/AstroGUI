@@ -38,4 +38,4 @@ class Database():
                 if row[self.fieldNames[0]] == name:
                     return row
             return []
-
+        
