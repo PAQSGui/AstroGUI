@@ -1,36 +1,95 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.pyplot import figure
+import Spec_tools as tool
+import templater
 
-def PlotFile(file):
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QLayout,
+    QVBoxLayout,
+    QSlider,
+    QLabel,
+    QWidget,
+    QMainWindow,
+    )
+from PySide6.QtGui import (
+    Qt,
+)
 
-    visrange = np.linspace(3800, 7500, 4)
+from PySide6.QtCore import QSize
 
-    UpdateFigure(file, 'k')
-    UpdateFigure(file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
-    UpdateFigure(file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
-    UpdateFigure(file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
+class Plotter:
+
+    layout: QHBoxLayout 
+    file: tool.SDSS_spectrum
+    bigFig : FigureCanvasQTAgg
+
+    def __init__(self):
+        self.layout = QHBoxLayout()
+        self.bigFig = FigureCanvasQTAgg(figure('k'))
+        self.layout.addWidget(self.bigFig)
+        self.bigFig.setMinimumSize(QSize(560, 560))
+        self.layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+        self.lineThickness=0.5
+        self.l2_product = None
+
+    def optionsWindow(self):
+        self.optsWindow = QWidget()
+        self.optsLayout = QVBoxLayout()
+        self.optsLayout.addWidget(QLabel("Plot Line Thickness"))
+        self.thickSlider=QSlider(Qt.Orientation.Horizontal)
+        self.thickSlider.setRange(1,15) #slider only takes integers
+        self.thickSlider.setSingleStep(1)
+        self.thickSlider.setValue(int(self.lineThickness*10))
+        self.thickSlider.valueChanged.connect(lambda: self.setThickness(self.thickSlider.value()))
+        self.optsLayout.addWidget(self.thickSlider)
+        self.optsWindow.setLayout(self.optsLayout)
+        self.optsWindow.show()
+
+    def setThickness(self, newValue):
+        self.lineThickness=float(newValue)/10.0
+        self.PlotFile()
+
+    def addFile(self, file, l2_product = None):
+        self.file = file
+        self.l2_product = l2_product
+        self.PlotFile()
+
+    def PlotFile(self):
+
+        visrange = np.linspace(3800, 7500, 4)
+
+        self.UpdateFigure('k')
+        #self.UpdateFigure(self.file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
+        #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
+        #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
+
+        if self.l2_product != None:
+            templater.plotTemplate(self.file, self.l2_product)
+        plt.legend()
+        self.bigFig.draw()
 
 
-def UpdateFigure(file, key, limitPlot = False, range = [6250, 7400]):
-    plt.figure(key)
-    plt.clf() #clear figure
-    plt.step(file.Wavelength, file.Flux, color = key) #figure key is used for color
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux (erg/s/cm2/Å)')
-    plt.step(file.Wavelength,file.Noise,label='Noise',color='0.5')
-    plt.legend()
+    def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):
+        plt.figure(key)
+        plt.clf() #clear figure
+        plt.step(self.file.Wavelength, self.file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux (erg/s/cm2/Å)')
+        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
 
-    if limitPlot:
-        plt.xlim(range)
-    else: 
-        plt.title(file.Objectname)  
+        if limitPlot:
+            plt.xlim(range)
+        else: 
+            plt.title(self.file.Objectname)  
 
-def ShowSN(file):
-    fig = plt.figure()
-    plt.step(file.Wavelength, file.Flux/file.Noise)
-    plt.xlabel('Wavelength (Å)')
-    plt.ylabel('Flux/Noise Ratio')
-    plt.title(file.Objectname+" S/N Spectrum")
-    canv=FigureCanvasQTAgg(fig)
-    canv.show()
+    def ShowSN(file):
+        fig = plt.figure()
+        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux/Noise Ratio')
+        plt.title(file.Objectname+"S/N Spectrum")
+        canv=FigureCanvasQTAgg(fig)
+        canv.show()
