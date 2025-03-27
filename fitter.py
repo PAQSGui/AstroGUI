@@ -10,6 +10,7 @@ class Fitter:
     pipe: Pipeline
     l2_product: dict
     best : str
+    redshift: float
     layout: QVBoxLayout
     templateInfo: QLabel
 
@@ -24,6 +25,7 @@ class Fitter:
         self.l2_product = l2_product
 
         ZBEST  = self.l2_product['zBest']
+        self.redshift = ZBEST
         self.best = l2_product['zBestSubType']
         self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
 

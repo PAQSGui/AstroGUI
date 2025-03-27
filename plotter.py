@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
-import templater
+from templater import Templater
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -25,7 +25,7 @@ class Plotter:
     layout: QHBoxLayout 
     file: tool.SDSS_spectrum
     bigFig : FigureCanvasQTAgg
-    templater : templater.Templater
+    templater : Templater
 
     def __init__(self):
         self.layout = QVBoxLayout()
@@ -37,33 +37,42 @@ class Plotter:
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.bigFig.setMinimumSize(QSize(560, 560))
 
-        self.templater = templater.Templater(self)
+        self.templater = Templater(self)
         self.layout.addLayout(self.templater.layout)
         
         plotLayout.addWidget(self.bigFig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
+        self.l2_product = None
 
     def optionsWindow(self):
-        optsLayout = QVBoxLayout()
-        optsLayout.addWidget(QLabel("Plot Line Thickness"))
-        thickSlider=QSlider(Qt.Orientation.Horizontal)
-        thickSlider.setRange(1,15) #slider only takes integers
-        thickSlider.setSingleStep(1)
-        thickSlider.setValue(int(self.lineThickness*10))
-        thickSlider.valueChanged.connect(lambda: self.setThickness(thickSlider.value()))
-        optsLayout.addWidget(thickSlider)
-        thickSlider.show()
+        self.optsWindow = QWidget()
+        self.optsLayout = QVBoxLayout()
+        self.optsLayout.addWidget(QLabel("Plot Line Thickness"))
+        self.thickSlider=QSlider(Qt.Orientation.Horizontal)
+        self.thickSlider.setRange(1,15) #slider only takes integers
+        self.thickSlider.setSingleStep(1)
+        self.thickSlider.setValue(int(self.lineThickness*10))
+        self.thickSlider.valueChanged.connect(lambda: self.setThickness(self.thickSlider.value()))
+        self.optsLayout.addWidget(self.thickSlider)
+        self.optsWindow.setLayout(self.optsLayout)
+        self.optsWindow.show()
 
-    def setThickness(self,newValue):
+    def setThickness(self, newValue):
         self.lineThickness=float(newValue)/10.0
+        self.PlotFile()
 
-    def addFile(self, file, l2_product):
+    def addFile(self, file, l2_product = None):
         self.file = file
-        self.PlotFile(l2_product)
+        self.l2_product = l2_product
+        self.PlotFile()
 
-    def PlotFile(self, l2_product = None):
+    def PlotFile(self, l2 = None):
+        if l2 == None:
+            l2_product = self.l2_product
+        else:
+            l2_product = l2
 
         visrange = np.linspace(3800, 7500, 4)
 
@@ -73,7 +82,7 @@ class Plotter:
         #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
         if l2_product != None:
-            self.templater.plotTemplate(self.file,l2_product)
+            self.templater.plotTemplate(self.file, l2_product)
         plt.legend()
         self.bigFig.draw()
 

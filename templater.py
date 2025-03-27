@@ -30,6 +30,7 @@ class Templater:
 
     layout: QHBoxLayout 
     dropdown: QComboBox
+
     def __init__(self, plotter):
         self.plotter = plotter
         self.layout = QHBoxLayout()
@@ -62,7 +63,8 @@ class Templater:
 
         #set combobox text:
         #print(l2_product['zBestSubType']) 
-        self.dropdown.setCurrentText(f'template-{l2_product['zBestSubType'].lower()}.fits') 
+        best = l2_product['zBestSubType'].lower()
+        self.dropdown.setCurrentText(f'template-%s' % best) 
         self.spec_current=spec
         self.l2_current=l2_product
     
