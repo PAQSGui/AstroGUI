@@ -13,6 +13,10 @@ class Database():
     def __init__(self, dataFile, fieldNames = []):
         self.dataFile = dataFile
         self.fieldNames = fieldNames
+        if fieldNames != []:
+            with open(self.dataFile, 'a', newline='') as file:
+                writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
+                writer.writeheader()            
 
     def addEntry(self, name, category, note, redshift):
         with open(self.dataFile, 'a', newline='') as file:
@@ -25,7 +29,6 @@ class Database():
     def addFitting(self, l2):
         with open(self.dataFile, 'a', newline='') as file:
             writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-            writer.writeheader()
             writer.writerow(l2)
 
     def getFitting(self, name):
