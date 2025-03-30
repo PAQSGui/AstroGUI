@@ -95,18 +95,26 @@ class Navigator:
 
         while True:
             try:
-                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile())) #not OS safe I think
+                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
                 print("Current File: " + self.getCurrentFile())
                 break
             except OSError:
                 self.deleteFile(delta)
                 continue
+            except IndexError: #Osiris
+                self.current = tool.Osiris_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
+                print("Current File: " + self.getCurrentFile())
+                break
         self.UpdateGraph(self.current)
         self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
-        l2_product = self.fitter.fitFile(self.getCurrentFilePath())
-        self.plotter.addFile(file, l2_product)
+        try: 
+            l2_product = self.fitter.fitFile(self.getCurrentFilePath())
+            self.plotter.addFile(file, l2_product)
+        except ValueError:
+            self.plotter.addFile(file)
+            
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
@@ -118,7 +126,11 @@ class Navigator:
         if msg == "Back":
             pass
         elif msg == "Yes":
-            self.database.addEntry(self.getCurrentFile(), self.fitter.best, "None", self.fitter.redshift)
+            try:
+                self.database.addEntry(self.getCurrentFile(), self.fitter.best, self.whyInput.toPlainText(), self.fitter.redshift)
+            except AttributeError:
+                self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
+                
         elif msg == "Unsure":
             self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
             self.whyInput.setPlainText("")
