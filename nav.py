@@ -15,6 +15,8 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     )
 
+import re
+
 class Navigator:
 
     cursor: int
@@ -78,6 +80,7 @@ class Navigator:
         del self.files[self.cursor]
         if delta < 0:
             self.updateCursor(-1)
+        #QDir adds "." and ".." as files, which is stupid. Can it be disabled?
         print("skipping bad file\n")
 
     def openFolder(self):
@@ -90,6 +93,16 @@ class Navigator:
         self.cursor = 0
         self.loadFile()
 
+    def grismArray(self, filename):
+        grisms = []
+        for x in ['','R','G','B']:
+            try:
+                nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
+                grisms.append(nextGrism)
+            except FileNotFoundError:
+                grisms.append(None)
+        self.plotter.UpdateGrism(grisms)
+
     def loadFile(self, delta=1):
         print("Current File: " + self.getCurrentFile())
 
@@ -97,15 +110,21 @@ class Navigator:
             try:
                 self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
                 print("Current File: " + self.getCurrentFile())
+                self.UpdateGraph(self.current)
                 break
             except OSError:
                 self.deleteFile(delta)
                 continue
             except IndexError: #Osiris
-                self.current = tool.Osiris_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
-                print("Current File: " + self.getCurrentFile())
+                #check if there are other files with similar names
+                result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
+                if result != None:
+                    #Create a list of the files
+                    self.grismArray(result.group(1))
+                else:
+                    result = re.search(f'(.+).fits', self.getCurrentFile())
+                    self.grismArray(result.group(1))
                 break
-        self.UpdateGraph(self.current)
         self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
