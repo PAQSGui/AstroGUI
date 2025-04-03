@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
 from templater import Templater
+import Model
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -25,10 +26,11 @@ class Plotter:
     file: tool.SDSS_spectrum
     bigFig : FigureCanvasQTAgg
     templater : Templater
+    model:          Model
 
-    def __init__(self):
+    def __init__(self, model):
         self.layout = QVBoxLayout()
-
+        self.model = model
 
         plotLayout = QHBoxLayout()
 

@@ -26,6 +26,14 @@ class Database():
             else:
                 writer.writerow([name, True, category, None, redshift]) # ", True, %s, None, %f\n" % (category, redshift))
 
+    def getEntry(self, name):
+        with open(self.dataFile, 'r', newline = '') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row[self.fieldNames[0]] == name:
+                    return row
+                return []
+
     def addFitting(self, l2):
         with open(self.dataFile, 'a', newline='') as file:
             writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
