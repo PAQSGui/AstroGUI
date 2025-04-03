@@ -6,6 +6,9 @@ from PySide6.QtWidgets import (
     QLabel,
     QVBoxLayout,
     )
+from PySide6.QtGui import (
+    Qt,
+)
 
 class Fitter:
 
@@ -19,6 +22,7 @@ class Fitter:
     def __init__(self):
         self.pipe = Pipeline()
         self.layout = QVBoxLayout()
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
         self.database = Database("preProcess.csv",fields)
 
@@ -38,9 +42,7 @@ class Fitter:
         ZBEST  = float(l2_product['zBest'])
         self.redshift = ZBEST
         self.best = l2_product['zBestSubType']
-        self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
-
-        self.layout.addWidget(QLabel("Class, Probability"))
+        #self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
 
         classification = l2_product['zBestSubType']
         probability    = l2_product['zBestProb'] * 100

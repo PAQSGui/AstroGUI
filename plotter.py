@@ -40,7 +40,7 @@ class Plotter:
         self.layout.addLayout(self.templater.layout)
         
         plotLayout.addWidget(self.bigFig)
-        plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+        #plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
         self.l2_product = None

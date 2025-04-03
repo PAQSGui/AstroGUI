@@ -39,7 +39,7 @@ class Navigator:
         self.database = Database("data.csv")
 
         whyInput = QPlainTextEdit()
-        whyInput.setPlaceholderText("Type your reason for choosing 'unsure'")
+        whyInput.setPlaceholderText("Write your notes here")
         self.whyInput = whyInput
 
 
