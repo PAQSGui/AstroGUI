@@ -2,20 +2,20 @@ import Spec_tools as tool
 
 class DataObject:
 
-    filename: str
+    name: str
     file: tool.SDSS_spectrum
     fitting: dict
     redshift: float
 
     def __init__(self, filename, file, fitting, redshift):
-        self.filename = filename
+        self.name = filename
         self.file = file
         self.fitting = fitting
         self.redshift = redshift
 
     def toDict(self):
         selfDict = {
-        'name': self.filename,
+        'name': self.name,
         'file' : self.file,
         'fitting' : self.fitting,
         'redshift' : self.redshift }
@@ -23,9 +23,9 @@ class DataObject:
         return selfDict
     
     def fromDict(dict):
-        filename = dict['name']
+        name = dict['name']
         file = dict['file']
         fitting = dict['fitting']
         redshift = dict['redshift']
 
-        return DataObject(filename, file, fitting, redshift)
+        return DataObject(name, file, fitting, redshift)

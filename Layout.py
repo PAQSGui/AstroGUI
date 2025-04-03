@@ -33,14 +33,13 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-        # don't load anymore:
         self.model = Model(folder_path, True)
         self.setWindowTitle("AstroGUI")
 
-        self.plotter = Plotter(Model)
+        self.plotter = Plotter(self.model)
         self.fitter = Fitter()
         self.targetData = TargetData()
-        self.navigator = Navigator(0, self.plotter, self.fitter, self.targetData)
+        self.navigator = Navigator(self.plotter, self.model)
 
         mainLayout = QVBoxLayout()
 
@@ -93,4 +92,4 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        self.navigator.openFolder()
+        #self.navigator.openFolder()

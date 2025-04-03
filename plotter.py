@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
 import Spec_tools as tool
 from templater import Templater
-import Model
+from Model import Model
 
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -22,11 +22,11 @@ from PySide6.QtCore import QSize
 
 class Plotter:
 
-    layout: QVBoxLayout 
-    file: tool.SDSS_spectrum
-    bigFig : FigureCanvasQTAgg
+    layout:     QVBoxLayout 
+    file:       tool.SDSS_spectrum
+    bigFig :    FigureCanvasQTAgg
     templater : Templater
-    model:          Model
+    model:      Model
 
     def __init__(self, model):
         self.layout = QVBoxLayout()
@@ -40,12 +40,14 @@ class Plotter:
 
         self.templater = Templater(self)
         self.layout.addLayout(self.templater.layout)
-        
+        print(type(self.bigFig))
         plotLayout.addWidget(self.bigFig)
+
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
         self.l2_product = None
+        self.update()
 
     def optionsWindow(self):
         self.optsWindow = QWidget()
@@ -110,3 +112,21 @@ class Plotter:
         plt.title(file.Objectname+"S/N Spectrum")
         canv=FigureCanvasQTAgg(fig)
         canv.show()
+
+    def update(self):
+        model = self.model
+        data = Model.getState(model)
+        self.file = data.file
+        plt.figure('k')
+        plt.clf() #clear figure
+        plt.step(self.file.Wavelength, self.file.Flux, color = 'k', linewidth=self.lineThickness) #figure key is used for color
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux (erg/s/cm2/Å)')
+        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
+        plt.title(self.file.Objectname) 
+        plt.legend()
+
+        self.templater.plotTemplate(self.file, data.fitting)
+
+        self.bigFig.draw()
+
