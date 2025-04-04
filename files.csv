@@ -1,2 +1,19 @@
 name,file,category,redshift
 name,file,category,redshift
+name,file,category,redshift
+name,file,category,redshift
+name,file,category,redshift
+spec-10245-58161-0533.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb30873ed0>,QSO-LOWZ,1.305897565005871
+spec-10246-58171-0188.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb30878950>,QSO-LOWZ,0.44859336369125785
+spec-10246-58171-0344.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb38d8cc50>,QSO-MIDZ,1.484610134430987
+spec-10246-58171-0364.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3bb395d0>,QSO,2.0441893199198784
+spec-10246-58171-0447.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb325ac090>,QSO-MIDZ,0.9889625818356883
+spec-10247-58162-0218.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3a258590>,QSO-LOWZ,0.44536603681455555
+spec-10247-58162-0261.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb32cf01d0>,QSO-MIDZ,1.1893042479836093
+spec-10247-58162-0716.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb325ac090>,QSO,1.8202625422144894
+spec-10247-58162-0834.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb38d5e750>,QSO,0.13110723819640585
+spec-10247-58162-0942.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb38de5bd0>,QSO-MIDZ,1.8416021300303396
+spec-10248-58220-0280.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb38dd23d0>,QSO-LOWZ,0.5351273741251686
+spec-10248-58220-0348.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3bb04b50>,QSO-LOWZ,0.9926128158518557
+spec-10248-58220-0436.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb30934ad0>,QSO-LOWZ,0.44343270904012067
+spec-10248-58220-0811.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3084f290>,QSO,2.178521527827912

@@ -24,14 +24,13 @@ class Database():
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = directory.entryList()
-
-        with open(self.dataFile, 'a', newline='') as dataFile:
-            writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
-            for file in files:
-                spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
-                fitting = fitter.fitFile(directory.absoluteFilePath(file))
-                object = DataObject(file, spectra, fitting)
-                dict = object.toDict()
+        for file in files:
+            spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
+            fitting = fitter.fitFile(directory.absoluteFilePath(file))
+            object = DataObject(file, spectra, fitting)
+            dict = object.toDict()
+            with open(self.dataFile, 'a', newline='') as dataFile:
+                writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
                 writer.writerow(dict)
 
     def extract(self, fitter):
