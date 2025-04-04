@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QLabel,
     QWidget,
+    QCheckBox,
     )
 from PySide6.QtGui import (
     Qt,
@@ -26,6 +27,9 @@ class Plotter:
     bigFig : FigureCanvasQTAgg
     templater : Templater
 
+    snToggler : QCheckBox
+    skyToggler : QCheckBox
+
     def __init__(self):
         self.layout = QVBoxLayout()
 
@@ -38,15 +42,27 @@ class Plotter:
 
         self.templater = Templater(self)
         self.layout.addLayout(self.templater.layout)
+
+        self.skyToggler = QCheckBox()
+        self.snToggler = QCheckBox()
+        self.skyToggler.stateChanged.connect(lambda:  self.PlotFile())
+        self.snToggler.stateChanged.connect(lambda:  self.PlotFile())
+       
+        togglelayout = QHBoxLayout()
+        togglelayout.addWidget(QLabel("Toggle Sky"))
+        togglelayout.addWidget(self.skyToggler)
+        togglelayout.addWidget(QLabel("Toggle S/N"))
+        togglelayout.addWidget(self.snToggler)
         
         plotLayout.addWidget(self.bigFig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
+        self.templater.layout.addLayout(togglelayout)
         self.l2_product = None
 
-        self.showSN = True
-        self.showSky = True
+        self.showSN = False
+        self.showSky = False
 
 
     def optionsWindow(self):
@@ -106,15 +122,10 @@ class Plotter:
 
     def DrawPlot(self,data,colorcode):
         plt.step(data.Wavelength, data.Flux, color = colorcode, linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
+        if self.snToggler.isChecked():
             plt.step(data.Wavelength, data.Flux/data.Noise, label="Signal / Noise",  alpha=0.25, linewidth=self.lineThickness)
+        if self.skyToggler.isChecked():
+            plt.step(data.Wavelength, data.Skybackground, label="Sky Background",  alpha=0.25, linewidth=self.lineThickness)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(data.Wavelength, data.Noise, label='Noise', color=colorcode, alpha=0.5, linewidth=self.lineThickness)
-
-    def toggleSN(self):
-        self.showSN = not self.showSN
-        self.PlotFile()
-    def toggleSky(self):
-        self.showSky = not self.showSky
-        self.PlotFile()
