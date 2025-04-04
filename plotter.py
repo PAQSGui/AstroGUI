@@ -45,6 +45,8 @@ class Plotter:
         self.layout.addLayout(plotLayout)
         self.l2_product = None
 
+        self.showSN = True
+
     def optionsWindow(self):
         self.optsWindow = QWidget()
         self.optsLayout = QVBoxLayout()
@@ -73,8 +75,6 @@ class Plotter:
         else:
             l2_product = l2
 
-        visrange = np.linspace(3800, 7500, 4)
-
         self.UpdateFigure('k')
 
         if l2_product != None:
@@ -97,26 +97,20 @@ class Plotter:
         self.bigFig.draw()
 
 
-    def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400], file=None):
+    def UpdateFigure(self, key, file=None):
         if file==None:
             file=self.file
         plt.figure('k')
         plt.clf() #clear figure
         plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        if self.showSN:
+            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
+        plt.title(file.Objectname)  
 
-        if limitPlot:
-            plt.xlim(range)
-        else: 
-            plt.title(file.Objectname)  
-
-    def ShowSN(file):
-        fig = plt.figure()
-        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux/Noise Ratio')
-        plt.title(file.Objectname+"S/N Spectrum")
-        canv=FigureCanvasQTAgg(fig)
-        canv.show()
+    def toggleSN(self):
+        self.showSN = not self.showSN
+        self.UpdateFigure('k')
+        self.PlotFile()
