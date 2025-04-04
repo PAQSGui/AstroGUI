@@ -48,6 +48,7 @@ class Plotter:
         self.layout.addLayout(plotLayout)
         self.l2_product = None
         self.update()
+        self.showSN = True
 
     def optionsWindow(self):
         self.optsWindow = QWidget()
@@ -77,27 +78,40 @@ class Plotter:
         else:
             l2_product = l2
 
-        visrange = np.linspace(3800, 7500, 4)
-
         self.UpdateFigure('k')
-        #self.UpdateFigure(self.file,'b', limitPlot = True, range = [visrange[0], visrange[1]])
-        #self.UpdateFigure(self.file,'g', limitPlot = True, range = [visrange[1], visrange[2]])
-        #self.UpdateFigure(self.file,'r', limitPlot = True, range = [visrange[2], visrange[3]])
 
         if l2_product != None:
-            #self.templater.setMiddle(l2_product) # for some
             self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
         plt.legend()
         self.bigFig.draw()
 
-
-    def UpdateFigure(self, key, limitPlot = False, range = [6250, 7400]):
-        plt.figure(key)
+    def UpdateGrism(self, spectra):
+        plt.figure('k')
         plt.clf() #clear figure
-        plt.step(self.file.Wavelength, self.file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        colorcodes = ['k','r','g','b']
+        for x in [0,1,2,3]:
+            if spectra[x]!=None:
+                plt.step(spectra[x].Wavelength, spectra[x].Flux, color = colorcodes[x], linewidth=self.lineThickness) #figure key is used for color
+                plt.xlabel('Wavelength (Å)')
+                plt.ylabel('Flux (erg/s/cm2/Å)')
+                plt.step(spectra[x].Wavelength, spectra[x].Noise, label='Noise', color=colorcodes[x], alpha=0.5, linewidth=self.lineThickness)
+
+        plt.legend()
+        self.bigFig.draw()
+
+
+    def UpdateFigure(self, key, file=None):
+        if file==None:
+            file=self.file
+        plt.figure('k')
+        plt.clf() #clear figure
+        plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        if self.showSN:
+            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
+        plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
+        plt.title(file.Objectname)  
 
         if limitPlot:
             plt.xlim(range)
@@ -130,3 +144,7 @@ class Plotter:
 
         self.bigFig.draw()
 
+    def toggleSN(self):
+        self.showSN = not self.showSN
+        self.UpdateFigure('k')
+        self.PlotFile()

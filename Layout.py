@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
         self.plotter = Plotter(self.model)
         self.fitter = Fitter()
-        self.targetData = TargetData()
+        self.targetData = TargetData(self.fitter)
         self.navigator = Navigator(self.plotter, self.model)
 
         mainLayout = QVBoxLayout()
@@ -92,4 +92,3 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
-        #self.navigator.openFolder()

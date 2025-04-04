@@ -56,7 +56,7 @@ class Templater:
 
         #set combobox text:
         best = l2_product['zBestSubType'].lower()
-        print(f'template-%s' % best)
+        #print(f'template-%s' % best)
         self.dropdown.setCurrentText(f'template-%s.fits' % best)
         self.spec_current=spec
         self.l2_current=l2_product

@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     )
 
+import re
+
 class Navigator:
 
     layout: QHBoxLayout
@@ -20,7 +22,7 @@ class Navigator:
         self.layout = QHBoxLayout()
 
         whyInput = QPlainTextEdit()
-        whyInput.setPlaceholderText("Type your reason for choosing 'unsure'")
+        whyInput.setPlaceholderText("Write your notes here")
         self.whyInput = whyInput
 
         backButton = QPushButton("Back")
@@ -37,13 +39,46 @@ class Navigator:
         self.layout.addWidget(unsureButton)
         self.layout.addWidget(self.whyInput)
 
+#    def grismArray(self, filename):
+#        grisms = []
+#        for x in ['','R','G','B']:
+#            try:
+#                nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
+#                grisms.append(nextGrism)
+#            except FileNotFoundError:
+#                grisms.append(None)
+#        self.plotter.UpdateGrism(grisms)
+
+    def loadFile(self, delta=1):
+        print("Current File: " + self.getCurrentFile())
+
+        while True:
+            try:
+                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
+                print("Current File: " + self.getCurrentFile())
+                self.UpdateGraph(self.current)
+                break
+            except OSError:
+                self.deleteFile(delta)
+                continue
+            except IndexError: #Osiris
+                #check if there are other files with similar names
+                result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
+                if result != None:
+                    #Create a list of the files
+                    self.grismArray(result.group(1))
+                else:
+                    result = re.search(f'(.+).fits', self.getCurrentFile())
+                    self.grismArray(result.group(1))
+                break
+        self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
+ 
     def NavBtn (self, msg, delta):
         if msg == "Yes":
             self.model.addDBEntry(True, self.whyInput.toPlainText())
-            self.whyInput.setPlainText("")
         elif msg == "Unsure":
             self.model.addDBEntry(False, self.whyInput.toPlainText())
-            self.whyInput.setPlainText("")
 
+        self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
         self.plotter.update()
