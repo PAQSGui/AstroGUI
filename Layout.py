@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
 
         self.plotter = Plotter(self.model)
-        self.targetData = TargetData(self.model.fitter)
+        self.targetData = TargetData(self.model)
         self.navigator = Navigator(self.plotter, self.model)
 
         mainLayout = QVBoxLayout()

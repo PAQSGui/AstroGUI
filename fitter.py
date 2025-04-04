@@ -66,6 +66,7 @@ class Fitter:
     
     def clearLayout(self):
         for i in range(self.layout.count()): self.layout.itemAt(i).widget().close()
+        print("i've cleared the layout")
 
 def convert_l2(row):
     l2_product = dict()

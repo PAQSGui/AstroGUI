@@ -27,6 +27,7 @@ class Plotter:
     bigFig :    FigureCanvasQTAgg
     templater : Templater
     model:      Model
+    showSN:     bool
 
     def __init__(self, model):
         self.layout = QVBoxLayout()
@@ -46,8 +47,8 @@ class Plotter:
 
         self.layout.addLayout(plotLayout)
         self.l2_product = None
-        self.update()
         self.showSN = True
+        self.update()
 
     def optionsWindow(self):
         self.optsWindow = QWidget()
@@ -116,10 +117,13 @@ class Plotter:
     def update(self):
         model = self.model
         data = Model.getState(model)
-        self.file = data.file
+        file = data.file
+        self.file = file
         plt.figure('k')
         plt.clf() #clear figure
         plt.step(self.file.Wavelength, self.file.Flux, color = 'k', linewidth=self.lineThickness) #figure key is used for color
+        if self.showSN:
+            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
@@ -132,5 +136,5 @@ class Plotter:
 
     def toggleSN(self):
         self.showSN = not self.showSN
-        self.UpdateFigure('k')
+        self.update()
         self.PlotFile()
