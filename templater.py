@@ -46,8 +46,9 @@ class Templater:
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         try:
             wave, model = template.create_PCA_model(target,l2_product)
-        except FileNotFoundError:
-            print("not found, trying by appending new, this is a bad solution tho")
+        except FileNotFoundError as e:
+            print("templater.py def plotTemplate FileNotFoundError")  
+            print(e)
             name = l2_product['zBestSubType']
             print(name)
             l2_product['zBestSubType']=f'new-{name}'
@@ -87,7 +88,9 @@ class Templater:
         
         try:
             self.plotter.PlotFile(self.l2_current)
-        except FileNotFoundError:
+        except FileNotFoundError as e:
+            print("templater.py def text_changed FileNotFoundError")  
+            print(e)
             for file in listdir(config.TEMPLATE_PATH):
                 if file.lower()==s:
                     result = re.search(f'template-(.+).fits', file)

@@ -92,16 +92,22 @@ class Plotter:
             l2_product = self.l2_product
         else:
             l2_product = l2
-
-        self.UpdateFigure('k')
+        try:
+            self.UpdateFigure('k')
+        except AttributeError as e:
+            print("plotter.py def PlotFile AttributeError")  
+            print(e)
+            self.UpdateGrism()
 
         if l2_product != None:
             self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
         plt.legend()
         self.bigFig.draw()
 
-    def UpdateGrism(self, spectra):
+    def UpdateGrism(self, spectra=None):
         plt.figure('k')
+        if spectra==None:
+            spectra=self.file
         plt.clf() #clear figure
         colorcodes = ['k','r','g','b']
         for x in [0,1,2,3]:
@@ -112,7 +118,7 @@ class Plotter:
         self.bigFig.draw()
 
 
-    def UpdateFigure(self, key, file=None):
+    def UpdateFigure(self, key='k', file=None):
         if file==None:
             file=self.file
         plt.figure('k')
