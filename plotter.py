@@ -103,6 +103,7 @@ class Plotter:
         plt.figure('k')
         plt.clf() #clear figure
         plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
@@ -112,11 +113,11 @@ class Plotter:
         else: 
             plt.title(file.Objectname)  
 
-    def ShowSN(file):
-        fig = plt.figure()
-        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux/Noise Ratio')
-        plt.title(file.Objectname+"S/N Spectrum")
-        canv=FigureCanvasQTAgg(fig)
-        canv.show()
+    # def ShowSN(file):
+    #     fig = plt.figure()
+    #     plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
+    #     plt.xlabel('Wavelength (Å)')
+    #     plt.ylabel('Flux/Noise Ratio')
+    #     plt.title(file.Objectname+"S/N Spectrum")
+    #     canv=FigureCanvasQTAgg(fig)
+    #     canv.show()
