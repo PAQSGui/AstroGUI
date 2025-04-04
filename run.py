@@ -72,8 +72,8 @@ class MainWindow(QMainWindow):
         
         rightButtons = QVBoxLayout()
 
-        signoiseButton = QPushButton("Show S/N spec")
-        signoiseButton.clicked.connect(lambda: self.plotter.ShowSN())
+        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton.clicked.connect(lambda: self.plotter.toggleSN())
 
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
