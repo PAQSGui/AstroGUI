@@ -15,6 +15,8 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     )
 
+import re
+
 class Navigator:
 
     cursor: int
@@ -78,6 +80,7 @@ class Navigator:
         del self.files[self.cursor]
         if delta < 0:
             self.updateCursor(-1)
+        #QDir adds "." and ".." as files, which is stupid. Can it be disabled?
         print("skipping bad file\n")
 
     def openFolder(self):
@@ -90,23 +93,47 @@ class Navigator:
         self.cursor = 0
         self.loadFile()
 
+    def grismArray(self, filename):
+        grisms = []
+        for x in ['','R','G','B']:
+            try:
+                nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
+                grisms.append(nextGrism)
+            except FileNotFoundError:
+                grisms.append(None)
+        self.plotter.UpdateGrism(grisms)
+
     def loadFile(self, delta=1):
         print("Current File: " + self.getCurrentFile())
 
         while True:
             try:
-                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile())) #not OS safe I think
+                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
                 print("Current File: " + self.getCurrentFile())
+                self.UpdateGraph(self.current)
                 break
             except OSError:
                 self.deleteFile(delta)
                 continue
-        self.UpdateGraph(self.current)
+            except IndexError: #Osiris
+                #check if there are other files with similar names
+                result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
+                if result != None:
+                    #Create a list of the files
+                    self.grismArray(result.group(1))
+                else:
+                    result = re.search(f'(.+).fits', self.getCurrentFile())
+                    self.grismArray(result.group(1))
+                break
         self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
 
     def UpdateGraph(self, file):
-        l2_product = self.fitter.fitFile(self.getCurrentFilePath())
-        self.plotter.addFile(file, l2_product)
+        try: 
+            l2_product = self.fitter.fitFile(self.getCurrentFilePath())
+            self.plotter.addFile(file, l2_product)
+        except ValueError:
+            self.plotter.addFile(file)
+            
 
     def getUserInput(self):
         text = self.whyInput.toPlainText()
@@ -118,7 +145,11 @@ class Navigator:
         if msg == "Back":
             pass
         elif msg == "Yes":
-            self.database.addEntry(self.getCurrentFile(), self.fitter.best, "None", self.fitter.redshift)
+            try:
+                self.database.addEntry(self.getCurrentFile(), self.fitter.best, self.whyInput.toPlainText(), self.fitter.redshift)
+            except AttributeError:
+                self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
+                
         elif msg == "Unsure":
             self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
             self.whyInput.setPlainText("")
