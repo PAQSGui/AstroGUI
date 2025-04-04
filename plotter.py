@@ -46,6 +46,8 @@ class Plotter:
         self.l2_product = None
 
         self.showSN = True
+        self.showSky = True
+
 
     def optionsWindow(self):
         self.optsWindow = QWidget()
@@ -88,10 +90,7 @@ class Plotter:
         colorcodes = ['k','r','g','b']
         for x in [0,1,2,3]:
             if spectra[x]!=None:
-                plt.step(spectra[x].Wavelength, spectra[x].Flux, color = colorcodes[x], linewidth=self.lineThickness) #figure key is used for color
-                plt.xlabel('Wavelength (Å)')
-                plt.ylabel('Flux (erg/s/cm2/Å)')
-                plt.step(spectra[x].Wavelength, spectra[x].Noise, label='Noise', color=colorcodes[x], alpha=0.5, linewidth=self.lineThickness)
+                self.DrawPlot(spectra[x],colorcodes[x])
 
         plt.legend()
         self.bigFig.draw()
@@ -102,15 +101,20 @@ class Plotter:
             file=self.file
         plt.figure('k')
         plt.clf() #clear figure
-        plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
+        self.DrawPlot(file,key)
+        plt.title(file.Objectname)  
+
+    def DrawPlot(self,data,colorcode):
+        plt.step(data.Wavelength, data.Flux, color = colorcode, linewidth=self.lineThickness) #figure key is used for color
         if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
+            plt.step(data.Wavelength, data.Flux/data.Noise, label="Signal / Noise",  alpha=0.25, linewidth=self.lineThickness)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
-        plt.title(file.Objectname)  
+        plt.step(data.Wavelength, data.Noise, label='Noise', color=colorcode, alpha=0.5, linewidth=self.lineThickness)
 
     def toggleSN(self):
         self.showSN = not self.showSN
-        self.UpdateFigure('k')
+        self.PlotFile()
+    def toggleSky(self):
+        self.showSky = not self.showSky
         self.PlotFile()
