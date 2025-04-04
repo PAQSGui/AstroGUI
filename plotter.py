@@ -111,20 +111,7 @@ class Plotter:
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
         plt.title(file.Objectname)  
-
-        if limitPlot:
-            plt.xlim(range)
-        else: 
-            plt.title(self.file.Objectname)  
-
-    def ShowSN(file):
-        fig = plt.figure()
-        plt.step(file.Wavelength, file.Flux/file.Noise, linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux/Noise Ratio')
-        plt.title(file.Objectname+"S/N Spectrum")
-        canv=FigureCanvasQTAgg(fig)
-        canv.show()
+        plt.title(self.file.Objectname)  
 
     def update(self):
         model = self.model
