@@ -99,8 +99,11 @@ class Navigator:
             try:
                 nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
                 grisms.append(nextGrism)
-            except FileNotFoundError:
+            except FileNotFoundError as e:
+                print("nav.py def grismArray FilNotFoundError")
+                print(e)
                 grisms.append(None)
+        self.plotter.file=grisms
         self.plotter.UpdateGrism(grisms)
 
     def loadFile(self, delta=1):
@@ -112,10 +115,14 @@ class Navigator:
                 print("Current File: " + self.getCurrentFile())
                 self.UpdateGraph(self.current)
                 break
-            except OSError:
+            except OSError as e:
+                print("nav.py def loadFile OSError")
+                print(e)
                 self.deleteFile(delta)
                 continue
-            except IndexError: #Osiris
+            except IndexError as e:
+                print("nav.py def loadFile IndexError")
+                print(e) #Osiris
                 #check if there are other files with similar names
                 result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
                 if result != None:
@@ -131,7 +138,9 @@ class Navigator:
         try: 
             l2_product = self.fitter.fitFile(self.getCurrentFilePath())
             self.plotter.addFile(file, l2_product)
-        except ValueError:
+        except ValueError as e:
+            print("nav.py def UpdateGraph ValueError")
+            print(e)
             self.plotter.addFile(file)
             
 
@@ -147,7 +156,9 @@ class Navigator:
         elif msg == "Yes":
             try:
                 self.database.addEntry(self.getCurrentFile(), self.fitter.best, self.whyInput.toPlainText(), self.fitter.redshift)
-            except AttributeError:
+            except AttributeError as e:
+                print("nav.py def NavBtn AttributeError")  
+                print(e)
                 self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
                 
         elif msg == "Unsure":

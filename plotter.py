@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QLabel,
     QWidget,
+    QCheckBox,
     )
 from PySide6.QtGui import (
     Qt,
@@ -26,6 +27,9 @@ class Plotter:
     bigFig : FigureCanvasQTAgg
     templater : Templater
 
+    snToggler : QCheckBox
+    skyToggler : QCheckBox
+
     def __init__(self):
         self.layout = QVBoxLayout()
 
@@ -38,14 +42,28 @@ class Plotter:
 
         self.templater = Templater(self)
         self.layout.addLayout(self.templater.layout)
+
+        self.skyToggler = QCheckBox()
+        self.snToggler = QCheckBox()
+        self.skyToggler.stateChanged.connect(lambda:  self.PlotFile())
+        self.snToggler.stateChanged.connect(lambda:  self.PlotFile())
+       
+        togglelayout = QHBoxLayout()
+        togglelayout.addWidget(QLabel("Toggle Sky"))
+        togglelayout.addWidget(self.skyToggler)
+        togglelayout.addWidget(QLabel("Toggle S/N"))
+        togglelayout.addWidget(self.snToggler)
         
         plotLayout.addWidget(self.bigFig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
+        self.templater.layout.addLayout(togglelayout)
         self.l2_product = None
 
-        self.showSN = True
+        self.showSN = False
+        self.showSky = False
+
 
     def optionsWindow(self):
         self.optsWindow = QWidget()
@@ -74,43 +92,47 @@ class Plotter:
             l2_product = self.l2_product
         else:
             l2_product = l2
-
-        self.UpdateFigure('k')
+        try:
+            self.UpdateFigure('k')
+        except AttributeError as e:
+            print("plotter.py def PlotFile AttributeError")  
+            print(e)
+            self.UpdateGrism()
 
         if l2_product != None:
             self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
         plt.legend()
         self.bigFig.draw()
 
-    def UpdateGrism(self, spectra):
+    def UpdateGrism(self, spectra=None):
         plt.figure('k')
+        if spectra==None:
+            spectra=self.file
         plt.clf() #clear figure
         colorcodes = ['k','r','g','b']
         for x in [0,1,2,3]:
             if spectra[x]!=None:
-                plt.step(spectra[x].Wavelength, spectra[x].Flux, color = colorcodes[x], linewidth=self.lineThickness) #figure key is used for color
-                plt.xlabel('Wavelength (Å)')
-                plt.ylabel('Flux (erg/s/cm2/Å)')
-                plt.step(spectra[x].Wavelength, spectra[x].Noise, label='Noise', color=colorcodes[x], alpha=0.5, linewidth=self.lineThickness)
+                self.DrawPlot(spectra[x],colorcodes[x])
 
         plt.legend()
         self.bigFig.draw()
 
 
-    def UpdateFigure(self, key, file=None):
+    def UpdateFigure(self, key='k', file=None):
         if file==None:
             file=self.file
         plt.figure('k')
         plt.clf() #clear figure
-        plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
+        self.DrawPlot(file,key)
         plt.title(file.Objectname)  
 
-    def toggleSN(self):
-        self.showSN = not self.showSN
-        self.UpdateFigure('k')
-        self.PlotFile()
+    def DrawPlot(self,data,colorcode):
+        plt.step(data.Wavelength, data.Flux, color = colorcode, linewidth=self.lineThickness) #figure key is used for color
+        if self.snToggler.isChecked():
+            plt.step(data.Wavelength, data.Flux/data.Noise, label="Signal / Noise",  alpha=0.25, linewidth=self.lineThickness)
+        if self.skyToggler.isChecked():
+            plt.step(data.Wavelength, data.Skybackground, label="Sky Background",  alpha=0.25, linewidth=self.lineThickness)
+        plt.xlabel('Wavelength (Å)')
+        plt.ylabel('Flux (erg/s/cm2/Å)')
+        plt.ylim([0,np.max(data.Flux)])
+        plt.step(data.Wavelength, data.Noise, label='Noise', color=colorcode, alpha=0.5, linewidth=self.lineThickness)
