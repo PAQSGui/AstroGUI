@@ -17,13 +17,14 @@ from PySide6.QtGui import (
 
 # Class represents the top of the program and contains the labels used to display meta information
 class TargetData:
-    def __init__(self):
+    def __init__(self, fitter):
         self.layout = QHBoxLayout()
-        self.nbrLabel = QLabel("What is the DELTAMAG of -+ 2 neighbors on the CCD")
+        self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
         self.targetLabel = QLabel()
         self.targetLabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         
         self.layout.addWidget(self.nbrLabel)
+        self.layout.addLayout(fitter.layout)
         self.layout.addWidget(self.targetLabel)
 
     # Is supposed to extract target data from FITS file and update the labels accordingly

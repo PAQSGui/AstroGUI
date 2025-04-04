@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
         self.plotter = Plotter()
         self.fitter = Fitter()
-        self.targetData = TargetData()
+        self.targetData = TargetData(self.fitter)
         self.navigator = Navigator(0, self.plotter, self.fitter, self.targetData)
 
         mainLayout = QVBoxLayout()
@@ -63,6 +63,13 @@ class MainWindow(QMainWindow):
         # configure the middle layout
         midLayout = QHBoxLayout()
 
+        midLayout.addLayout(self.plotter.layout)
+        # midLayout.addLayout(self.fitter.layout)
+
+        # configure the bottom layout
+        botLayout = QHBoxLayout()
+        botLayout.addLayout(self.navigator.layout)
+        
         rightButtons = QVBoxLayout()
 
         signoiseButton = QPushButton("Show S/N spec")
@@ -74,13 +81,7 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addLayout(self.fitter.layout)
-
-        midLayout.addLayout(self.plotter.layout)
-        midLayout.addLayout(rightButtons) 
-
-        # configure the bottom layout
-        botLayout = self.navigator.layout
+        botLayout.addLayout(rightButtons)
 
         mainLayout.addLayout(self.targetData.layout)
         mainLayout.addLayout(midLayout)
