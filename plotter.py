@@ -134,4 +134,5 @@ class Plotter:
             plt.step(data.Wavelength, data.Skybackground, label="Sky Background",  alpha=0.25, linewidth=self.lineThickness)
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
+        plt.ylim([0,np.max(data.Flux)])
         plt.step(data.Wavelength, data.Noise, label='Noise', color=colorcode, alpha=0.5, linewidth=self.lineThickness)

@@ -43,6 +43,10 @@ class Templater:
         self.dropdown.textActivated.connect(self.text_changed)
 
     def plotTemplate(self, spec, l2_product, firstLoad = False):
+
+        if type(spec)==list:
+            #This should add them together, or make sure to receive a single plot
+            spec=spec[0]
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         try:
             wave, model = template.create_PCA_model(target,l2_product)
