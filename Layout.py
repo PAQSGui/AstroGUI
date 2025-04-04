@@ -37,8 +37,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
 
         self.plotter = Plotter(self.model)
-        self.fitter = Fitter()
-        self.targetData = TargetData(self.fitter)
+        self.targetData = TargetData(self.model.fitter)
         self.navigator = Navigator(self.plotter, self.model)
 
         mainLayout = QVBoxLayout()
@@ -62,12 +61,9 @@ class MainWindow(QMainWindow):
         button_quit.triggered.connect(lambda: app.quit())
         file_menu.addAction(button_quit)
 
-         # configure the middle layout
+        # configure the middle layout
         midLayout = QHBoxLayout()
-
         midLayout.addLayout(self.plotter.layout)
-        # midLayout.addLayout(self.fitter.layout)
-
 
         # configure the bottom layout
         botLayout = QHBoxLayout()

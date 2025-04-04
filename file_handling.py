@@ -17,6 +17,8 @@ from PySide6.QtGui import (
 
 # Class represents the top of the program and contains the labels used to display meta information
 class TargetData:
+    layout: QHBoxLayout
+
     def __init__(self, fitter):
         self.layout = QHBoxLayout()
         self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
