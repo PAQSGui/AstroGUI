@@ -21,8 +21,6 @@ class Fitter:
 
     def __init__(self):
         self.pipe = Pipeline()
-        self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
         self.database = Database("preProcess.csv",fields)
 
@@ -36,26 +34,6 @@ class Fitter:
         else:
             l2_product = convert_l2(l2)
 
-
-        self.clearLayout()
-        ZBEST  = float(l2_product['zBest'])
-        self.redshift = ZBEST
-        self.best = l2_product['zBestSubType']
-
-        classification = l2_product['zBestSubType']
-        probability    = l2_product['zBestProb'] * 100
-
-        self.layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
-
-        subTypes = l2_product['zAltSubType']
-        probabilities = l2_product['zAltProb']
-
-        for i in range(1,len(subTypes)):
-            probability = probabilities[i] * 100
-            if probability > 10:
-                text = subTypes[i] + ': %.2f %%' % probability
-                self.layout.addWidget(QLabel(text))
-
         return l2_product
 
     def getBestGuess(self):
@@ -63,10 +41,7 @@ class Fitter:
 
     def getl2_product(self, name):
         return self.l2_product
-    
-    def clearLayout(self):
-        for i in range(self.layout.count()): self.layout.itemAt(i).widget().close()
-        print("i've cleared the layout")
+
 
 def convert_l2(row):
     l2_product = dict()

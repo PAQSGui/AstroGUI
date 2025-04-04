@@ -2,7 +2,7 @@ from nav import Navigator
 from ssPicture import LoadPicture
 from plotter import Plotter
 from fitter import Fitter
-from file_handling import TargetData
+from InfoLayout import InfoLayout
 from Model import Model
 
 from PySide6.QtWidgets import (
@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
     navigator:  Navigator
     plotter:    Plotter
     fitter:     Fitter
-    targetData: TargetData
+    infoLayout: InfoLayout
 
     def __init__(self):
         super().__init__()
@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AstroGUI")
 
         self.plotter = Plotter(self.model)
-        self.targetData = TargetData(self.model)
+        self.infoLayout = InfoLayout(self.model)
         self.navigator = Navigator(self.plotter, self.model)
 
         mainLayout = QVBoxLayout()
@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(skygrabButton)
         botLayout.addLayout(rightButtons)
 
-        mainLayout.addLayout(self.targetData.layout)
+        mainLayout.addLayout(self.infoLayout.layout)
         mainLayout.addLayout(midLayout)
         mainLayout.addLayout(botLayout)
         

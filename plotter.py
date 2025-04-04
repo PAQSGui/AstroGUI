@@ -128,13 +128,12 @@ class Plotter:
         plt.ylabel('Flux (erg/s/cm2/Å)')
         plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
         plt.title(self.file.Objectname) 
-        plt.legend()
 
         self.templater.plotTemplate(self.file, data.fitting)
 
+        plt.legend()
         self.bigFig.draw()
 
     def toggleSN(self):
         self.showSN = not self.showSN
         self.update()
-        self.PlotFile()
