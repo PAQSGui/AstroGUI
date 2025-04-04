@@ -38,17 +38,12 @@ class Navigator:
         self.layout.addWidget(self.whyInput)
 
     def NavBtn (self, msg, delta):
-        if msg == "Back":
-            pass
-        elif msg == "Yes":
-            pass
-            # add in model database
-            #self.database.addEntry(self.getCurrentFile(), self.fitter.best, "None", self.fitter.redshift)
+        if msg == "Yes":
+            self.model.addDBEntry(True, self.whyInput.toPlainText())
+            self.whyInput.setPlainText("")
         elif msg == "Unsure":
-            pass
-            # addd in model database
-            #self.database.addEntry(self.getCurrentFile(), "None", self.whyInput.toPlainText(), 0.0)
-            #self.whyInput.setPlainText("")
+            self.model.addDBEntry(False, self.whyInput.toPlainText())
+            self.whyInput.setPlainText("")
 
         self.model.updateCursor(delta)
         self.plotter.update()

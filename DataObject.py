@@ -5,27 +5,39 @@ class DataObject:
     name: str
     file: tool.SDSS_spectrum
     fitting: dict
+    category: str
     redshift: float
 
-    def __init__(self, filename, file, fitting, redshift):
+    def __init__(self, filename, file, fitting):
         self.name = filename
         self.file = file
         self.fitting = fitting
-        self.redshift = redshift
+        try:
+            self.category = fitting['zBestSubType']
+            self.redshift = fitting['zBest']
+        except:
+            self.category = None
+            self.redshift = 0
+
+    def changeRedshift(self, val):
+        self.redshift = val
+
+    def changeCategory(self, cat):
+        self.category = cat
 
     def toDict(self):
         selfDict = {
         'name': self.name,
         'file' : self.file,
-        'fitting' : self.fitting,
-        'redshift' : self.redshift }
+        'category' : self.category,
+        'redshift' : self.redshift}
 
         return selfDict
     
-    def fromDict(dict):
+    def fromDict(dict, fitting):
         name = dict['name']
         file = dict['file']
-        fitting = dict['fitting']
+        category = dict['category']
         redshift = dict['redshift']
 
-        return DataObject(name, file, fitting, redshift)
+        return DataObject(name, file, fitting, category, redshift)
