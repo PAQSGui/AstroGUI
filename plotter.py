@@ -40,7 +40,6 @@ class Plotter:
 
         self.templater = Templater(self)
         self.layout.addLayout(self.templater.layout)
-        print(type(self.bigFig))
         plotLayout.addWidget(self.bigFig)
 
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
