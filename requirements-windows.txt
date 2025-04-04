@@ -1,4 +1,4 @@
-astropy==7.0.1
+astropy==6.1.7
 astropy-iers-data==0.2025.3.24.0.35.32
 certifi==2025.1.31
 charset-normalizer==3.4.1
