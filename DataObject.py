@@ -40,4 +40,8 @@ class DataObject:
         category = dict['category']
         redshift = dict['redshift']
 
-        return DataObject(name, file, fitting, category, redshift)
+        object = DataObject(name, file, fitting)
+        object.changeCategory(category)
+        object.changeRedshift(redshift)
+
+        return object

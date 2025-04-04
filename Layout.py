@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-        self.model = Model(folder_path)
+        self.model = Model(folder_path, True)
         self.setWindowTitle("AstroGUI")
 
         self.plotter = Plotter(self.model)

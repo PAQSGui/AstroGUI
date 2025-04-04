@@ -17,3 +17,8 @@ spec-10248-58220-0280.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb38dd23d0>,Q
 spec-10248-58220-0348.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3bb04b50>,QSO-LOWZ,0.9926128158518557
 spec-10248-58220-0436.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb30934ad0>,QSO-LOWZ,0.44343270904012067
 spec-10248-58220-0811.fits,<Spec_tools.SDSS_spectrum object at 0x7fbb3084f290>,QSO,2.178521527827912
+name,file,category,redshift
+name,file,category,redshift
+name,file,category,redshift
+name,file,category,redshift
+name,file,category,redshift

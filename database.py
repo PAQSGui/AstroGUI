@@ -41,10 +41,11 @@ class Database():
         with open(self.dataFile, 'r', newline='') as file:      
             reader = csv.DictReader(file)
             for row in reader:
-                object = DataObject.fromDict(row)
-                object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
-                object.fitting = fitter.fitFile(directory.absoluteFilePath(object.name))
-                files.append(object)     
+                if row['name'] != self.fieldNames[0]:
+                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']))
+                    object = DataObject.fromDict(row, fitting)
+                    object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
+                    files.append(object)     
 
         return files
 
@@ -63,7 +64,6 @@ class Database():
                 if row[self.fieldNames[0]] == name:
                     return row
                 return []
-
 
     def addFitting(self, l2):
         with open(self.dataFile, 'a', newline='') as file:
