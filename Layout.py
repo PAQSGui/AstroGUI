@@ -19,8 +19,8 @@ from PySide6.QtGui import (
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
-# Middle is the plots and 'show' buttons
-# Bottom is the 'Yes', 'No' etc buttons
+# Middle is the plot
+# Bottom is the navigation bottom
 
 class MainWindow(QMainWindow):
     model:      Model
@@ -62,14 +62,21 @@ class MainWindow(QMainWindow):
         button_quit.triggered.connect(lambda: app.quit())
         file_menu.addAction(button_quit)
 
-        
-        # configure the middle layout
+         # configure the middle layout
         midLayout = QHBoxLayout()
 
+        midLayout.addLayout(self.plotter.layout)
+        # midLayout.addLayout(self.fitter.layout)
+
+
+        # configure the bottom layout
+        botLayout = QHBoxLayout()
+        botLayout.addLayout(self.navigator.layout)
+        
         rightButtons = QVBoxLayout()
 
-        signoiseButton = QPushButton("Show S/N spec")
-        signoiseButton.clicked.connect(lambda: Plotter(self.navigator.current).showSN())
+        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton.clicked.connect(lambda: self.plotter.toggleSN())
 
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
@@ -77,13 +84,7 @@ class MainWindow(QMainWindow):
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
-        rightButtons.addLayout(self.fitter.layout)
-
-        midLayout.addLayout(self.plotter.layout)
-        midLayout.addLayout(rightButtons) 
-
-        # configure the bottom layout
-        botLayout = self.navigator.layout
+        botLayout.addLayout(rightButtons)
 
         mainLayout.addLayout(self.targetData.layout)
         mainLayout.addLayout(midLayout)
