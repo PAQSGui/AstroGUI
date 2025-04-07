@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     )
 from PySide6.QtGui import (
     QAction,
-    QIcon,
+    QFont,
 )
 
 from PySide6.QtCore import QSize
@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         # add toolbar
 
         file_menu = self.menuBar()
-        file_menu.setBaseSize(QSize(32, 32))
+        file_menu.setFont(QFont("",18))
 
         button_open = QAction("📂", self)
         button_open.setStatusTip("Open a folder and plot FITS files inside")
@@ -63,6 +63,10 @@ class MainWindow(QMainWindow):
         button_options.setStatusTip("Open a window to configure the program")
         button_options.triggered.connect(lambda: self.plotLayout.optionsWindow())
         file_menu.addAction(button_options)
+
+        button_stack = QAction("🥞", self)
+        button_stack.setStatusTip("Load other spectra of the same object and overplot them for comparison")
+        file_menu.addAction(button_stack)
 
         # configure the bottom layout
         botLayout = QHBoxLayout()
@@ -76,7 +80,6 @@ class MainWindow(QMainWindow):
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
 
-        rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
         botLayout.addLayout(rightButtons)
