@@ -78,15 +78,15 @@ class PlotLayout:
         self.thickSlider=QSlider(Qt.Orientation.Horizontal)
         self.thickSlider.setRange(1,15) #slider only takes integers
         self.thickSlider.setSingleStep(1)
-        self.thickSlider.setValue(int(self.lineThickness*10))
+        self.thickSlider.setValue(int(self.model.lineThickness*10))
         self.thickSlider.valueChanged.connect(lambda: self.setThickness(self.thickSlider.value()))
         self.optsLayout.addWidget(self.thickSlider)
         self.optsWindow.setLayout(self.optsLayout)
         self.optsWindow.show()
 
     def setThickness(self, newValue):
-        self.lineThickness=float(newValue)/10.0
-        self.PlotFile()
+        self.model.lineThickness=float(newValue)/10.0
+        self.plotter.UpdateFigure()
 
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*10)
