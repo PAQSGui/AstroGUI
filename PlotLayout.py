@@ -13,7 +13,16 @@ from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QSlider,
+    QLabel,
     )
+
+from PySide6.QtGui import (
+    Qt,
+)
+
+from PySide6.QtCore import QSize
+
 
 class PlotLayout:
     layout: QHBoxLayout
