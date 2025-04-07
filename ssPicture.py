@@ -31,6 +31,6 @@ def LoadPicture(model):
     dec = header['DEC']
     #https://github.com/behrouzz/sdss
     reg = Region(ra, dec, fov=0.033)
-    print(reg.nearest_objects())
+    #print(reg.nearest_objects())
     
     Show(reg)

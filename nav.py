@@ -10,6 +10,8 @@ from PySide6.QtWidgets import (
     )
 
 import re
+from PySide6.QtCore import QSize
+
 
 class Navigator:
 
@@ -24,6 +26,7 @@ class Navigator:
 
         whyInput = QPlainTextEdit()
         whyInput.setPlaceholderText("Write your notes here")
+        whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
         backButton = QPushButton("Back")

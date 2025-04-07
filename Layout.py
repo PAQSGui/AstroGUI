@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QFileDialog,
     QMessageBox,
+    QStatusBar,
+    QLayout,
     )
 from PySide6.QtGui import (
     QAction,
@@ -57,10 +59,13 @@ class MainWindow(QMainWindow):
 
         self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
+        self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator = Navigator(self.plotLayout, self.model)
+        self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         mainLayout = QVBoxLayout()
 
+        self.setStatusBar(QStatusBar(self))
         # add toolbar
 
         file_menu = self.menuBar()
@@ -83,17 +88,12 @@ class MainWindow(QMainWindow):
         # configure the bottom layout
         botLayout = QHBoxLayout()
         botLayout.addLayout(self.navigator.layout)
-        
-        rightButtons = QVBoxLayout()
+        skygrabButton = QAction("🌌", self)
+        skygrabButton.setStatusTip('Load image cutout from the Sloan Digital Sky Survey (SDSS)')
+        skygrabButton.triggered.connect(lambda: LoadPicture(self.model))
+        file_menu.addAction(skygrabButton)
 
-        skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.model))
-
-        #rightButtons.addWidget(signoiseButton)
-        rightButtons.addWidget(skygrabButton)
-        botLayout.addLayout(rightButtons)
-
-        mainLayout.addLayout(self.infoLayout.layout)
+        mainLayout.addLayout(self.infoLayout)
         mainLayout.addLayout(self.plotLayout.layout)
         mainLayout.addLayout(botLayout)
         
