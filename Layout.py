@@ -52,14 +52,14 @@ class MainWindow(QMainWindow):
         # add toolbar
 
         file_menu = self.menuBar()
-        file_menu.setBaseSize(QSize(16, 16))
+        file_menu.setBaseSize(QSize(32, 32))
 
-        button_open = QAction(QIcon("img/fasil-freeicons.io-folder.png"), "Open Folder", self)
+        button_open = QAction("📂", self)
         button_open.setStatusTip("Open a folder and plot FITS files inside")
         button_open.triggered.connect(lambda: self.openFolder())
         file_menu.addAction(button_open)
 
-        button_options = QAction(QIcon("img/fasil-freeicons.io-options.png"), "Options", self)
+        button_options = QAction("⚙️", self)
         button_options.setStatusTip("Open a window to configure the program")
         button_options.triggered.connect(lambda: self.plotLayout.optionsWindow())
         file_menu.addAction(button_options)
