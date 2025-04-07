@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFileDialog,
-    QToolBar,
+    QMessageBox,
     )
 from PySide6.QtGui import (
     QAction,
@@ -34,12 +34,24 @@ class MainWindow(QMainWindow):
     infoLayout: InfoLayout
 
     def openFolder(self):
-        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-        self.model = Model(folder_path, False)
+        while True:
+            try:
+                folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
+                if folder_path == "":
+                    # Hacky way of exiting program of dialog is cancelled
+                    exit()
+                self.model = Model(folder_path, True)
+            except FileNotFoundError:
+                popup = QMessageBox()
+                popup.setWindowTitle("Error")
+                popup.setText("Folder does not contain any FITS files")
+                popup.setIcon(QMessageBox.Icon.Critical)
+                popup.exec()
+            else:
+                break
 
     def __init__(self, app):
         super().__init__()
-
         self.openFolder()
         self.setWindowTitle("AstroGUI")
 
@@ -74,11 +86,8 @@ class MainWindow(QMainWindow):
         
         rightButtons = QVBoxLayout()
 
-        signoiseButton = QPushButton("Toggle S/N spec")
-        signoiseButton.clicked.connect(lambda: self.plotLayout.toggleSN())
-
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
+        skygrabButton.clicked.connect(lambda: LoadPicture(self.model))
 
         rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
