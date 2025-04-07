@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFileDialog,
+    QMessageBox,
     )
 from PySide6.QtGui import (
     QAction,
@@ -31,9 +32,22 @@ class MainWindow(QMainWindow):
 
     def __init__(self, app):
         super().__init__()
-
-        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-        self.model = Model(folder_path, True)
+        while True:
+            try:
+                folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
+                if folder_path == "":
+                    # Hacky way of exiting program of dialog is cancelled
+                    exit()
+                self.model = Model(folder_path, True)
+            except FileNotFoundError:
+                popup = QMessageBox()
+                popup.setWindowTitle("Error")
+                popup.setText("Folder does not contain any FITS files")
+                popup.setIcon(QMessageBox.Icon.Critical)
+                popup.exec()
+            else:
+                break
+        
         self.setWindowTitle("AstroGUI")
 
         self.plotLayout = PlotLayout(self.model)
