@@ -12,10 +12,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QFileDialog,
+    QToolBar,
     )
 from PySide6.QtGui import (
     QAction,
+    QIcon,
 )
+
+from PySide6.QtCore import QSize
 
 # Layout should be top, middle, bottom
 # Top is just meta data etc
@@ -29,11 +33,14 @@ class MainWindow(QMainWindow):
     fitter:     Fitter
     infoLayout: InfoLayout
 
+    def openFolder(self):
+        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
+        self.model = Model(folder_path, False)
+
     def __init__(self, app):
         super().__init__()
 
-        folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-        self.model = Model(folder_path, True)
+        self.openFolder()
         self.setWindowTitle("AstroGUI")
 
         self.plotLayout = PlotLayout(self.model)
@@ -43,23 +50,20 @@ class MainWindow(QMainWindow):
         mainLayout = QVBoxLayout()
 
         # add toolbar
-        menu = self.menuBar()
-        file_menu = menu.addMenu("&File")
 
-        button_open = QAction("Open Folder", self)
+        file_menu = QToolBar("My main toolbar")
+        file_menu.setIconSize(QSize(16, 16))
+        self.addToolBar(file_menu)
+
+        button_open = QAction(QIcon("img/fasil-freeicons.io-folder.png"), "Open Folder", self)
         button_open.setStatusTip("Open a folder and plot FITS files inside")
-        button_open.triggered.connect(lambda: self.navigator.openFolder())
+        button_open.triggered.connect(lambda: self.openFolder())
         file_menu.addAction(button_open)
 
-        button_options = QAction("Options", self)
+        button_options = QAction(QIcon("img/fasil-freeicons.io-options.png"), "Options", self)
         button_options.setStatusTip("Open a window to configure the program")
-        button_options.triggered.connect(lambda: self.plotter.optionsWindow())
+        button_options.triggered.connect(lambda: self.plotLayout.optionsWindow())
         file_menu.addAction(button_options)
-
-        button_quit = QAction("Exit", self)
-        button_quit.setStatusTip("Exit program")
-        button_quit.triggered.connect(lambda: app.quit())
-        file_menu.addAction(button_quit)
 
         # configure the bottom layout
         botLayout = QHBoxLayout()
