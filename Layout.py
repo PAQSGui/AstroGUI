@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
     fitter:     Fitter
     infoLayout: InfoLayout
 
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
 
         folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")

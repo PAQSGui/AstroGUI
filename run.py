@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 
 def main():
     app = QApplication([])
-    window = MainWindow()
+    window = MainWindow(app)
     window.show()
     app.exec()
 
