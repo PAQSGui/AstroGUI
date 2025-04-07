@@ -24,6 +24,9 @@ class DataObject:
 
     def changeCategory(self, cat):
         self.category = cat
+    
+    def getFile(self):
+        return self.file
 
     def toDict(self):
         selfDict = {

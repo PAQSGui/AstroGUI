@@ -38,6 +38,7 @@ class Model:
         self.options[opt] = val
     
     def changeRedShift(self, val):
+<<<<<<< HEAD
         self.objects[self.cursor].changeRedshift(val)
 
     def getRedShift(self):
@@ -45,6 +46,9 @@ class Model:
     
     def getCategory(self):
         return self.objects[self.cursor].category
+=======
+        self.objects[self.cursor].changeRedShift(val)
+>>>>>>> main
 
     def changeCategory(self, cat):
         self.objects[self.cursor].changeCategory(cat) 
