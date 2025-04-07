@@ -1,6 +1,7 @@
 
-from plotter import Plotter
+from PlotLayout import PlotLayout
 from Model import Model
+import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QPushButton,
@@ -14,7 +15,7 @@ class Navigator:
 
     layout: QHBoxLayout
     model: Model
-    plotter: Plotter
+    plotter: PlotLayout
 
     def __init__(self, plotter, model):
         self.model = model

@@ -2,13 +2,11 @@
 from xpca.pipeline import Pipeline
 from database import Database
 import numpy as np
+
 from PySide6.QtWidgets import (
     QLabel,
     QVBoxLayout,
     )
-from PySide6.QtGui import (
-    Qt,
-)
 
 class Fitter:
 

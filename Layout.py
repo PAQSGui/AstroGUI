@@ -1,9 +1,9 @@
 from nav import Navigator
 from ssPicture import LoadPicture
-from plotter import Plotter
 from fitter import Fitter
 from InfoLayout import InfoLayout
 from Model import Model
+from PlotLayout import PlotLayout
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -25,7 +25,7 @@ from PySide6.QtGui import (
 class MainWindow(QMainWindow):
     model:      Model
     navigator:  Navigator
-    plotter:    Plotter
+    plotLayout: PlotLayout
     fitter:     Fitter
     infoLayout: InfoLayout
 
@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         self.model = Model(folder_path, True)
         self.setWindowTitle("AstroGUI")
 
-        self.plotter = Plotter(self.model)
+        self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
-        self.navigator = Navigator(self.plotter, self.model)
+        self.navigator = Navigator(self.plotLayout, self.model)
 
         mainLayout = QVBoxLayout()
 
@@ -61,10 +61,6 @@ class MainWindow(QMainWindow):
         button_quit.triggered.connect(lambda: app.quit())
         file_menu.addAction(button_quit)
 
-        # configure the middle layout
-        midLayout = QHBoxLayout()
-        midLayout.addLayout(self.plotter.layout)
-
         # configure the bottom layout
         botLayout = QHBoxLayout()
         botLayout.addLayout(self.navigator.layout)
@@ -72,7 +68,7 @@ class MainWindow(QMainWindow):
         rightButtons = QVBoxLayout()
 
         signoiseButton = QPushButton("Toggle S/N spec")
-        signoiseButton.clicked.connect(lambda: self.plotter.toggleSN())
+        signoiseButton.clicked.connect(lambda: self.plotLayout.toggleSN())
 
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
@@ -83,7 +79,7 @@ class MainWindow(QMainWindow):
         botLayout.addLayout(rightButtons)
 
         mainLayout.addLayout(self.infoLayout.layout)
-        mainLayout.addLayout(midLayout)
+        mainLayout.addLayout(self.plotLayout.layout)
         mainLayout.addLayout(botLayout)
         
         widget = QWidget()

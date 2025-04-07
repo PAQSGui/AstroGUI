@@ -1,6 +1,5 @@
 import Spec_tools as tool
 from DataObject import DataObject
-import csv
 from fitter import Fitter
 from database import Database
 

@@ -1,17 +1,9 @@
-from astropy.io import fits
-
 from PySide6.QtWidgets import (
-    QApplication, 
-    QMainWindow, 
-    QPushButton,
-    QWidget,
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
-    QSizePolicy,
     )
 from PySide6.QtGui import (
-    QAction,
     Qt,
 )
 
@@ -36,6 +28,11 @@ class InfoLayout:
         self.layout.addLayout(self.targetLayout)
         self.updateAll()
     
+    def updateAll(self):
+        self.updateNbrLabel()
+        self.updateClassProb()
+        self.updateTarget()
+
     def updateNbrLabel(self):
         self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
 
@@ -66,11 +63,6 @@ class InfoLayout:
         self.targetLayout.addWidget(QLabel("Mag"))
         self.targetLayout.addWidget(QLabel("MAG Type"))
         self.targetLayout.addWidget(QLabel("EBV"))
-
-    def updateAll(self):
-        self.updateNbrLabel()
-        self.updateClassProb()
-        self.updateTarget()
 
 def clearLayout(layout):
     for i in range(layout.count()): layout.itemAt(i).widget().close()
