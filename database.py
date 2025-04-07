@@ -23,7 +23,7 @@ class Database():
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
-        files = directory.entryList()
+        files = directory.entryList()[0:10]
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
             fitting = fitter.fitFile(directory.absoluteFilePath(file))
