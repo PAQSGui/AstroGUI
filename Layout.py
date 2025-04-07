@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
         skygrabButton.clicked.connect(lambda: LoadPicture(self.model))
 
-        rightButtons.addWidget(signoiseButton)
+        #rightButtons.addWidget(signoiseButton)
         rightButtons.addWidget(skygrabButton)
         botLayout.addLayout(rightButtons)
 
