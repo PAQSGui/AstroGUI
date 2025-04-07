@@ -86,4 +86,4 @@ class Navigator:
 
         self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
-        self.plotlayout.update()
+        self.plotlayout.newFile()

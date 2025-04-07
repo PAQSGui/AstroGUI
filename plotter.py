@@ -7,13 +7,14 @@ from templater import Templater
 class Plotter:
     model:  Model   
     figure: FigureCanvasQTAgg  
-    templater = Templater()   
+    templater: Templater 
     lineThickness=0.5
     showSN = True
     showSky = True
 
     def __init__(self, model, figure ):
         self.model = model
+        self.templater = Templater(model)
         self.figure = figure
 
     def UpdateGrism(self, spectra=None):
@@ -34,7 +35,7 @@ class Plotter:
         plt.figure('k')
         plt.clf()
         self.DrawPlot(file,key)
-        self.templater.plotTemplate(file, self.model.getState().fitting)
+        self.templater.plotTemplate()
         plt.title(file.Objectname)  
         plt.legend
         self.figure.draw()
