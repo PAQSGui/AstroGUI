@@ -15,11 +15,11 @@ class Navigator:
 
     layout: QHBoxLayout
     model: Model
-    plotter: PlotLayout
+    plotlayout: PlotLayout
 
-    def __init__(self, plotter, model):
+    def __init__(self, plotlayout, model):
         self.model = model
-        self.plotter = plotter
+        self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
 
         whyInput = QPlainTextEdit()
@@ -86,4 +86,4 @@ class Navigator:
 
         self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
-        self.plotter.update()
+        self.plotlayout.newFile()

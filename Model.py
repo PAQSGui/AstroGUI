@@ -1,14 +1,11 @@
-import Spec_tools as tool
-from DataObject import DataObject
 from fitter import Fitter
 from database import Database
-
-
 
 class Model:
     cursor = 0
     objects = []
     options: dict
+    path = ""
     fileFieldNames = ['name', 'file', 'category', 'redshift']
     fileDB : Database
     catFieldNames = ['name', 'categorized', 'category', 'redshift', 'note']
@@ -16,7 +13,8 @@ class Model:
     fitter: Fitter
 
     def __init__(self, path, fromCSV = False):
-        
+
+        self.path = path
         self.fileDB = Database('files.csv', self.fileFieldNames, path)
         self.categoryDB = Database('data.csv', self.catFieldNames, path)
         self.fitter = Fitter()
@@ -27,9 +25,7 @@ class Model:
         self.objects = self.fileDB.extract(self.fitter)
 
         # initilaize options
-    
-    def getState(self):
-        return self.objects[self.cursor]
+
     
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
@@ -38,10 +34,22 @@ class Model:
         self.options[opt] = val
     
     def changeRedShift(self, val):
-        self.objects[self.cursor].changeRedShift(val)
-
+        self.objects[self.cursor].changeRedshift(val)
+    
     def changeCategory(self, cat):
         self.objects[self.cursor].changeCategory(cat) 
+
+    def getRedShift(self):
+        return float(self.objects[self.cursor].redshift)
+    
+    def getCategory(self):
+        return self.objects[self.cursor].category
+    
+    def getState(self):
+        return self.objects[self.cursor]
+    
+    def getFile(self):
+        return self.objects[self.cursor].file
 
     def addDBEntry(self, categorised, note):
         object = self.objects[self.cursor]

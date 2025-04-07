@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
 
         button_options = QAction("Options", self)
         button_options.setStatusTip("Open a window to configure the program")
-        button_options.triggered.connect(lambda: self.plotter.optionsWindow())
+        button_options.triggered.connect(lambda: self.plotLayout.optionsWindow())
         file_menu.addAction(button_options)
 
         button_quit = QAction("Exit", self)
@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         signoiseButton.clicked.connect(lambda: self.plotLayout.toggleSN())
 
         skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.navigator.directory, self.navigator.getCurrentFile()))
+        skygrabButton.clicked.connect(lambda: LoadPicture(self.model))
 
         rightButtons.addWidget(QPushButton("SHOW spectra of STACK"))
         rightButtons.addWidget(signoiseButton)

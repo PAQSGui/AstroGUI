@@ -2,7 +2,7 @@ from astropy.io.fits import getheader
 from matplotlib import pyplot as plt
 from sdss import Region
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-
+from PySide6.QtCore import QDir
 def Show(region, band='all', figsize=None):
     #Shamelessly copied from Behrouz' own implementation
     if region.data is None:
@@ -23,7 +23,9 @@ def Show(region, band='all', figsize=None):
     canv=FigureCanvasQTAgg(fig)
     canv.show()
 
-def LoadPicture(dir, file):
+def LoadPicture(model):
+    dir = QDir(model.path)
+    file = model.getState().name
     header = getheader(dir.absoluteFilePath(file))
     ra = header['RA']
     dec = header['DEC']
