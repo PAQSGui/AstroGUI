@@ -19,6 +19,7 @@ class Templater:
         spec = state.file
         l2_product = state.fitting
         l2_product['zBest'] = self.model.getRedShift()
+        l2_product['zBestSubType'] = self.model.getCategory()
 
         if type(spec)==list:
             #This should add them together, or make sure to receive a single plot

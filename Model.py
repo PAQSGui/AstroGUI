@@ -42,6 +42,9 @@ class Model:
 
     def getRedShift(self):
         return float(self.objects[self.cursor].redshift)
+    
+    def getCategory(self):
+        return self.objects[self.cursor].category
 
     def changeCategory(self, cat):
         self.objects[self.cursor].changeCategory(cat) 

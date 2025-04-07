@@ -46,7 +46,7 @@ class PlotLayout:
         zSlider.setValue(model.getRedShift()*10)
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
-        
+
         sliderLayout.addWidget(zSlider)
 
         self.dropdown = QComboBox()
@@ -105,31 +105,14 @@ class PlotLayout:
     def text_changed(self, s):
 
         result = re.search(f'template-(.+).fits', s)
-        self.l2_current['zBestSubType']=result.group(1)
+        self.model.changeCategory(result.group(1))
         
         try:
-            self.plotter.PlotFile(self.l2_current)
+            self.update()
         except FileNotFoundError as e:
-            print("templater.py def text_changed FileNotFoundError")  
-            print(e)
             for file in listdir(config.TEMPLATE_PATH):
                 if file.lower()==s:
                     result = re.search(f'template-(.+).fits', file)
                     self.l2_current['zBestSubType']=result.group(1)
                     self.plotter.PlotFile(self.l2_current)
                     break
-
-    def drawTemplate(self):
-        firstLoad = True
-        state = self.model.getState()
-        file = state.file
-        fitting = state.fitting
-        self.templater.plotTemplate(file, fitting)
-        #set combobox text:
-        best = fitting['zBestSubType'].lower()
-        #print(f'template-%s' % best)
-        self.dropdown.setCurrentText(f'template-%s.fits' % best)
-        self.spec_current=file
-        self.l2_current=fitting
-        if firstLoad:
-            self.setMiddle(fitting)
