@@ -27,6 +27,7 @@ class PlotLayout:
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
+    zSlider: QSlider 
 
     def __init__(self, model):
         self.model = model
@@ -41,8 +42,8 @@ class PlotLayout:
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.sliderMoved.connect(self.slider_changed)
-        zSlider.sliderReleased.connect(self.sliderrelease)
-
+        #zSlider.sliderReleased.connect(self.sliderrelease)
+        self.zSlider = zSlider
         sliderLayout.addWidget(zSlider)
 
         self.dropdown = QComboBox()
@@ -81,6 +82,7 @@ class PlotLayout:
 
     def update(self):
         self.plotter.UpdateFigure()
+        self.setMiddle()
 
     def toggleSN(self):
         self.plotter.showSN = not self.plotter.showSN
@@ -91,21 +93,22 @@ class PlotLayout:
         self.update()
 
     def sliderrelease(self):
-        self.l2_current['zBest']=float(self.zSlider.value())/100
-        self.setMiddle(self.l2_current)
-        self.plotter.PlotFile(self.l2_current)
-        
-    def setMiddle(self,l2_product):
-        newMiddle = l2_product['zBest']*100
+        self.model.changeRedShift(float(self.zSlider.value())/100)
+        self.setMiddle()
+        self.update()
+
+    def slider_changed(self):
+        self.model.changeRedShift(float(self.zSlider.value())/100)
+        self.setMiddle()
+        self.update()
+
+    def setMiddle(self):
+        redshift = self.model.getRedShift()
+        newMiddle = redshift*100
         self.zSlider.setMinimum(newMiddle-100)
         self.zSlider.setMaximum(newMiddle+100)
         self.zSlider.setValue(newMiddle)
     
-    def slider_changed(self,s):
-        self.l2_current['zBest']=float(self.zSlider.value())/100
-
-        self.plotter.PlotFile(self.l2_current, first = False)
-
     def text_changed(self, s):
 
         result = re.search(f'template-(.+).fits', s)

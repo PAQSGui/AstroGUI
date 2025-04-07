@@ -38,7 +38,10 @@ class Model:
         self.options[opt] = val
     
     def changeRedShift(self, val):
-        self.obejcts[self.cursor].changeRedShift(val)
+        self.objects[self.cursor].changeRedshift(val)
+
+    def getRedShift(self):
+        return float(self.objects[self.cursor].redshift)
 
     def changeCategory(self, cat):
         self.objects[self.cursor].changeCategory(cat) 
