@@ -2,13 +2,11 @@
 from xpca.pipeline import Pipeline
 from database import Database
 import numpy as np
+
 from PySide6.QtWidgets import (
     QLabel,
     QVBoxLayout,
     )
-from PySide6.QtGui import (
-    Qt,
-)
 
 class Fitter:
 
@@ -21,8 +19,6 @@ class Fitter:
 
     def __init__(self):
         self.pipe = Pipeline()
-        self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
         self.database = Database("preProcess.csv",fields)
 
@@ -32,31 +28,9 @@ class Fitter:
         if l2 == []:
             self.pipe.run(filePath, source='sdss')
             l2_product = self.pipe.catalog_items[0]
-            #l2_product is type dict
             self.database.addFitting(l2_product)
         else:
             l2_product = convert_l2(l2)
-
-
-        self.clearLayout()
-        ZBEST  = float(l2_product['zBest'])
-        self.redshift = ZBEST
-        self.best = l2_product['zBestSubType']
-        #self.layout.addWidget(QLabel("template: " + self.best + ': %.5f' % ZBEST))
-
-        classification = l2_product['zBestSubType']
-        probability    = l2_product['zBestProb'] * 100
-
-        self.layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
-
-        subTypes = l2_product['zAltSubType']
-        probabilities = l2_product['zAltProb']
-
-        for i in range(1,len(subTypes)):
-            probability = probabilities[i] * 100
-            if probability > 10:
-                text = subTypes[i] + ': %.2f %%' % probability
-                self.layout.addWidget(QLabel(text))
 
         return l2_product
 
@@ -65,9 +39,7 @@ class Fitter:
 
     def getl2_product(self, name):
         return self.l2_product
-    
-    def clearLayout(self):
-        for i in range(self.layout.count()): self.layout.itemAt(i).widget().close()
+
 
 def convert_l2(row):
     l2_product = dict()
