@@ -51,9 +51,8 @@ class MainWindow(QMainWindow):
 
         # add toolbar
 
-        file_menu = QToolBar("My main toolbar")
-        file_menu.setIconSize(QSize(16, 16))
-        self.addToolBar(file_menu)
+        file_menu = self.menuBar()
+        file_menu.setBaseSize(QSize(16, 16))
 
         button_open = QAction(QIcon("img/fasil-freeicons.io-folder.png"), "Open Folder", self)
         button_open.setStatusTip("Open a folder and plot FITS files inside")
