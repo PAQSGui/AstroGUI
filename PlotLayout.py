@@ -1,8 +1,6 @@
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from matplotlib.pyplot import figure
-from templater import Templater
 from Model import Model
+from matplotlib.pyplot import figure
 
 from plotter import Plotter
 
@@ -22,7 +20,6 @@ from PySide6.QtGui import (
 
 from PySide6.QtCore import QSize
 from xpca import config
-#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
 from os import listdir
 import re
 
@@ -30,39 +27,39 @@ class PlotLayout:
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
-    showSN = True
 
     def __init__(self, model):
         self.model = model
         self.layout = QVBoxLayout()
 
-        plotLayout = QHBoxLayout()
+        fig = FigureCanvasQTAgg(figure('k'))
+        fig.setMinimumSize(QSize(560, 560))
+        self.plotter = Plotter(model, fig)
 
-        self.lineThickness=0.5
-        self.bigFig = FigureCanvasQTAgg(figure('k'))
-        self.bigFig.setMinimumSize(QSize(560, 560))
+        sliderLayout = QHBoxLayout()
 
-        self.templater = Templater()
-        self.layout.addLayout(self.templater.layout)
-        plotLayout.addWidget(self.bigFig)
+        zSlider = QSlider(Qt.Orientation.Horizontal)
+        zSlider.setSingleStep(1)
+        zSlider.sliderMoved.connect(self.slider_changed)
+        zSlider.sliderReleased.connect(self.sliderrelease)
 
-        self.zSlider = QSlider(Qt.Orientation.Horizontal)
-        self.zSlider.setSingleStep(1)
-        self.zSlider.sliderMoved.connect(self.slider_changed)
-        self.zSlider.sliderReleased.connect(self.sliderrelease)
-        self.layout.addWidget(self.zSlider)
+        sliderLayout.addWidget(zSlider)
+
         self.dropdown = QComboBox()
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
                 self.dropdown.addItem(file)
-        self.layout.addWidget(self.dropdown)
+
+        sliderLayout.addWidget(self.dropdown)
 
         self.dropdown.textActivated.connect(self.text_changed)
 
+        plotLayout = QHBoxLayout()
+        plotLayout.addWidget(fig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
-        self.l2_product = None
+        self.layout.addLayout(sliderLayout)
         self.update()
 
     def optionsWindow(self):
@@ -82,75 +79,15 @@ class PlotLayout:
         self.lineThickness=float(newValue)/10.0
         self.PlotFile()
 
-    def addFile(self, file, l2_product = None):
-        self.file = file
-        self.l2_product = l2_product
-        self.PlotFile()
-
-    def PlotFile(self, l2 = None, first = True):
-        if l2 == None:
-            l2_product = self.l2_product
-        else:
-            l2_product = l2
-
-        self.UpdateFigure('k')
-
-        if l2_product != None:
-            self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
-        plt.legend()
-        self.bigFig.draw()
-
-    def UpdateGrism(self, spectra):
-        plt.figure('k')
-        plt.clf() #clear figure
-        colorcodes = ['k','r','g','b']
-        for x in [0,1,2,3]:
-            if spectra[x]!=None:
-                plt.step(spectra[x].Wavelength, spectra[x].Flux, color = colorcodes[x], linewidth=self.lineThickness) #figure key is used for color
-                plt.xlabel('Wavelength (Å)')
-                plt.ylabel('Flux (erg/s/cm2/Å)')
-                plt.step(spectra[x].Wavelength, spectra[x].Noise, label='Noise', color=colorcodes[x], alpha=0.5, linewidth=self.lineThickness)
-
-        plt.legend()
-        self.bigFig.draw()
-
-
-    def UpdateFigure(self, key, file=None):
-        if file==None:
-            file=self.file
-        plt.figure('k')
-        plt.clf() #clear figure
-        plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
-        plt.title(file.Objectname)  
-        plt.title(self.file.Objectname)  
-
     def update(self):
-        model = self.model
-        data = Model.getState(model)
-        file = data.file
-        self.file = file
-        plt.figure('k')
-        plt.clf() #clear figure
-        plt.step(self.file.Wavelength, self.file.Flux, color = 'k', linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
-        plt.title(self.file.Objectname) 
-
-        self.templater.plotTemplate(self.file, data.fitting)
-
-        plt.legend()
-        self.bigFig.draw()
+        self.plotter.UpdateFigure()
 
     def toggleSN(self):
-        self.showSN = not self.showSN
+        self.plotter.showSN = not self.plotter.showSN
+        self.update()
+
+    def toggleSky(self):
+        self.plotter.showSky = not self.plotter.showSky
         self.update()
 
     def sliderrelease(self):
