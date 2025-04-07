@@ -1,13 +1,11 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.pyplot import figure
-import Spec_tools as tool
 from templater import Templater
 from Model import Model
-from PySide6.QtCore import QSize
 
 from plotter import Plotter
+
 from PySide6.QtWidgets import (
     QLayout,
     QWidget,
@@ -15,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QSlider,
     QLabel,
+    QComboBox,
     )
 
 from PySide6.QtGui import (
@@ -22,7 +21,10 @@ from PySide6.QtGui import (
 )
 
 from PySide6.QtCore import QSize
-
+from xpca import config
+#https://www.geeksforgeeks.org/list-all-files-of-certain-type-in-a-directory-using-python/
+from os import listdir
+import re
 
 class PlotLayout:
     layout: QHBoxLayout
@@ -40,9 +42,22 @@ class PlotLayout:
         self.bigFig = FigureCanvasQTAgg(figure('k'))
         self.bigFig.setMinimumSize(QSize(560, 560))
 
-        self.templater = Templater(self)
+        self.templater = Templater()
         self.layout.addLayout(self.templater.layout)
         plotLayout.addWidget(self.bigFig)
+
+        self.zSlider = QSlider(Qt.Orientation.Horizontal)
+        self.zSlider.setSingleStep(1)
+        self.zSlider.sliderMoved.connect(self.slider_changed)
+        self.zSlider.sliderReleased.connect(self.sliderrelease)
+        self.layout.addWidget(self.zSlider)
+        self.dropdown = QComboBox()
+        for file in listdir(config.TEMPLATE_PATH):
+            if file.endswith(".fits"):
+                self.dropdown.addItem(file)
+        self.layout.addWidget(self.dropdown)
+
+        self.dropdown.textActivated.connect(self.text_changed)
 
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
@@ -137,3 +152,51 @@ class PlotLayout:
     def toggleSN(self):
         self.showSN = not self.showSN
         self.update()
+
+    def sliderrelease(self):
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+        self.setMiddle(self.l2_current)
+        self.plotter.PlotFile(self.l2_current)
+        
+    def setMiddle(self,l2_product):
+        newMiddle = l2_product['zBest']*100
+        self.zSlider.setMinimum(newMiddle-100)
+        self.zSlider.setMaximum(newMiddle+100)
+        self.zSlider.setValue(newMiddle)
+    
+    def slider_changed(self,s):
+        self.l2_current['zBest']=float(self.zSlider.value())/100
+
+        self.plotter.PlotFile(self.l2_current, first = False)
+
+    def text_changed(self, s):
+
+        result = re.search(f'template-(.+).fits', s)
+        self.l2_current['zBestSubType']=result.group(1)
+        
+        try:
+            self.plotter.PlotFile(self.l2_current)
+        except FileNotFoundError as e:
+            print("templater.py def text_changed FileNotFoundError")  
+            print(e)
+            for file in listdir(config.TEMPLATE_PATH):
+                if file.lower()==s:
+                    result = re.search(f'template-(.+).fits', file)
+                    self.l2_current['zBestSubType']=result.group(1)
+                    self.plotter.PlotFile(self.l2_current)
+                    break
+
+    def drawTemplate(self):
+        firstLoad = True
+        state = self.model.getState()
+        file = state.file
+        fitting = state.fitting
+        self.templater.plotTemplate(file, fitting)
+        #set combobox text:
+        best = fitting['zBestSubType'].lower()
+        #print(f'template-%s' % best)
+        self.dropdown.setCurrentText(f'template-%s.fits' % best)
+        self.spec_current=file
+        self.l2_current=fitting
+        if firstLoad:
+            self.setMiddle(fitting)
