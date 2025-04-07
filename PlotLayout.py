@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QLabel,
     QComboBox,
+    QPushButton
     )
 
 from PySide6.QtGui import (
@@ -37,8 +38,6 @@ class PlotLayout:
         fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
-        sliderLayout = QHBoxLayout()
-
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
@@ -47,16 +46,22 @@ class PlotLayout:
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
 
-        sliderLayout.addWidget(zSlider)
-
         self.dropdown = QComboBox()
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
                 self.dropdown.addItem(file)
-
-        sliderLayout.addWidget(self.dropdown)
-
         self.dropdown.textActivated.connect(self.text_changed)
+
+        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton.clicked.connect(lambda: self.toggleSN())
+        showskybutton = QPushButton("Toggle Sky")
+        showskybutton.clicked.connect(lambda: self.toggleSky())
+
+        sliderLayout = QHBoxLayout()
+        sliderLayout.addWidget(self.dropdown)
+        sliderLayout.addWidget(zSlider)
+        sliderLayout.addWidget(signoiseButton)
+        sliderLayout.addWidget(showskybutton)
 
         plotLayout = QHBoxLayout()
         plotLayout.addWidget(fig)
@@ -84,7 +89,7 @@ class PlotLayout:
         self.PlotFile()
 
     def newFile(self):
-        self.zSlider.setvalue(self.model.getRedShift()*10)
+        self.zSlider.setValue(self.model.getRedShift()*10)
         self.update()
 
     def update(self):
