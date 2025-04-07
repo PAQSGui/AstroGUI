@@ -59,10 +59,14 @@ class Navigator:
                 print("Current File: " + self.getCurrentFile())
                 self.UpdateGraph(self.current)
                 break
-            except OSError:
+            except OSError as e:
+                print("nav.py def loadFile OSError")
+                print(e)
                 self.deleteFile(delta)
                 continue
-            except IndexError: #Osiris
+            except IndexError as e:
+                print("nav.py def loadFile IndexError")
+                print(e) #Osiris
                 #check if there are other files with similar names
                 result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
                 if result != None:
