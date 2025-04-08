@@ -16,19 +16,6 @@ class Plotter:
         self.templater = Templater(model)
         self.figure = figure
 
-    def UpdateGrism(self, spectra=None):
-        plt.figure('k')
-        if spectra==None:
-            spectra=self.model.getState().file
-        plt.clf() #clear figure
-        colorcodes = ['k','r','g','b']
-        for x in [0,1,2,3]:
-            if spectra[x]!=None:
-                self.DrawPlot(spectra[x],colorcodes[x])
-
-        plt.legend()
-        self.figure.draw()
-
     def UpdateFigure(self, key='k'):
         file = self.model.getState().file
         plt.figure('k')
