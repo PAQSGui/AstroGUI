@@ -23,7 +23,7 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
         #then set the list to full again.
         pipeline.active_templates=fullList
         print(zaltpars)
-        pipe.catalog_items[0]['zAltPars']=zaltpars
+        pipeline.catalog_items[0]['zAltPars']=zaltpars
 
 
 def createTarget(filename,spec, fscale=1.):
