@@ -12,6 +12,7 @@ class Model:
     categoryDB : Database
     fitter: Fitter
     lineThickness = 0.5
+    redshiftRez = 1e4
 
     def __init__(self, path, fromCSV = False):
 

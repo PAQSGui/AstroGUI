@@ -41,8 +41,8 @@ class PlotLayout:
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
-        zSlider.setMaximum(200)
-        zSlider.setValue(model.getRedShift()*10)
+        zSlider.setMaximum(6*self.model.redshiftRez)
+        zSlider.setValue(model.getRedShift()*self.model.redshiftRez)
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
 
@@ -89,7 +89,7 @@ class PlotLayout:
         self.plotter.UpdateFigure()
 
     def newFile(self):
-        self.zSlider.setValue(self.model.getRedShift()*10)
+        self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.update()
 
     def update(self):
@@ -104,7 +104,7 @@ class PlotLayout:
         self.update()
 
     def sliderChanged(self):
-        self.model.changeRedShift(float(self.zSlider.value())/10)
+        self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
         self.update()
     
     def text_changed(self, s):
