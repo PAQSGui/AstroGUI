@@ -12,11 +12,13 @@ from PySide6.QtWidgets import (
     QSlider,
     QLabel,
     QComboBox,
-    QPushButton
+    QPushButton,
+    QLineEdit,
     )
 
 from PySide6.QtGui import (
     Qt,
+    QDoubleValidator,
 )
 
 from PySide6.QtCore import QSize
@@ -28,7 +30,8 @@ class PlotLayout:
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
-    zSlider: QSlider 
+    zSlider: QSlider
+    zTextBox: QLineEdit
 
     def __init__(self, model):
         self.model = model
@@ -41,7 +44,7 @@ class PlotLayout:
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
-        zSlider.setMaximum(6*self.model.redshiftRez)
+        zSlider.setMaximum(self.model.redshiftMax*self.model.redshiftRez)
         zSlider.setValue(model.getRedShift()*self.model.redshiftRez)
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
@@ -50,7 +53,7 @@ class PlotLayout:
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
                 self.dropdown.addItem(file)
-        self.dropdown.textActivated.connect(self.text_changed)
+        self.dropdown.textActivated.connect(self.dropboxSelect)
 
         signoiseButton = QPushButton("Toggle S/N spec")
         signoiseButton.clicked.connect(lambda: self.toggleSN())
@@ -60,6 +63,12 @@ class PlotLayout:
         sliderLayout = QHBoxLayout()
         sliderLayout.addWidget(self.dropdown)
         sliderLayout.addWidget(zSlider)
+
+        self.zTextBox=QLineEdit(text=str(model.getRedShift()))
+        self.zTextBox.setValidator(QDoubleValidator())
+        self.zTextBox.editingFinished.connect(self.zTextInput)
+        sliderLayout.addWidget(self.zTextBox)
+
         sliderLayout.addWidget(signoiseButton)
         sliderLayout.addWidget(showskybutton)
 
@@ -105,9 +114,24 @@ class PlotLayout:
 
     def sliderChanged(self):
         self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
+        self.zTextBox.setText(str(self.model.getRedShift()))
         self.update()
+
+    def zTextInput(self):
+            conv=float(self.zTextBox.text())
+            if conv>self.model.redshiftMax:
+                conv=self.model.redshiftMax
+                self.zTextBox.setText(str(conv))
+            elif conv<self.model.redshiftMin:
+                conv=self.model.redshiftMin
+                self.zTextBox.setText(str(conv))
+
+            self.model.changeRedShift(conv)
+            self.zSlider.setValue(int(conv*self.model.redshiftRez))
+            self.update()
+
     
-    def text_changed(self, s):
+    def dropboxSelect(self, s):
 
         result = re.search(f'template-(.+).fits', s)
         self.model.changeCategory(result.group(1))
