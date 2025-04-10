@@ -68,9 +68,12 @@ class Model:
 
     def initOptions(self):
         options = {
-            "lineThickness": 3,
+            "LineWidth": 0.5,
+            "GraphColor": "Black",
+            "TemplateColor" : "Red",
+            "NoiseColor" : "Grey",
             "SNColor": "Blue",
-            "skyColor": "Orange"
+            "SkyColor": "Orange"
             }
         self.options = options
 
