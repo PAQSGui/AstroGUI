@@ -1,3 +1,6 @@
+import matplotlib as plt
+from Spec_tools import Osiris_spectrum, SDSS_spectrum
+from re import search
 
 
 def UpdateGrism(model, plotter, spectra=None):
@@ -17,18 +20,18 @@ def grismArray(nav, filename):
     grisms = []
     for x in ['','R','G','B']:
         try:
-            nextGrism = tool.Osiris_spectrum(nav.directory.absoluteFilePath(filename+x+".fits"))
+            nextGrism = Osiris_spectrum(nav.directory.absoluteFilePath(filename+x+".fits"))
             grisms.append(nextGrism)
         except FileNotFoundError:
             grisms.append(None)
     nav.plotter.UpdateGrism(grisms)
 
 def loadFile(nav, delta=1):
-    print("Current File: " + self.getCurrentFile())
+    print("Current File: " + nav.getCurrentFile())
 
     while True:
         try:
-            nav.current = tool.SDSS_spectrum(nav.directory.absoluteFilePath(nav.getCurrentFile()))
+            nav.current = SDSS_spectrum(nav.directory.absoluteFilePath(nav.getCurrentFile()))
             print("Current File: " + nav.getCurrentFile())
             nav.UpdateGraph(nav.current)
             break
@@ -41,12 +44,12 @@ def loadFile(nav, delta=1):
             print("nav.py def loadFile IndexError")
             print(e) #Osiris
             #check if there are other files with similar names
-            result = re.search(f'(.+)([RGB]).fits', nav.getCurrentFile())
+            result = search(f'(.+)([RGB]).fits', nav.getCurrentFile())
             if result != None:
                 #Create a list of the files
                 nav.grismArray(result.group(1))
             else:
-                result = re.search(f'(.+).fits', nav.getCurrentFile())
+                result = search(f'(.+).fits', nav.getCurrentFile())
                 nav.grismArray(result.group(1))
             break
     nav.targetData.updateTargetData(nav.getCurrentFilePath()) # Updates target data labels
