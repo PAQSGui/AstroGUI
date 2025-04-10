@@ -27,10 +27,9 @@ def LoadPicture(model):
     dir = QDir(model.path)
     file = model.getState().name
     header = getheader(dir.absoluteFilePath(file))
-    ra = header['RA']
-    dec = header['DEC']
+    ra = header['PLUG_RA']
+    dec = header['PLUG_DEC']
     #https://github.com/behrouzz/sdss
     reg = Region(ra, dec, fov=0.033)
-    print(reg.nearest_objects())
     
     Show(reg)

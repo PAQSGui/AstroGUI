@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QFileDialog,
     QMessageBox,
+    QStatusBar,
+    QLayout,
     )
 from PySide6.QtGui import (
     QAction,
@@ -57,45 +59,43 @@ class MainWindow(QMainWindow):
 
         self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
+        self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator = Navigator(self.plotLayout, self.model)
+        self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         mainLayout = QVBoxLayout()
 
+        self.setStatusBar(QStatusBar(self))
         # add toolbar
 
         file_menu = self.menuBar()
         file_menu.setFont(QFont("",18))
 
-        button_open = QAction("📂", self)
-        button_open.setStatusTip("Open a folder and plot FITS files inside")
-        button_open.triggered.connect(lambda: self.openFolder())
-        file_menu.addAction(button_open)
+        def addButton(emoji,tooltip,func=None):
+            button = QAction(emoji, self)
+            button.setStatusTip(tooltip)
+            if func != None:
+                button.triggered.connect(func)
+            file_menu.addAction(button)
 
-        button_options = QAction("⚙️", self)
-        button_options.setStatusTip("Open a window to configure the program")
-        button_options.triggered.connect(lambda: self.plotLayout.optionsWindow())
-        file_menu.addAction(button_options)
 
-        button_stack = QAction("🥞", self)
-        button_stack.setStatusTip("Load other spectra of the same object and overplot them for comparison")
-        file_menu.addAction(button_stack)
-
-        # configure the bottom layout
-        botLayout = QHBoxLayout()
-        botLayout.addLayout(self.navigator.layout)
+        addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
+        addButton("⚙️","Open a window to configure the program",lambda: self.plotLayout.optionsWindow())
+        addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: LoadPicture(self.model))
         
-        rightButtons = QVBoxLayout()
-
-        skygrabButton = QPushButton('Image cutout (DSS) 100\"x100\"')        
-        skygrabButton.clicked.connect(lambda: LoadPicture(self.model))
-
-        #rightButtons.addWidget(signoiseButton)
-        rightButtons.addWidget(skygrabButton)
-        botLayout.addLayout(rightButtons)
-
-        mainLayout.addLayout(self.infoLayout.layout)
+        file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
+        
+        addButton("💾","Save current workspace")
+        addButton("📜","Review evaluated spectra")
+        addButton("🥞","Load other spectra of the same object and overplot them for comparison")
+        addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")
+        addButton("🌈","Open a wizard to merge a set of grisms into a single spectrum")
+        addButton("🏭","Open a wizard to process targets using xpca")
+        addButton("🗠","Open a window to manually adjust the template parameters")
+        
+        mainLayout.addLayout(self.infoLayout)
         mainLayout.addLayout(self.plotLayout.layout)
-        mainLayout.addLayout(botLayout)
+        mainLayout.addLayout(self.navigator.layout)
         
         widget = QWidget()
         widget.setLayout(mainLayout)

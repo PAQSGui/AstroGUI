@@ -32,7 +32,7 @@ class Templater:
             name = l2_product['zBestSubType']
             l2_product['zBestSubType']=f'new-{name}'
             wave, model = template.create_PCA_model(target,l2_product)
-        plt.plot(wave, model, color='r', lw=1.0, alpha=0.7, label = l2_product['zBestSubType'])
+        plt.plot(wave, model, color='r', lw=self.model.lineThickness, alpha=0.7, label = l2_product['zBestSubType'])
 
             
 
