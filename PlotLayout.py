@@ -102,6 +102,7 @@ class PlotLayout:
 
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
+        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
         self.update()
 
     def update(self):
