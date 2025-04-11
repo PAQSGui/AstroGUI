@@ -6,13 +6,13 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QComboBox,
     QRadioButton,
     QButtonGroup,
 )
 
 class OptionsWindow(QWidget):
     model: Model
+    colors = ['Grey', 'Black','Purple', 'Blue', 'Green', 'Yellow', 'Orange', 'Red',]
 
     def __init__(self, model, plo):
         super().__init__()
@@ -29,57 +29,46 @@ class OptionsWindow(QWidget):
         ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
         lineWidth.addWidget(ltEdit)
 
-        graphColor = self.colorChooser("Graph",'GraphColor')
+        graphColor = self.colorChooser("Graph:",'GraphColor')
+        noiseColor = self.colorChooser("Noise:",'NoiseColor')
 
-        noiseColor = self.colorChooser("Noise",'NoiseColor')
-
-
-
-
+        snColor = self.colorChooser("S/N:", 'SNColor')
+        skyColor = self.colorChooser("Sky:", 'SkyColor')
 
         layout = QVBoxLayout()
         layout.addLayout(lineWidth)
 
         layout.addWidget(QLabel('Colors'))
-        layout.addLayout(graphColor)
-        layout.addLayout(noiseColor)
+        layout.addWidget(graphColor)
+        layout.addWidget(noiseColor)
+        layout.addWidget(snColor)
+        layout.addWidget(skyColor)
         self.setLayout(layout)
-
-
-        #thickSlider=QSlider(Qt.Orientation.Horizontal)
-        #thickSlider.setRange(1,15) #slider only takes integers
-        #thickSlider.setSingleStep(1)
-        #thickSlider.setValue(int(model.getOption('lineWidth')))
-        #thickSlider.valueChanged.connect(lambda: model.setOptions('lineWidth', thickSlider.value()))
-
-        #optsLayout.addWidget(thickSlider)
-
-        #"lineWidth": 3,
-        #"GraphColor": "Black",
-        #"TemplateColor" : "Red",
-        #"NoiseColor" : "Grey",
-        #"SNColor": "Blue",
-        #"skyColor": "Orange"
-    
+        
     def colorChooser(self, text, key):
         layout = QHBoxLayout()
+        widget = QWidget()
+        widget.setLayout(layout)
+
+        colorGroup = QButtonGroup(widget)
+
         layout.addWidget(QLabel(text))
-        colors = QButtonGroup()
-        #colors.addButton(QRadioButton('Green'))
-        #colors.addButton(QRadioButton('Orange'))
-        blue = QRadioButton('Blue')
-        red = QRadioButton('Red')
 
-        colors.addButton(blue)
-        colors.addButton(red)
+        current = self.model.getOption(key)
 
-        layout.addWidget(blue)
-        layout.addWidget(red)
-        #layout.addWidget(colors)
-        return layout
+        for color in self.colors:
+            button = QRadioButton(color)
+            colorGroup.addButton(button)
+            if color == current:
+                button.setChecked(True)
+            layout.addWidget(button)
+
+        colorGroup.buttonClicked.connect(lambda button: self.updateOption(key, button.text()))
+
+        return widget
 
     def updateOption(self, opt, val):
-        self.model.setOptions(opt, val)
+        self.model.setOption(opt, val)
         self.plo.update()
 
 

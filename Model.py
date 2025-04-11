@@ -30,7 +30,7 @@ class Model:
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
 
-    def setOptions(self, opt, val):
+    def setOption(self, opt, val):
         self.options[opt] = val
     
     def changeRedShift(self, val):
@@ -68,12 +68,12 @@ class Model:
 
     def initOptions(self):
         options = {
-            "LineWidth": 0.5,
-            "GraphColor": "Black",
-            "TemplateColor" : "Red",
-            "NoiseColor" : "Grey",
-            "SNColor": "Blue",
-            "SkyColor": "Orange"
+            'LineWidth': 0.5,
+            'GraphColor': 'Black',
+            'TemplateColor' : 'Red',
+            'NoiseColor' : 'Grey',
+            'SNColor': 'Blue',
+            'SkyColor': 'Orange',
             }
         self.options = options
 
