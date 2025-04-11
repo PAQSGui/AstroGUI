@@ -41,6 +41,9 @@ class Model:
 
     def getOption(self, opt):
         return self.options[opt]
+    
+    def getOptions(self):
+        return self.options
 
     def getRedShift(self):
         return float(self.objects[self.cursor].redshift)
@@ -74,6 +77,8 @@ class Model:
             'NoiseColor' : 'Grey',
             'SNColor': 'Blue',
             'SkyColor': 'Orange',
+            'ShowSN' : False,
+            'ShowSky' : False
             }
         self.options = options
 

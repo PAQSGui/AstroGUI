@@ -79,11 +79,13 @@ class PlotLayout:
         self.plotter.UpdateFigure()
 
     def toggleSN(self):
-        self.plotter.showSN = not self.plotter.showSN
+        new = not self.model.getOption('ShowSN')
+        self.model.setOption('ShowSN', new)
         self.update()
 
-    def toggleSky(self):
-        self.plotter.showSky = not self.plotter.showSky
+    def toggleSky(self):        
+        new = not self.model.getOption('ShowSky')
+        self.model.setOption('ShowSky', new)
         self.update()
 
     def sliderChanged(self):
