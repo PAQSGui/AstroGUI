@@ -11,7 +11,11 @@ class Model:
     catFieldNames = ['name', 'categorized', 'category', 'redshift', 'note']
     categoryDB : Database
     fitter: Fitter
+    #OPTION Params
     lineThickness = 0.5
+    redshiftRez = 1e4
+    redshiftMax = 6
+    redshiftMin = 0
 
     def __init__(self, path, fromCSV = False):
 
