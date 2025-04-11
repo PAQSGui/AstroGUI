@@ -26,7 +26,7 @@ class Database():
         files = directory.entryList()[0:10]
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
-            fitting = fitter.fitFile(directory.absoluteFilePath(file))
+            fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
             object = DataObject(file, spectra, fitting)
             dict = object.toDict()
             with open(self.dataFile, 'a', newline='') as dataFile:
@@ -46,7 +46,6 @@ class Database():
                     object = DataObject.fromDict(row, fitting)
                     object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
                     files.append(object)     
-
         return files
 
     def getFile(self, name):

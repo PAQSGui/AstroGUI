@@ -2,15 +2,17 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
+    QWidget,
     )
 from PySide6.QtGui import (
     Qt,
 )
 
 from Model import Model
+from PySide6.QtCore import QSize
 
 # Class represents the top of the program and contains the labels used to display meta information
-class InfoLayout:
+class InfoLayout(QHBoxLayout):
     layout = QHBoxLayout()
     model: Model
     nbrLabel: QLabel
@@ -18,11 +20,19 @@ class InfoLayout:
     targetLayout = QVBoxLayout()
 
     def __init__(self, model):
+        super().__init__()
+        central=QWidget()
+        self.addWidget(central)
+        
+        central.setLayout(self.layout)
+        central.setMaximumSize(QSize(9999999, 150))
 
         self.model = model
         self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
         self.targetLayout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         
+        
+
         self.layout.addWidget(self.nbrLabel)
         self.layout.addLayout(self.classProbLayout)
         self.layout.addLayout(self.targetLayout)
@@ -59,6 +69,7 @@ class InfoLayout:
         return self.classProbLayout
     
     def updateTarget(self):
+        clearLayout(self.targetLayout)
         self.targetLayout.addWidget(QLabel("Target metadata:"))
         self.targetLayout.addWidget(QLabel("Mag"))
         self.targetLayout.addWidget(QLabel("MAG Type"))

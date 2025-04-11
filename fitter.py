@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     )
 
+from handler_xpca import get_all_fits
+
 class Fitter:
 
     pipe: Pipeline
@@ -18,17 +20,19 @@ class Fitter:
     templateInfo: QLabel
 
     def __init__(self):
-        self.pipe = Pipeline()
+        self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
         self.database = Database("preProcess.csv",fields)
 
-    def fitFile(self, filePath):
+    def fitFile(self, filePath, spec=None):
         obj_nme = filePath[-21:][:-5]
         l2 = self.database.getFitting(obj_nme)
         if l2 == []:
             self.pipe.run(filePath, source='sdss')
+            #get_all_fits(self.pipe,filePath, spec)
             l2_product = self.pipe.catalog_items[0]
             self.database.addFitting(l2_product)
+            #print(self.pipe.full_results)
         else:
             l2_product = convert_l2(l2)
 

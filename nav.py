@@ -10,6 +10,8 @@ from PySide6.QtWidgets import (
     )
 
 import re
+from PySide6.QtCore import QSize
+
 
 class Navigator:
 
@@ -17,13 +19,15 @@ class Navigator:
     model: Model
     plotlayout: PlotLayout
 
-    def __init__(self, plotlayout, model):
+    def __init__(self, plotlayout, infoLayout, model):
         self.model = model
         self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
+        self.infoLayout=infoLayout
 
         whyInput = QPlainTextEdit()
         whyInput.setPlaceholderText("Write your notes here")
+        whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
         backButton = QPushButton("Back")
@@ -39,44 +43,6 @@ class Navigator:
         self.layout.addWidget(yesButton)
         self.layout.addWidget(unsureButton)
         self.layout.addWidget(self.whyInput)
-
-#    def grismArray(self, filename):
-#        grisms = []
-#        for x in ['','R','G','B']:
-#            try:
-#                nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
-#                grisms.append(nextGrism)
-#            except FileNotFoundError:
-#                grisms.append(None)
-#        self.plotter.UpdateGrism(grisms)
-
-    def loadFile(self, delta=1):
-        print("Current File: " + self.getCurrentFile())
-
-        while True:
-            try:
-                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
-                print("Current File: " + self.getCurrentFile())
-                self.UpdateGraph(self.current)
-                break
-            except OSError as e:
-                print("nav.py def loadFile OSError")
-                print(e)
-                self.deleteFile(delta)
-                continue
-            except IndexError as e:
-                print("nav.py def loadFile IndexError")
-                print(e) #Osiris
-                #check if there are other files with similar names
-                result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
-                if result != None:
-                    #Create a list of the files
-                    self.grismArray(result.group(1))
-                else:
-                    result = re.search(f'(.+).fits', self.getCurrentFile())
-                    self.grismArray(result.group(1))
-                break
-        self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":
@@ -87,3 +53,4 @@ class Navigator:
         self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
         self.plotlayout.newFile()
+        self.infoLayout.updateAll()
