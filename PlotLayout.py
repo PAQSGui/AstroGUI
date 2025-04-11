@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QPushButton,
     QLineEdit,
+    QSizePolicy,
     )
 
 from PySide6.QtGui import (
@@ -64,9 +65,11 @@ class PlotLayout:
         sliderLayout.addWidget(self.dropdown)
         sliderLayout.addWidget(zSlider)
 
-        self.zTextBox=QLineEdit(text=str(model.getRedShift()))
+        sliderLayout.addWidget(QLabel("z ="))
+        self.zTextBox=QLineEdit(text=str(round(model.getRedShift(),4)))
         self.zTextBox.setValidator(QDoubleValidator())
         self.zTextBox.editingFinished.connect(self.zTextInput)
+        self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sliderLayout.addWidget(self.zTextBox)
 
         sliderLayout.addWidget(signoiseButton)
