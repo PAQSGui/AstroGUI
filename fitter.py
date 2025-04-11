@@ -21,16 +21,15 @@ class Fitter:
 
     def __init__(self):
         self.pipe = Pipeline(debug=False)
-        fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
+        fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
         self.database = Database("preProcess.csv",fields)
 
-    def fitFile(self, filePath, spec=None):
+    def fitFile(self, filePath, spec):
         obj_nme = filePath[-21:][:-5]
         l2 = self.database.getFitting(obj_nme)
         if l2 == []:
-            self.pipe.run(filePath, source='sdss')
-            #get_all_fits(self.pipe,filePath, spec)
-            l2_product = self.pipe.catalog_items[0]
+            #self.pipe.run(filePath, source='sdss')
+            l2_product = get_all_fits(self.pipe,filePath, spec)
             self.database.addFitting(l2_product)
             #print(self.pipe.full_results)
         else:
@@ -39,9 +38,7 @@ class Fitter:
         return l2_product
 
     def getBestGuess(self):
-        return self.best
-
-    def getl2_product(self, name):
+        return self.bestdatabase
         return self.l2_product
 
 
@@ -52,33 +49,29 @@ def convert_l2(row):
     l2_product['zBestProb']     = float(row['zBestProb'])
     l2_product['zBestType']     = row['zBestType']
     l2_product['zBestSubType']  = row['zBestSubType']
+    
+    def auxInsert(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  x.strip("'")) 
+    
+    def auxInsertFloat(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  float(x.strip(','))) 
 
-    tempAltType = row['zAltType'].strip('[]').split()
-    newAltType = []
-    for i in range(len(tempAltType)):
-        newAltType.insert(i,  tempAltType[i].strip("'"))
-    l2_product['zAltType'] = newAltType
+    def aux(key, func):
+        temp = row[key].strip('[]').split()
+        new = []
+        for i in range(len(temp)):
+            func(temp,i,new)
+        return new
 
-    tempAltSubType = row['zAltSubType'].strip('[]').split()
-    newAltSubType = []
-    for i in range(len(tempAltSubType)):
-        subType = tempAltSubType[i]
-        if subType != '--':
-            newAltSubType.insert(i,  subType.strip("'")) 
-    l2_product['zAltSubType'] = newAltSubType
+    l2_product['zAltType'] = aux('zAltType',lambda temp,i,new: new.insert(i,  temp[i].strip("'")))
 
-    tempAltProb = row['zAltProb'].strip('[]').split()
-    newAltProb = []
-    for i in range(len(tempAltProb)):
-        prob = tempAltProb[i]
-        if prob != '--':
-            newAltProb.insert(i, float(prob.strip(',')))
-    l2_product['zAltProb'] = newAltProb
+    l2_product['zAltSubType'] = aux('zAltSubType',auxInsert)
 
-    tempBestPars = row['zBestPars'].strip('[]').split()
-    newBestPars = []
-    for i in range(len(tempBestPars)):
-        newBestPars.insert(i, float(tempBestPars[i].strip(',')))
-    l2_product['zBestPars'] = np.array(newBestPars)
+    l2_product['zAltProb'] = aux('zAltProb',auxInsertFloat)
 
+    l2_product['zBestPars'] = np.array(aux('zBestPars',lambda temp,i,new: new.insert(i, float(temp[i].strip(',')))))
     return l2_product
