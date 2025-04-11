@@ -85,23 +85,6 @@ class PlotLayout:
         self.layout.addLayout(sliderLayout)
         self.update()
 
-    def optionsWindow(self):
-        self.optsWindow = QWidget()
-        self.optsLayout = QVBoxLayout()
-        self.optsLayout.addWidget(QLabel("Plot Line Thickness"))
-        self.thickSlider=QSlider(Qt.Orientation.Horizontal)
-        self.thickSlider.setRange(1,15) #slider only takes integers
-        self.thickSlider.setSingleStep(1)
-        self.thickSlider.setValue(int(self.model.lineThickness*10))
-        self.thickSlider.valueChanged.connect(lambda: self.setThickness(self.thickSlider.value()))
-        self.optsLayout.addWidget(self.thickSlider)
-        self.optsWindow.setLayout(self.optsLayout)
-        self.optsWindow.show()
-
-    def setThickness(self, newValue):
-        self.model.lineThickness=float(newValue)/10.0
-        self.plotter.UpdateFigure()
-
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
@@ -113,11 +96,13 @@ class PlotLayout:
         self.plotter.UpdateFigure()
 
     def toggleSN(self):
-        self.plotter.showSN = not self.plotter.showSN
+        new = not self.model.getOption('ShowSN')
+        self.model.setOption('ShowSN', new)
         self.update()
 
-    def toggleSky(self):
-        self.plotter.showSky = not self.plotter.showSky
+    def toggleSky(self):        
+        new = not self.model.getOption('ShowSky')
+        self.model.setOption('ShowSky', new)
         self.update()
 
     def sliderChanged(self):

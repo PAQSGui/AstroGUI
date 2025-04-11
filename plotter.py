@@ -8,8 +8,6 @@ class Plotter:
     model:  Model   
     figure: FigureCanvasQTAgg  
     templater: Templater 
-    showSN = True
-    showSky = True
 
     def __init__(self, model, figure ):
         self.model = model
@@ -27,15 +25,20 @@ class Plotter:
         self.figure.draw()
         
     def DrawPlot(self,data,colorcode):
-        plt.step(data.Wavelength, data.Flux, color = colorcode, linewidth=self.model.lineThickness) #figure key is used for color
+        options = self.model.getOptions()
 
-        if self.showSN:
-            plt.step(data.Wavelength, data.Flux/data.Noise, label="Signal / Noise",  alpha=0.25, linewidth=self.model.lineThickness)
+        lineWidth = options['LineWidth']
 
-        if self.showSky:
-            plt.step(data.Wavelength, data.Skybackground, label="Sky Background",  alpha=0.25, linewidth=self.model.lineThickness)
+        plt.step(data.Wavelength, data.Flux, color =options['GraphColor'], linewidth=lineWidth) #figure key is used for color
+
+        if options['ShowSN']:
+            plt.step(data.Wavelength, data.Flux/data.Noise, color = options['SNColor'], label="Signal / Noise",  alpha=0.25, linewidth=lineWidth)
+
+        if options['ShowSky']:
+            plt.step(data.Wavelength, data.Skybackground, color = options['SkyColor'], label="Sky Background",  alpha=0.25, linewidth=lineWidth)
 
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
+
         plt.ylim([0,np.max(data.Flux)])
-        plt.step(data.Wavelength, data.Noise, label='Noise', color=colorcode, alpha=0.5, linewidth=self.model.lineThickness)
+        plt.step(data.Wavelength, data.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)

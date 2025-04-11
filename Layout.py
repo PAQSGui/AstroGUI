@@ -4,6 +4,7 @@ from fitter import Fitter
 from InfoLayout import InfoLayout
 from Model import Model
 from PlotLayout import PlotLayout
+from optionsWindow import OptionsWindow
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -35,6 +36,8 @@ class MainWindow(QMainWindow):
     fitter:     Fitter
     infoLayout: InfoLayout
 
+
+
     def openFolder(self):
         while True:
             try:
@@ -52,6 +55,9 @@ class MainWindow(QMainWindow):
             else:
                 break
 
+    def closeEvent(self, ev):
+        self.optionsWindow.close()
+        
     def __init__(self, app):
         super().__init__()
         self.openFolder()
@@ -61,6 +67,7 @@ class MainWindow(QMainWindow):
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
+        self.optionsWindow = OptionsWindow(self.model, self.plotLayout)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         mainLayout = QVBoxLayout()
@@ -80,7 +87,7 @@ class MainWindow(QMainWindow):
 
 
         addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
-        addButton("⚙️","Open a window to configure the program",lambda: self.plotLayout.optionsWindow())
+        addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
         addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: LoadPicture(self.model))
         
         file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))

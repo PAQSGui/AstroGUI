@@ -29,13 +29,13 @@ class Model:
         
         self.objects = self.fileDB.extract(self.fitter)
 
-        # initilaize options
+        self.initOptions()
 
     
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
 
-    def setOptions(self, opt, val):
+    def setOption(self, opt, val):
         self.options[opt] = val
     
     def changeRedShift(self, val):
@@ -43,6 +43,12 @@ class Model:
     
     def changeCategory(self, cat):
         self.objects[self.cursor].changeCategory(cat) 
+
+    def getOption(self, opt):
+        return self.options[opt]
+    
+    def getOptions(self):
+        return self.options
 
     def getRedShift(self):
         return float(self.objects[self.cursor].redshift)
@@ -67,4 +73,18 @@ class Model:
             redshift = None
 
         self.categoryDB.addEntry(object.name, categorised, category, redshift, note)
+
+    def initOptions(self):
+        options = {
+            'LineWidth': 0.5,
+            'GraphColor': 'Black',
+            'TemplateColor' : 'Red',
+            'NoiseColor' : 'Grey',
+            'SNColor': 'Blue',
+            'SkyColor': 'Orange',
+            'ShowSN' : False,
+            'ShowSky' : False
+            }
+        self.options = options
+
 
