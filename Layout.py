@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
-        self.navigator = Navigator(self.plotLayout, self.model)
+        self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         mainLayout = QVBoxLayout()

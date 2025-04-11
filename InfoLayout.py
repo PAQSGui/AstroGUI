@@ -69,6 +69,7 @@ class InfoLayout(QHBoxLayout):
         return self.classProbLayout
     
     def updateTarget(self):
+        clearLayout(self.targetLayout)
         self.targetLayout.addWidget(QLabel("Target metadata:"))
         self.targetLayout.addWidget(QLabel("Mag"))
         self.targetLayout.addWidget(QLabel("MAG Type"))

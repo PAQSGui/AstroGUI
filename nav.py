@@ -19,10 +19,11 @@ class Navigator:
     model: Model
     plotlayout: PlotLayout
 
-    def __init__(self, plotlayout, model):
+    def __init__(self, plotlayout, infoLayout, model):
         self.model = model
         self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
+        self.infoLayout=infoLayout
 
         whyInput = QPlainTextEdit()
         whyInput.setPlaceholderText("Write your notes here")
@@ -52,3 +53,4 @@ class Navigator:
         self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
         self.plotlayout.newFile()
+        self.infoLayout.updateAll()
