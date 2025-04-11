@@ -46,7 +46,6 @@ class Database():
                     object = DataObject.fromDict(row, fitting)
                     object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
                     files.append(object)     
-
         return files
 
     def getFile(self, name):

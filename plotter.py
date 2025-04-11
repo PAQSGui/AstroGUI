@@ -23,7 +23,7 @@ class Plotter:
         self.DrawPlot(file,key)
         self.templater.plotTemplate()
         plt.title(file.Objectname)  
-        plt.legend
+        plt.legend()
         self.figure.draw()
         
     def DrawPlot(self,data,colorcode):

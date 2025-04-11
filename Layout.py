@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
                 if folder_path == "":
                     # Hacky way of exiting program of dialog is cancelled
                     exit()
-                self.model = Model(folder_path, True)
+                self.model = Model(folder_path) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
             except FileNotFoundError:
                 popup = QMessageBox()
                 popup.setWindowTitle("Error")
@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
-        self.navigator = Navigator(self.plotLayout, self.model)
+        self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         mainLayout = QVBoxLayout()
