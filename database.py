@@ -24,6 +24,7 @@ class Database():
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = directory.entryList()[0:10]
+        print(files)
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
             fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
@@ -46,7 +47,7 @@ class Database():
                     object = DataObject.fromDict(row, fitting)
                     object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
                     files.append(object)     
-
+        #print(files)
         return files
 
     def getFile(self, name):

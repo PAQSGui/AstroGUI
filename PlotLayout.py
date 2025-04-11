@@ -55,6 +55,8 @@ class PlotLayout:
             if file.endswith(".fits"):
                 self.dropdown.addItem(file)
         self.dropdown.textActivated.connect(self.dropboxSelect)
+        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower())
 
         signoiseButton = QPushButton("Toggle S/N spec")
         signoiseButton.clicked.connect(lambda: self.toggleSN())
@@ -103,7 +105,8 @@ class PlotLayout:
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
-        #need to reinsert update of combobox
+        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
         self.update()
 
     def update(self):
