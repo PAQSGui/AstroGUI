@@ -6,6 +6,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QComboBox,
+    QRadioButton,
+    QButtonGroup,
 )
 
 class OptionsWindow(QWidget):
@@ -26,8 +29,20 @@ class OptionsWindow(QWidget):
         ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
         lineWidth.addWidget(ltEdit)
 
+        graphColor = self.colorChooser("Graph",'GraphColor')
+
+        noiseColor = self.colorChooser("Noise",'NoiseColor')
+
+
+
+
+
         layout = QVBoxLayout()
         layout.addLayout(lineWidth)
+
+        layout.addWidget(QLabel('Colors'))
+        layout.addLayout(graphColor)
+        layout.addLayout(noiseColor)
         self.setLayout(layout)
 
 
@@ -46,10 +61,22 @@ class OptionsWindow(QWidget):
         #"SNColor": "Blue",
         #"skyColor": "Orange"
     
-    def optionsWidget(text):
+    def colorChooser(self, text, key):
         layout = QHBoxLayout()
         layout.addWidget(QLabel(text))
-        layout.addWidget(QLineEdit)
+        colors = QButtonGroup()
+        #colors.addButton(QRadioButton('Green'))
+        #colors.addButton(QRadioButton('Orange'))
+        blue = QRadioButton('Blue')
+        red = QRadioButton('Red')
+
+        colors.addButton(blue)
+        colors.addButton(red)
+
+        layout.addWidget(blue)
+        layout.addWidget(red)
+        #layout.addWidget(colors)
+        return layout
 
     def updateOption(self, opt, val):
         self.model.setOptions(opt, val)
