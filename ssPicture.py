@@ -7,19 +7,25 @@ from PySide6.QtCore import QDir
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QLabel,
     QLineEdit,
 )
+def loadCoords(model):
+        dir = QDir(model.path)
+        file = model.getState().name
+        header = getheader(dir.absoluteFilePath(file))
+        ra = header['PLUG_RA']
+        dec = header['PLUG_DEC']
+        return ra,dec
+
 
 class SkygrabWindow(QWidget):
     ax: plt.Axes
-    coords: QLabel
     canv: FigureCanvasQTAgg
 
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("SDSS Sky Picture")
+        #self.setWindowTitle("SDSS Sky Picture")
         fig, self.ax = plt.subplots()
         #if isinstance(figsize, tuple) and len(figsize)==2:
         #    fig, self.ax = plt.subplots(figsize=figsize)
@@ -28,24 +34,20 @@ class SkygrabWindow(QWidget):
         self.canv=FigureCanvasQTAgg(fig)
         layout = QVBoxLayout()
         #add labels describing the object and its coordinates
-        self.coords=QLabel("Write the object's coords here")
         layout.addWidget(self.canv)
-        layout.addWidget(self.coords)
         self.setLayout(layout)
 
     def LoadPicture(self,model):
-        dir = QDir(model.path)
-        file = model.getState().name
-        header = getheader(dir.absoluteFilePath(file))
-        ra = header['PLUG_RA']
-        dec = header['PLUG_DEC']
-        self.coords.setText(f"RA: {ra}, DEC: {dec}")
+        ra,dec=loadCoords(model)
         #https://github.com/behrouzz/sdss
         reg = Region(ra, dec, fov=0.033)
         
         self.Update(reg)
 
-        self.show()
+        file = model.getState().file
+        plt.title(file.Objectname)  
+        model.skygrabNotLoaded=False
+        #self.show()
 
     
     def Update(self, region, band='all'):

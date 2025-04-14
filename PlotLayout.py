@@ -27,7 +27,7 @@ from xpca import config
 from os import listdir
 import re
 
-class PlotLayout:
+class PlotLayout(QWidget):
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
@@ -35,6 +35,7 @@ class PlotLayout:
     zTextBox: QLineEdit
 
     def __init__(self, model):
+        super().__init__()
         self.model = model
         self.layout = QVBoxLayout()
 
@@ -84,6 +85,7 @@ class PlotLayout:
         self.layout.addLayout(plotLayout)
         self.layout.addLayout(sliderLayout)
         self.update()
+        self.setLayout(self.layout)
 
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)

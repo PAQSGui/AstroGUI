@@ -11,6 +11,8 @@ from PySide6.QtGui import (
 from Model import Model
 from PySide6.QtCore import QSize
 
+from ssPicture import loadCoords
+
 # Class represents the top of the program and contains the labels used to display meta information
 class InfoLayout(QHBoxLayout):
     layout = QHBoxLayout()
@@ -74,6 +76,8 @@ class InfoLayout(QHBoxLayout):
         self.targetLayout.addWidget(QLabel("Mag"))
         self.targetLayout.addWidget(QLabel("MAG Type"))
         self.targetLayout.addWidget(QLabel("EBV"))
+        ra,dec=loadCoords(self.model)
+        self.targetLayout.addWidget(QLabel(f"RA: {ra:.4f}, DEC: {dec:.4f}"))
 
 def clearLayout(layout):
     for i in range(layout.count()): layout.itemAt(i).widget().close()

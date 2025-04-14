@@ -7,14 +7,13 @@ from optionsWindow import OptionsWindow
 
 from PySide6.QtWidgets import (
     QMainWindow, 
-    QPushButton,
     QWidget,
     QVBoxLayout,
-    QHBoxLayout,
     QFileDialog,
     QMessageBox,
     QStatusBar,
     QLayout,
+    QTabWidget,
     )
 from PySide6.QtGui import (
     QAction,
@@ -34,7 +33,6 @@ class MainWindow(QMainWindow):
     plotLayout: PlotLayout
     fitter:     Fitter
     infoLayout: InfoLayout
-
 
 
     def openFolder(self):
@@ -89,7 +87,7 @@ class MainWindow(QMainWindow):
 
         addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
         addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
-        addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: self.navigator.skygrabWindow.LoadPicture(self.model))
+        #addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: self.navigator.skygrabWindow.LoadPicture(self.model))
         
         file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
         
@@ -102,7 +100,16 @@ class MainWindow(QMainWindow):
         addButton("🗠","Open a window to manually adjust the template parameters")
         
         mainLayout.addLayout(self.infoLayout)
-        mainLayout.addLayout(self.plotLayout.layout)
+        #Create tabs for plotlayout and skygrab
+        tabs = QTabWidget()
+        tabs.addTab(self.plotLayout,"Spectrum Plot")
+        tabs.addTab(self.navigator.skygrabWindow,"SDSS Photo")
+        def loadIfClicked(index):
+            if (index == 1 and self.model.skygrabNotLoaded):
+                self.navigator.skygrabWindow.LoadPicture(self.model)
+        tabs.tabBarClicked.connect(loadIfClicked)
+        mainLayout.addWidget(tabs)
+        #mainLayout.addLayout(self.plotLayout.layout)
         mainLayout.addLayout(self.navigator.layout)
         
         widget = QWidget()

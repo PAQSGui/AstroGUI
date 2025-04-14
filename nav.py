@@ -58,5 +58,7 @@ class Navigator:
         self.model.updateCursor(delta)
         self.plotlayout.newFile()
         self.infoLayout.updateAll()
-        if (not self.skygrabWindow.isHidden()):
+        if (self.skygrabWindow.isHidden()):
+            self.model.skygrabNotLoaded=True
+        else:
             self.skygrabWindow.LoadPicture(self.model)
