@@ -59,7 +59,7 @@ class Navigator:
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-        self.plotter.update()
+        self.plotlayout.update()
         note = self.model.getNote()
         self.whyInput.setPlainText(note)
         self.plotlayout.newFile()
