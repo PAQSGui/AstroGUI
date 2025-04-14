@@ -104,6 +104,9 @@ class PlotLayout:
         new = not self.model.getOption('ShowSky')
         self.model.setOption('ShowSky', new)
         self.update()
+    
+    def getYLimit(self):
+        return self.plotter.getYLim()
 
     def sliderChanged(self):
         self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
