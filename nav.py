@@ -23,7 +23,11 @@ class Navigator:
         self.layout = QHBoxLayout()
 
         whyInput = QPlainTextEdit()
-        whyInput.setPlaceholderText("Write your notes here")
+        note = self.model.getNote()
+        if note == "":
+            whyInput.setPlaceholderText("Write your notes here")
+        else:
+            whyInput.setPlainText(note)
         self.whyInput = whyInput
 
         backButton = QPushButton("Back")
@@ -49,34 +53,6 @@ class Navigator:
 #            except FileNotFoundError:
 #                grisms.append(None)
 #        self.plotter.UpdateGrism(grisms)
-
-    def loadFile(self, delta=1):
-        print("Current File: " + self.getCurrentFile())
-
-        while True:
-            try:
-                self.current = tool.SDSS_spectrum(self.directory.absoluteFilePath(self.getCurrentFile()))
-                print("Current File: " + self.getCurrentFile())
-                self.UpdateGraph(self.current)
-                break
-            except OSError as e:
-                print("nav.py def loadFile OSError")
-                print(e)
-                self.deleteFile(delta)
-                continue
-            except IndexError as e:
-                print("nav.py def loadFile IndexError")
-                print(e) #Osiris
-                #check if there are other files with similar names
-                result = re.search(f'(.+)([RGB]).fits', self.getCurrentFile())
-                if result != None:
-                    #Create a list of the files
-                    self.grismArray(result.group(1))
-                else:
-                    result = re.search(f'(.+).fits', self.getCurrentFile())
-                    self.grismArray(result.group(1))
-                break
-        self.targetData.updateTargetData(self.getCurrentFilePath()) # Updates target data labels
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":
@@ -84,6 +60,7 @@ class Navigator:
         elif msg == "Unsure":
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
-        self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
         self.plotter.update()
+        note = self.model.getNote()
+        self.whyInput.setPlainText(note)
