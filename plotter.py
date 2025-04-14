@@ -21,13 +21,13 @@ class Plotter:
         file = self.model.getState().file
         plt.figure('k')
         plt.clf()
-        self.DrawPlot(file,key)
+        self.DrawPlot(file)
         self.templater.plotTemplate()
         plt.title(file.Objectname)  
         plt.legend()
         self.figure.draw()
         
-    def DrawPlot(self,data,colorcode):
+    def DrawPlot(self, data):
         options = self.model.getOptions()
 
         lineWidth = options['LineWidth']

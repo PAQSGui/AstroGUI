@@ -46,10 +46,10 @@ class OptionsWindow(QWidget):
         maxEdit.setText(str(max))
         maxEdit.setInputMask('900')
         maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
-        button = QPushButton('Adjust the y-axis')
+        button = QPushButton('Adjust')
         button.clicked.connect(lambda: self.updateOption('yLimit', True))
 
-        graphHeight.addWidget(QLabel('Zoom in on y-axis'))
+        graphHeight.addWidget(QLabel('Y-axis:'))
         graphHeight.addWidget(minEdit)
         graphHeight.addWidget(maxEdit)
         graphHeight.addWidget(button)

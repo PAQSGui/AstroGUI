@@ -90,4 +90,9 @@ class Model:
             }
         self.options = options
 
+    def resetYLimit(self):
+        self.options['yLimit'] = False
+        self.options['ymin'] = 0
+        self.options['ymax'] = 0
+
 
