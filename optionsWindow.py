@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QRadioButton,
     QButtonGroup,
+    QPushButton,
 )
 
 class OptionsWindow(QWidget):
@@ -35,6 +36,24 @@ class OptionsWindow(QWidget):
         snColor = self.colorChooser("S/N:", 'SNColor')
         skyColor = self.colorChooser("Sky:", 'SkyColor')
 
+        graphHeight = QHBoxLayout()
+        min, max = plo.getYLimit()
+        minEdit = QLineEdit()
+        minEdit.setText(str(min))
+        minEdit.setInputMask('900')
+        minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', minEdit.text()))
+        maxEdit = QLineEdit()
+        maxEdit.setText(str(max))
+        maxEdit.setInputMask('900')
+        maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
+        button = QPushButton('Adjust')
+        button.clicked.connect(lambda: self.updateOption('yLimit', True))
+
+        graphHeight.addWidget(QLabel('Y-axis:'))
+        graphHeight.addWidget(minEdit)
+        graphHeight.addWidget(maxEdit)
+        graphHeight.addWidget(button)
+
         layout = QVBoxLayout()
         layout.addLayout(lineWidth)
 
@@ -43,6 +62,8 @@ class OptionsWindow(QWidget):
         layout.addWidget(noiseColor)
         layout.addWidget(snColor)
         layout.addWidget(skyColor)
+        layout.addLayout(graphHeight)
+
         self.setLayout(layout)
         
     def colorChooser(self, text, key):
@@ -64,7 +85,6 @@ class OptionsWindow(QWidget):
             layout.addWidget(button)
 
         colorGroup.buttonClicked.connect(lambda button: self.updateOption(key, button.text()))
-
         return widget
 
     def updateOption(self, opt, val):

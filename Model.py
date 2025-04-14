@@ -31,12 +31,12 @@ class Model:
 
         self.initOptions()
 
-    
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
 
     def setOption(self, opt, val):
         self.options[opt] = val
+        print(val)
     
     def changeRedShift(self, val):
         self.objects[self.cursor].changeRedshift(val)
@@ -83,8 +83,16 @@ class Model:
             'SNColor': 'Blue',
             'SkyColor': 'Orange',
             'ShowSN' : False,
-            'ShowSky' : False
+            'ShowSky' : False,
+            'yLimit' : False,
+            'ymin' : 0,
+            'ymax' : 0,
             }
         self.options = options
+
+    def resetYLimit(self):
+        self.options['yLimit'] = False
+        self.options['ymin'] = 0
+        self.options['ymax'] = 0
 
 

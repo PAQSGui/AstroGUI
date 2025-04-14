@@ -90,6 +90,7 @@ class PlotLayout:
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
         self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
         self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
+        self.model.resetYLimit()
         self.update()
 
     def update(self):
@@ -104,6 +105,9 @@ class PlotLayout:
         new = not self.model.getOption('ShowSky')
         self.model.setOption('ShowSky', new)
         self.update()
+    
+    def getYLimit(self):
+        return self.plotter.getYLim()
 
     def sliderChanged(self):
         self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
