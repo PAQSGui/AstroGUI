@@ -38,7 +38,6 @@ class Model:
 
     def setOption(self, opt, val):
         self.options[opt] = val
-        print(val)
     
     def changeRedShift(self, val):
         self.objects[self.cursor].changeRedshift(val)

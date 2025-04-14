@@ -28,6 +28,7 @@ from PySide6.QtCore import QSize
 # Bottom is the navigation bottom
 
 class MainWindow(QMainWindow):
+
     model:      Model
     navigator:  Navigator
     plotLayout: PlotLayout
@@ -65,8 +66,10 @@ class MainWindow(QMainWindow):
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
-        self.optionsWindow = OptionsWindow(self.model, self.plotLayout)
+        self.optionsWindow = OptionsWindow(self.model)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+
+        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
 
         mainLayout = QVBoxLayout()
 

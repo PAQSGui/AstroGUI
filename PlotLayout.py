@@ -23,6 +23,7 @@ from PySide6.QtGui import (
 )
 
 from PySide6.QtCore import QSize
+from PySide6.QtCore import QObject, Signal, Slot
 from xpca import config
 from os import listdir
 import re
@@ -87,6 +88,10 @@ class PlotLayout(QWidget):
         self.update()
         self.setLayout(self.layout)
 
+    @Slot()
+    def update(self):
+        self.plotter.UpdateFigure()
+
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
@@ -95,8 +100,8 @@ class PlotLayout(QWidget):
         self.model.resetYLimit()
         self.update()
 
-    def update(self):
-        self.plotter.UpdateFigure()
+    #def update(self):
+    #    self.plotter.UpdateFigure()
 
     def toggleSN(self):
         new = not self.model.getOption('ShowSN')
