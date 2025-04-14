@@ -42,9 +42,10 @@ class Database():
             reader = csv.DictReader(file)
             for row in reader:
                 if row['name'] != self.fieldNames[0]:
-                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']))
+                    spectra = tool.SDSS_spectrum(directory.absoluteFilePath(row['name']))
+                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']), spectra)
                     object = DataObject.fromDict(row, fitting)
-                    object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
+                    object.file = spectra
                     files.append(object)     
         return files
 

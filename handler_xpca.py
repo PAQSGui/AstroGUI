@@ -6,24 +6,28 @@ from os.path import basename
 from astropy.io.fits import getheader
 from re import search
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
-        #debug mode possible allows us to get the full output, i.e. all zaltpars
-        #It's pretty hard to understand
-        #make a copy of the list of processed templates
+        print(filePath)
         fullList=pipeline.active_templates[:]
-        #run the pipeline to get most of the info
-        pipeline.run(filePath, source=src)
-        #iterate over each template, fitting to it and adding the result into an array
         zaltpars=[]
         for i in range(0,len(fullList)):
-            pipeline.active_templates=fullList[i:i+1]
+            pipeline.N_targets=1
+            pipeline.active_templates=[fullList[i]]
 
-            l2_product = pipeline.process_target(createTarget(filePath,spec), 0)
-            zaltpars.append(l2_product['zBestSubType'],l2_product['zBestPars'])
-        #sort by highest probability (https://www.skytowner.com/explore/sorting_value_of_one_array_according_to_another_in_python)
-        #then set the list to full again.
+            try:
+                print(i) #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
+                pipeline.run(filePath, source=src)
+                l2_product=pipeline.catalog_items[0]
+                #l2_product = pipeline.process_target(createTarget(filePath,spec), 0)[0]
+                zaltpars.append((l2_product['zBestSubType'],l2_product['zBestPars']))
+                #pipeline.reset()
+            except ValueError as e: #it seemingly cannot fit to galaxies
+                print(len(fullList))
         pipeline.active_templates=fullList
-        print(zaltpars)
-        pipeline.catalog_items[0]['zAltPars']=zaltpars
+        pipeline.run(filePath, source=src)
+        l2_product=pipeline.catalog_items[0]
+        #print(pipeline.active_templates[0])
+        l2_product['zAltPars']=zaltpars
+        return l2_product
 
 
 def createTarget(filename,spec, fscale=1.):
@@ -36,7 +40,7 @@ def createTarget(filename,spec, fscale=1.):
                     MJD_END=primary_header.get('MJD-END', 0.02),
                     SPECUID=primary_header.get('SPECUID', -1),
                     OBJ_UID=int(result.group(1)),
-                    OBJ_NME=primary_header.get('OBJECT', 1),
+                    OBJ_NME=str(primary_header.get('OBJECT', 1)),
                     )
     return Target(uid=prov.OBJ_UID,
                     name=prov.OBJ_NME,
