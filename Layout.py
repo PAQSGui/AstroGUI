@@ -20,13 +20,6 @@ from PySide6.QtGui import (
     QFont,
 )
 
-from PySide6.QtCore import QSize
-
-# Layout should be top, middle, bottom
-# Top is just meta data etc
-# Middle is the plot
-# Bottom is the navigation bottom
-
 class MainWindow(QMainWindow):
 
     model:      Model
@@ -65,11 +58,13 @@ class MainWindow(QMainWindow):
         self.plotLayout = PlotLayout(self.model)
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+
         self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
         self.optionsWindow = OptionsWindow(self.model)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
+        self.navigator.navigated.connect(self.plotLayout.newFile)
 
         mainLayout = QVBoxLayout()
 

@@ -92,6 +92,7 @@ class PlotLayout(QWidget):
     def update(self):
         self.plotter.UpdateFigure()
 
+    @Slot()
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))

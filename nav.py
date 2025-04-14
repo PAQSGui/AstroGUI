@@ -1,27 +1,28 @@
 
 from PlotLayout import PlotLayout
 from Model import Model
-import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QPushButton,
     QHBoxLayout,
     QPlainTextEdit,
+    QWidget,
     )
 
-import re
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Signal
 
 from ssPicture import SkygrabWindow
 
-class Navigator:
+class Navigator(QWidget):
 
     layout: QHBoxLayout
     model: Model
     plotlayout: PlotLayout
     skygrabWindow: SkygrabWindow
+    navigated = Signal(int)
 
     def __init__(self, plotlayout, infoLayout, model):
+        super().__init__()
         self.model = model
         self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
@@ -59,10 +60,10 @@ class Navigator:
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-        self.plotlayout.update()
+
         note = self.model.getNote()
         self.whyInput.setPlainText(note)
-        self.plotlayout.newFile()
+        self.navigated.emit(delta)
         self.infoLayout.updateAll()
         if (self.skygrabWindow.isHidden()):
             self.model.skygrabNotLoaded=True
