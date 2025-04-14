@@ -1,13 +1,9 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from matplotlib.pyplot import figure
-import Spec_tools as tool
-from templater import Templater
 from Model import Model
-from PySide6.QtCore import QSize
+from matplotlib.pyplot import figure
 
 from plotter import Plotter
+
 from PySide6.QtWidgets import (
     QLayout,
     QWidget,
@@ -15,125 +11,134 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QSlider,
     QLabel,
+    QComboBox,
+    QPushButton,
+    QLineEdit,
+    QSizePolicy,
     )
 
 from PySide6.QtGui import (
     Qt,
+    QDoubleValidator,
 )
 
 from PySide6.QtCore import QSize
-
+from xpca import config
+from os import listdir
+import re
 
 class PlotLayout:
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
-    showSN = True
+    zSlider: QSlider
+    zTextBox: QLineEdit
 
     def __init__(self, model):
         self.model = model
         self.layout = QVBoxLayout()
 
+        fig = FigureCanvasQTAgg(figure('k'))
+        fig.setMinimumSize(QSize(560, 560))
+        self.plotter = Plotter(model, fig)
+
+        zSlider = QSlider(Qt.Orientation.Horizontal)
+        zSlider.setSingleStep(1)
+        zSlider.setMinimum(0)
+        zSlider.setMaximum(self.model.redshiftMax*self.model.redshiftRez)
+        zSlider.setValue(model.getRedShift()*self.model.redshiftRez)
+        zSlider.sliderMoved.connect(self.sliderChanged)
+        self.zSlider = zSlider
+
+        self.dropdown = QComboBox()
+        for file in listdir(config.TEMPLATE_PATH):
+            if file.endswith(".fits"):
+                self.dropdown.addItem(file)
+        self.dropdown.textActivated.connect(self.dropboxSelect)
+        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower())
+
+        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton.clicked.connect(lambda: self.toggleSN())
+        showskybutton = QPushButton("Toggle Sky")
+        showskybutton.clicked.connect(lambda: self.toggleSky())
+
+        sliderLayout = QHBoxLayout()
+        sliderLayout.addWidget(self.dropdown)
+        sliderLayout.addWidget(zSlider)
+
+        sliderLayout.addWidget(QLabel("z ="))
+        self.zTextBox=QLineEdit(text=str(round(model.getRedShift(),4)))
+        self.zTextBox.setValidator(QDoubleValidator())
+        self.zTextBox.editingFinished.connect(self.zTextInput)
+        self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sliderLayout.addWidget(self.zTextBox)
+
+        sliderLayout.addWidget(signoiseButton)
+        sliderLayout.addWidget(showskybutton)
+
         plotLayout = QHBoxLayout()
-
-        self.lineThickness=0.5
-        self.bigFig = FigureCanvasQTAgg(figure('k'))
-        self.bigFig.setMinimumSize(QSize(560, 560))
-
-        self.templater = Templater(self)
-        self.layout.addLayout(self.templater.layout)
-        plotLayout.addWidget(self.bigFig)
-
+        plotLayout.addWidget(fig)
         plotLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
 
         self.layout.addLayout(plotLayout)
-        self.l2_product = None
+        self.layout.addLayout(sliderLayout)
         self.update()
 
-    def optionsWindow(self):
-        self.optsWindow = QWidget()
-        self.optsLayout = QVBoxLayout()
-        self.optsLayout.addWidget(QLabel("Plot Line Thickness"))
-        self.thickSlider=QSlider(Qt.Orientation.Horizontal)
-        self.thickSlider.setRange(1,15) #slider only takes integers
-        self.thickSlider.setSingleStep(1)
-        self.thickSlider.setValue(int(self.lineThickness*10))
-        self.thickSlider.valueChanged.connect(lambda: self.setThickness(self.thickSlider.value()))
-        self.optsLayout.addWidget(self.thickSlider)
-        self.optsWindow.setLayout(self.optsLayout)
-        self.optsWindow.show()
-
-    def setThickness(self, newValue):
-        self.lineThickness=float(newValue)/10.0
-        self.PlotFile()
-
-    def addFile(self, file, l2_product = None):
-        self.file = file
-        self.l2_product = l2_product
-        self.PlotFile()
-
-    def PlotFile(self, l2 = None, first = True):
-        if l2 == None:
-            l2_product = self.l2_product
-        else:
-            l2_product = l2
-
-        self.UpdateFigure('k')
-
-        if l2_product != None:
-            self.templater.plotTemplate(self.file, l2_product, firstLoad=first)
-        plt.legend()
-        self.bigFig.draw()
-
-    def UpdateGrism(self, spectra):
-        plt.figure('k')
-        plt.clf() #clear figure
-        colorcodes = ['k','r','g','b']
-        for x in [0,1,2,3]:
-            if spectra[x]!=None:
-                plt.step(spectra[x].Wavelength, spectra[x].Flux, color = colorcodes[x], linewidth=self.lineThickness) #figure key is used for color
-                plt.xlabel('Wavelength (Å)')
-                plt.ylabel('Flux (erg/s/cm2/Å)')
-                plt.step(spectra[x].Wavelength, spectra[x].Noise, label='Noise', color=colorcodes[x], alpha=0.5, linewidth=self.lineThickness)
-
-        plt.legend()
-        self.bigFig.draw()
-
-
-    def UpdateFigure(self, key, file=None):
-        if file==None:
-            file=self.file
-        plt.figure('k')
-        plt.clf() #clear figure
-        plt.step(file.Wavelength, file.Flux, color = key, linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(file.Wavelength, file.Noise, label='Noise', color=key, alpha=0.5, linewidth=self.lineThickness)
-        plt.title(file.Objectname)  
-        plt.title(self.file.Objectname)  
+    def newFile(self):
+        self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
+        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
+        self.model.resetYLimit()
+        self.update()
 
     def update(self):
-        model = self.model
-        data = Model.getState(model)
-        file = data.file
-        self.file = file
-        plt.figure('k')
-        plt.clf() #clear figure
-        plt.step(self.file.Wavelength, self.file.Flux, color = 'k', linewidth=self.lineThickness) #figure key is used for color
-        if self.showSN:
-            plt.step(file.Wavelength, file.Flux/file.Noise, label="Signal / Noise", linewidth=0.5)
-        plt.xlabel('Wavelength (Å)')
-        plt.ylabel('Flux (erg/s/cm2/Å)')
-        plt.step(self.file.Wavelength, self.file.Noise, label='Noise', color='0.5', linewidth=self.lineThickness)
-        plt.title(self.file.Objectname) 
-
-        self.templater.plotTemplate(self.file, data.fitting)
-
-        plt.legend()
-        self.bigFig.draw()
+        self.plotter.UpdateFigure()
 
     def toggleSN(self):
-        self.showSN = not self.showSN
+        new = not self.model.getOption('ShowSN')
+        self.model.setOption('ShowSN', new)
         self.update()
+
+    def toggleSky(self):        
+        new = not self.model.getOption('ShowSky')
+        self.model.setOption('ShowSky', new)
+        self.update()
+    
+    def getYLimit(self):
+        return self.plotter.getYLim()
+
+    def sliderChanged(self):
+        self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
+        self.zTextBox.setText(str(self.model.getRedShift()))
+        self.update()
+
+    def zTextInput(self):
+            conv=float(self.zTextBox.text())
+            if conv>self.model.redshiftMax:
+                conv=self.model.redshiftMax
+                self.zTextBox.setText(str(conv))
+            elif conv<self.model.redshiftMin:
+                conv=self.model.redshiftMin
+                self.zTextBox.setText(str(conv))
+
+            self.model.changeRedShift(conv)
+            self.zSlider.setValue(int(conv*self.model.redshiftRez))
+            self.update()
+
+    
+    def dropboxSelect(self, s):
+
+        result = re.search(f'template-(.+).fits', s)
+        self.model.changeCategory(result.group(1))
+        
+        try:
+            self.update()
+        except FileNotFoundError as e:
+            for file in listdir(config.TEMPLATE_PATH):
+                if file.lower()==s:
+                    result = re.search(f'template-(.+).fits', file)
+                    self.l2_current['zBestSubType']=result.group(1)
+                    self.plotter.PlotFile(self.l2_current)
+                    break

@@ -10,17 +10,20 @@ from PySide6.QtWidgets import (
     )
 
 import re
+from PySide6.QtCore import QSize
+
 
 class Navigator:
 
     layout: QHBoxLayout
     model: Model
-    plotter: PlotLayout
+    plotlayout: PlotLayout
 
-    def __init__(self, plotter, model):
+    def __init__(self, plotlayout, infoLayout, model):
         self.model = model
-        self.plotter = plotter
+        self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
+        self.infoLayout=infoLayout
 
         whyInput = QPlainTextEdit()
         note = self.model.getNote()
@@ -28,6 +31,7 @@ class Navigator:
             whyInput.setPlaceholderText("Write your notes here")
         else:
             whyInput.setPlainText(note)
+        whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
         backButton = QPushButton("Back")
@@ -43,16 +47,6 @@ class Navigator:
         self.layout.addWidget(yesButton)
         self.layout.addWidget(unsureButton)
         self.layout.addWidget(self.whyInput)
-
-#    def grismArray(self, filename):
-#        grisms = []
-#        for x in ['','R','G','B']:
-#            try:
-#                nextGrism = tool.Osiris_spectrum(self.directory.absoluteFilePath(filename+x+".fits"))
-#                grisms.append(nextGrism)
-#            except FileNotFoundError:
-#                grisms.append(None)
-#        self.plotter.UpdateGrism(grisms)
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":
@@ -64,3 +58,5 @@ class Navigator:
         self.plotter.update()
         note = self.model.getNote()
         self.whyInput.setPlainText(note)
+        self.plotlayout.newFile()
+        self.infoLayout.updateAll()

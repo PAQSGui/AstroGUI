@@ -23,10 +23,10 @@ class Database():
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
-        files = directory.entryList()
+        files = directory.entryList()[0:10]
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
-            fitting = fitter.fitFile(directory.absoluteFilePath(file))
+            fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
             object = DataObject(file, spectra, fitting)
             dict = object.toDict()
             with open(self.dataFile, 'a', newline='') as dataFile:
@@ -42,11 +42,11 @@ class Database():
             reader = csv.DictReader(file)
             for row in reader:
                 if row['name'] != self.fieldNames[0]:
-                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']))
+                    spectra = tool.SDSS_spectrum(directory.absoluteFilePath(row['name']))
+                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']), spectra)
                     object = DataObject.fromDict(row, fitting)
-                    object.file = tool.SDSS_spectrum(directory.absoluteFilePath(object.name))
+                    object.file = spectra
                     files.append(object)     
-
         return files
 
     def getFile(self, name):
