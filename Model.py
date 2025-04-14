@@ -2,6 +2,8 @@ from fitter import Fitter
 from database import Database
 
 class Model:
+    skygrabNotLoaded = True
+
     cursor = 0
     objects = []
     options: dict

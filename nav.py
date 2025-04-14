@@ -12,18 +12,22 @@ from PySide6.QtWidgets import (
 import re
 from PySide6.QtCore import QSize
 
+from ssPicture import SkygrabWindow
 
 class Navigator:
 
     layout: QHBoxLayout
     model: Model
     plotlayout: PlotLayout
+    skygrabWindow: SkygrabWindow
 
     def __init__(self, plotlayout, infoLayout, model):
         self.model = model
         self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
         self.infoLayout=infoLayout
+
+        self.skygrabWindow = SkygrabWindow()
 
         whyInput = QPlainTextEdit()
         note = self.model.getNote()
@@ -60,3 +64,7 @@ class Navigator:
         self.whyInput.setPlainText(note)
         self.plotlayout.newFile()
         self.infoLayout.updateAll()
+        if (self.skygrabWindow.isHidden()):
+            self.model.skygrabNotLoaded=True
+        else:
+            self.skygrabWindow.LoadPicture(self.model)
