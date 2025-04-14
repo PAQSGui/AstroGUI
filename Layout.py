@@ -1,5 +1,4 @@
 from nav import Navigator
-from ssPicture import LoadPicture
 from fitter import Fitter
 from InfoLayout import InfoLayout
 from Model import Model
@@ -57,6 +56,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
+        self.navigator.skygrabWindow.close()
         
     def __init__(self, app):
         super().__init__()
@@ -81,6 +81,7 @@ class MainWindow(QMainWindow):
         def addButton(emoji,tooltip,func=None):
             button = QAction(emoji, self)
             button.setStatusTip(tooltip)
+            button.setToolTip(tooltip) #seemingly not working, at least not on Linux
             if func != None:
                 button.triggered.connect(func)
             file_menu.addAction(button)
@@ -88,7 +89,7 @@ class MainWindow(QMainWindow):
 
         addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
         addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
-        addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: LoadPicture(self.model))
+        addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: self.navigator.skygrabWindow.LoadPicture(self.model))
         
         file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
         
