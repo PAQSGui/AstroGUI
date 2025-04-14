@@ -63,7 +63,7 @@ class Database():
             for row in reader:
                 if row[self.fieldNames[0]] == name:
                     return row
-                return []
+            return None
 
     def addFitting(self, l2):
         with open(self.dataFile, 'a', newline='') as file:

@@ -74,6 +74,19 @@ class Model:
 
         self.categoryDB.addEntry(object.name, categorised, category, redshift, note)
 
+    def getDBEntry(self, name):
+        row = self.categoryDB.getEntry(name)
+        if row is not None:
+            return row
+        return None
+    
+    def getNote(self):
+        name = self.getState().name
+        entry = self.getDBEntry(name)
+        if entry is not None:
+            return entry['note']
+        return ""
+
     def initOptions(self):
         options = {
             'LineWidth': 0.5,
@@ -94,5 +107,3 @@ class Model:
         self.options['yLimit'] = False
         self.options['ymin'] = 0
         self.options['ymax'] = 0
-
-

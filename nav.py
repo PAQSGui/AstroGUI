@@ -26,7 +26,11 @@ class Navigator:
         self.infoLayout=infoLayout
 
         whyInput = QPlainTextEdit()
-        whyInput.setPlaceholderText("Write your notes here")
+        note = self.model.getNote()
+        if note == "":
+            whyInput.setPlaceholderText("Write your notes here")
+        else:
+            whyInput.setPlainText(note)
         whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
@@ -50,7 +54,9 @@ class Navigator:
         elif msg == "Unsure":
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
-        self.whyInput.setPlainText("")
         self.model.updateCursor(delta)
+        self.plotter.update()
+        note = self.model.getNote()
+        self.whyInput.setPlainText(note)
         self.plotlayout.newFile()
         self.infoLayout.updateAll()
