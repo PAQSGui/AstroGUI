@@ -2,13 +2,14 @@ from astropy.io.fits import getheader
 from matplotlib import pyplot as plt
 from sdss import Region
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PySide6.QtCore import QDir
+from PySide6.QtCore import QDir, Slot
+from Model import Model
 
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QLineEdit,
 )
+
 def loadCoords(model):
         dir = QDir(model.path)
         file = model.getState().name
@@ -17,14 +18,14 @@ def loadCoords(model):
         dec = header['PLUG_DEC']
         return ra,dec
 
-
 class SkygrabWindow(QWidget):
     ax: plt.Axes
     canv: FigureCanvasQTAgg
+    model: Model
 
-    def __init__(self):
+    def __init__(self, model):
         super().__init__()
-
+        self.model = model
         #self.setWindowTitle("SDSS Sky Picture")
         fig, self.ax = plt.subplots()
         #if isinstance(figsize, tuple) and len(figsize)==2:
@@ -37,19 +38,21 @@ class SkygrabWindow(QWidget):
         layout.addWidget(self.canv)
         self.setLayout(layout)
 
-    def LoadPicture(self,model):
-        ra,dec=loadCoords(model)
+    @Slot()
+    def LoadPicture(self):
+        if self.isHidden():
+            return
+        ra,dec=loadCoords(self.model)
         #https://github.com/behrouzz/sdss
         reg = Region(ra, dec, fov=0.033)
         
         self.Update(reg)
 
-        file = model.getState().file
+        file = self.model.getState().file
         plt.title(file.Objectname)  
-        model.skygrabNotLoaded=False
+        self.model.skygrabNotLoaded=False
         #self.show()
 
-    
     def Update(self, region, band='all'):
         #Shamelessly copied from Behrouz' own implementation
         if region.data is None:
