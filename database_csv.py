@@ -77,3 +77,37 @@ class Database():
                 if row[self.fieldNames[0]] == name:
                     return row
             return []        
+
+def convert_l2(row):
+    l2_product = dict()
+    l2_product['OBJ_NME']       = row['OBJ_NME']
+    l2_product['zBest']         = float(row['zBest'])
+    l2_product['zBestProb']     = float(row['zBestProb'])
+    l2_product['zBestType']     = row['zBestType']
+    l2_product['zBestSubType']  = row['zBestSubType']
+    
+    def auxInsert(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  x.strip("'")) 
+    
+    def auxInsertFloat(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  float(x.strip(','))) 
+
+    def aux(key, func):
+        temp = row[key].strip('[]').split()
+        new = []
+        for i in range(len(temp)):
+            func(temp,i,new)
+        return new
+
+    l2_product['zAltType'] = aux('zAltType',lambda temp,i,new: new.insert(i,  temp[i].strip("'")))
+
+    l2_product['zAltSubType'] = aux('zAltSubType',auxInsert)
+
+    l2_product['zAltProb'] = aux('zAltProb',auxInsertFloat)
+
+    l2_product['zBestPars'] = np.array(aux('zBestPars',lambda temp,i,new: new.insert(i, float(temp[i].strip(',')))))
+    return l2_product

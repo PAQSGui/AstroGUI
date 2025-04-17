@@ -1,5 +1,6 @@
 from fitter import Fitter
-from database_csv import Database
+from database_json import Database
+from os.path import dirname
 
 class Model:
     skygrabNotLoaded = True
@@ -7,7 +8,6 @@ class Model:
     cursor = 0
     objects = []
     options: dict
-    path = ""
     fileFieldNames = ['name', 'file', 'category', 'redshift']
     fileDB : Database
     catFieldNames = ['name', 'categorized', 'category', 'redshift', 'note']
@@ -19,17 +19,19 @@ class Model:
     redshiftMax = 6
     redshiftMin = 0
 
-    def __init__(self, path, fromCSV = False):
-
+    def __init__(self, files, fromFile = False):
+        path = dirname(files[0])
         self.path = path
         self.fileDB = Database('files', self.fileFieldNames, path)
         self.categoryDB = Database('data', self.catFieldNames, path)
-        self.fitter = Fitter()
+        self.fitter = Fitter(path)
 
-        if not fromCSV:
-            self.fileDB.populate(self.fitter)
+        #fitter processes files
+        if not fromFile:
+            self.fitter.populate(files,path)
         
-        self.objects = self.fileDB.extract(self.fitter)
+        #get objects from fitter
+        self.objects = self.fitter.getModel()
 
         self.initOptions()
 
@@ -73,10 +75,10 @@ class Model:
             category = None
             redshift = None
 
-        self.categoryDB.addEntry(object.name, categorised, category, redshift, note)
+        self.categoryDB.addEntry(object.name, catFieldNames, [categorised, category, redshift, note])
 
     def getDBEntry(self, name):
-        row = self.categoryDB.getEntry(name)
+        row = self.categoryDB.getByName(name,None)
         if row is not None:
             return row
         return None
@@ -85,6 +87,7 @@ class Model:
         name = self.getState().name
         entry = self.getDBEntry(name)
         if entry is not None:
+            print(entry)
             return entry['note']
         return ""
 
