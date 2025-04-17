@@ -1,6 +1,6 @@
 
 from xpca.pipeline import Pipeline
-from database import Database
+from database_csv import Database
 import numpy as np
 
 from PySide6.QtWidgets import (
@@ -13,7 +13,7 @@ from handler_xpca import get_all_fits
 class Fitter:
 
     pipe: Pipeline
-    database: Database
+    preProcess: Database
     best : str
     redshift: float
     layout: QVBoxLayout
@@ -22,15 +22,15 @@ class Fitter:
     def __init__(self):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-        self.database = Database("preProcess.csv",fields)
+        self.preProcess = Database("preProcess",fields)
 
     def fitFile(self, filePath, spec):
         obj_nme = filePath[-21:][:-5]
-        l2 = self.database.getFitting(obj_nme)
+        l2 = self.preProcess.getFitting(obj_nme)
         if l2 == []:
             #self.pipe.run(filePath, source='sdss')
             l2_product = get_all_fits(self.pipe,filePath, spec)
-            self.database.addFitting(l2_product)
+            self.preProcess.addFitting(l2_product)
             #print(self.pipe.full_results)
         else:
             l2_product = convert_l2(l2)
@@ -38,7 +38,7 @@ class Fitter:
         return l2_product
 
     def getBestGuess(self):
-        return self.bestdatabase
+        return self.best
         return self.l2_product
 
 

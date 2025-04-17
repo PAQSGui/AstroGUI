@@ -11,7 +11,7 @@ class Database():
     path : str
 
     def __init__(self, dataFile, fieldNames, path = ''):
-        self.dataFile = dataFile
+        self.dataFile = "%s.csv" % dataFile
         self.fieldNames = fieldNames
         self.path = path 
 

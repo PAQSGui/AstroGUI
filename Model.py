@@ -1,5 +1,5 @@
 from fitter import Fitter
-from database import Database
+from database_csv import Database
 
 class Model:
     skygrabNotLoaded = True
@@ -22,8 +22,8 @@ class Model:
     def __init__(self, path, fromCSV = False):
 
         self.path = path
-        self.fileDB = Database('files.csv', self.fileFieldNames, path)
-        self.categoryDB = Database('data.csv', self.catFieldNames, path)
+        self.fileDB = Database('files', self.fileFieldNames, path)
+        self.categoryDB = Database('data', self.catFieldNames, path)
         self.fitter = Fitter()
 
         if not fromCSV:
