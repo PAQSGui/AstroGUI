@@ -1,4 +1,4 @@
-from nav import Navigator
+from Navigator import Navigator
 from fitter import Fitter
 from InfoLayout import InfoLayout
 from Model import Model

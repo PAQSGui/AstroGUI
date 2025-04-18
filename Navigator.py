@@ -10,6 +10,9 @@ from PySide6.QtWidgets import (
 
 from PySide6.QtCore import QSize, Signal
 
+"""
+Navigator is responsible for navigating between files
+"""
 class Navigator(QWidget):
 
     layout: QHBoxLayout
