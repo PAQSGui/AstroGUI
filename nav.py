@@ -44,9 +44,18 @@ class Navigator(QWidget):
         self.layout.addWidget(yesButton)
         self.layout.addWidget(unsureButton)
         self.layout.addWidget(self.whyInput)
-        filedisplay=QListWidget(self)
-        filedisplay.insertItems(0,self.model.getFileList())
-        self.layout.addWidget(filedisplay)
+
+        self.filedisplay=QListWidget(self)
+        self.filedisplay.insertItems(0,self.model.getFileList())
+        self.filedisplay.itemActivated.connect(self.setSelected)
+        
+        self.layout.addWidget(self.filedisplay)
+    def setSelected(self,item):
+        itemIndex=self.filedisplay.indexFromItem(item).row()
+        self.model.cursor=itemIndex #update cursor
+        note = self.model.getNote()
+        self.whyInput.setPlainText(note)
+        self.navigated.emit(itemIndex)
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":
@@ -55,6 +64,8 @@ class Navigator(QWidget):
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
+        #print(self.model.getState().name)
+        self.filedisplay.setCurrentRow(self.model.cursor)
 
         note = self.model.getNote()
         self.whyInput.setPlainText(note)
