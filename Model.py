@@ -1,5 +1,5 @@
 from fitter import Fitter
-from database_json import Database
+from database_csv import Database
 from os.path import dirname
 
 class Model:

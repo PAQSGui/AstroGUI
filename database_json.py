@@ -2,17 +2,13 @@ import json
 from astropy.utils.misc import JsonCustomEncoder #https://docs.astropy.org/en/stable/api/astropy.utils.misc.JsonCustomEncoder.html
 from os import makedirs
 from pathlib import Path
-from PySide6.QtWidgets import (
-    QFileDialog,
-    QDialog,
-    QDialogButtonBox,
-    QVBoxLayout,
-    QLabel
-    )
 
 import Spec_tools as tool
 from DataObject import DataObject
 from numpy import array
+
+from database_common import CreateReplaceDialog
+
 class Database():
     filepath : Path
     directory : Path
@@ -34,28 +30,7 @@ class Database():
                                 except ValueError:
                                     continue
             except Exception as e:
-                replaceDialog=QDialog()
-                replaceDialog.setWindowTitle(str(type(e)))
-
-                QBtn = (
-                    QDialogButtonBox.Ok | QDialogButtonBox.Cancel
-                )
-
-                buttonBox = QDialogButtonBox(QBtn)
-                buttonBox.accepted.connect(replaceDialog.accept)
-                buttonBox.rejected.connect(replaceDialog.reject)
-
-                layout = QVBoxLayout()
-                layout.addWidget(QLabel("An exception occurred. It is possible a previous session was found in the folder, but cannot be opened. Would you like to overwrite it?"))
-                layout.addWidget(buttonBox)
-                replaceDialog.setLayout(layout)
-                    
-                if replaceDialog.exec():
-                    with open(self.filepath, 'w') as file:
-                        self.model = {} #dictionary
-                        json.dump(self.model, file, cls=JsonCustomEncoder)
-                else:
-                    raise e
+                self.model = CreateReplaceDialog(self.filepath,lambda file: json.dump({}, file, cls=JsonCustomEncoder),{},e)
         else:
             with open(self.filepath, 'w') as file:
                 self.model = {} #dictionary

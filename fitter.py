@@ -1,5 +1,5 @@
 from xpca.pipeline import Pipeline
-from database_json import Database
+from database_csv import Database
 import numpy as np
 import Spec_tools as tool
 from pathlib import Path

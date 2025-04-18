@@ -4,22 +4,45 @@ from DataObject import DataObject
 from PySide6.QtCore import (
     QDir,
 )
+from pathlib import Path
+
+from database_common import CreateReplaceDialog
 
 class Database():
-    dataFile = ""
+    filepath : Path
     fieldNames = ""
     path : str
 
-    def __init__(self, dataFile, fieldNames, path = ''):
-        self.dataFile = "%s.csv" % dataFile
-        self.fieldNames = fieldNames
-        self.path = path 
+    #def __init__(self, filepath, fieldNames, path = ''):
+    #    self.filepath = "%s.csv" % filepath
+    #    self.fieldNames = fieldNames
+    #    self.path = path 
 
-        with open(self.dataFile, 'a', newline='') as file:
+    #    with open(self.filepath, 'a', newline='') as file:
+    #        writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
+    #        writer.writeheader()  
+
+    def __init__(self, filename, fieldNames, directory=Path('/data/')):
+        def writeEmpty(file):
             writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-            writer.writeheader()  
+            writer.writeheader() 
 
 
+
+        self.directory=directory
+        self.filepath = directory / Path(filename).with_suffix('.csv')
+        if self.filepath.is_file():
+            try:
+                with open(self.filepath, 'r', newline='') as file:
+                    reader = csv.DictReader(file)
+                    self.model = {}
+                    for row in reader:
+                        if row['name'] != self.fieldNames[0]:
+                            self.model[row[0]]={fieldNames[i]: row[i] for i in range(len(fieldNames))}
+            except Exception as e:
+                self.model = CreateReplaceDialog(self.filepath,lambda file: writeEmpty(file),{},e)
+        else:
+            writeEmpty()
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
@@ -29,8 +52,8 @@ class Database():
             fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
             object = DataObject(file, spectra, fitting)
             dict = object.toDict()
-            with open(self.dataFile, 'a', newline='') as dataFile:
-                writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
+            with open(self.filepath, 'a', newline='') as filepath:
+                writer = csv.DictWriter(filepath, self.fieldNames, extrasaction = 'ignore')
                 writer.writerow(dict)
 
     def extract(self, fitter):
@@ -38,7 +61,7 @@ class Database():
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = []
 
-        with open(self.dataFile, 'r', newline='') as file:      
+        with open(self.filepath, 'r', newline='') as file:      
             reader = csv.DictReader(file)
             for row in reader:
                 if row['name'] != self.fieldNames[0]:
@@ -52,13 +75,19 @@ class Database():
     def getFile(self, name):
         pass
 
-    def addEntry(self, name, categorized, category, note, redshift):
-        with open(self.dataFile, 'a', newline='') as file:
+    def addEntry(self, name, fields, data):
+        if (len(fields)!=len(data)+1):
+            raise Exception("Expected fields to be one longer than data because of name field, but it is "+ len(fields))
+        entry={}
+        for i in range(len(data)):
+            entry[fields[i+1]]=data[i]
+        self.model[name]=entry
+        with open(self.filepath, 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([name, categorized, category, note, redshift])
+            writer.writerow(list(entry.values()))
 
     def getEntry(self, name):
-        with open(self.dataFile, 'r', newline = '') as file:
+        with open(self.filepath, 'r', newline = '') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if row[self.fieldNames[0]] == name:
@@ -66,17 +95,34 @@ class Database():
             return None
 
     def addFitting(self, l2):
-        with open(self.dataFile, 'a', newline='') as file:
+        with open(self.filepath, 'a', newline='') as file:
             writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
             writer.writerow(l2)
 
     def getFitting(self, name):
-        with open(self.dataFile, 'r', newline='') as file:
+        with open(self.filepath, 'r', newline='') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if row[self.fieldNames[0]] == name:
                     return row
             return []        
+
+    def getByName(self, name, default=[]):
+        return self.model.get(name,default)
+
+    def addByName(self, name, data):
+        self.model[name]=data
+        with open(self.filepath, 'a', newline='') as file:
+            writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
+            writer.writerow(data)
+
+    def getModel(self):
+        objs=[]
+        for item in list(self.model.items()):
+            spectra = tool.SDSS_spectrum((self.directory / Path(item[0]))) 
+            dobject = DataObject(item[0], spectra, item[1])
+            objs.append(dobject)
+        return objs
 
 def convert_l2(row):
     l2_product = dict()
@@ -111,3 +157,4 @@ def convert_l2(row):
 
     l2_product['zBestPars'] = np.array(aux('zBestPars',lambda temp,i,new: new.insert(i, float(temp[i].strip(',')))))
     return l2_product
+    
