@@ -5,6 +5,10 @@ from xpca.spectrum import Spectrum
 from os.path import basename
 from astropy.io.fits import getheader
 from re import search
+
+"""
+Helper-class for fitter
+"""
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         print(filePath)
         fullList=pipeline.active_templates[:]
