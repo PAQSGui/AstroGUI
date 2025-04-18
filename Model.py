@@ -29,6 +29,11 @@ class Model:
         #fitter processes files
         if not fromFile:
             self.fitter.populate(files,path)
+            for file in files:
+                data = self.fileDB.getByName(file)
+                if data == []:
+                        self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])
+                
         
         #get objects from fitter
         self.objects = self.fitter.getModel()
@@ -75,7 +80,7 @@ class Model:
             category = None
             redshift = None
 
-        self.categoryDB.addEntry(object.name, catFieldNames, [categorised, category, redshift, note])
+        self.categoryDB.addEntry(object.name, self.catFieldNames, [categorised, category, redshift, note])
 
     def getDBEntry(self, name):
         row = self.categoryDB.getByName(name,None)
@@ -87,7 +92,6 @@ class Model:
         name = self.getState().name
         entry = self.getDBEntry(name)
         if entry is not None:
-            print(entry)
             return entry['note']
         return ""
 
@@ -111,3 +115,6 @@ class Model:
         self.options['yLimit'] = False
         self.options['ymin'] = 0
         self.options['ymax'] = 0
+
+    def getFileList(self):
+        return list(self.fitter.preProcess.model.keys())

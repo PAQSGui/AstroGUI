@@ -27,7 +27,6 @@ class Templater:
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         
         try:
-            print(l2_product)
             wave, model = template.create_PCA_model(target,l2_product)
         except FileNotFoundError as e:
             name = l2_product['zBestSubType']

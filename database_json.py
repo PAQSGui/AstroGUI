@@ -33,11 +33,9 @@ class Database():
                                     values[key]=array(values[key])
                                 except ValueError:
                                     continue
-            except Exception as e: #this is a bit dangerous, maybe it should be a limited set of exceptions if that works
-                #makedirs(directory, exist_ok=True) Admin privileges are required to run this regardless
-                print(type(e))
+            except Exception as e:
                 replaceDialog=QDialog()
-                replaceDialog.setWindowTitle("Can't open database!")
+                replaceDialog.setWindowTitle(str(type(e)))
 
                 QBtn = (
                     QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -48,7 +46,7 @@ class Database():
                 buttonBox.rejected.connect(replaceDialog.reject)
 
                 layout = QVBoxLayout()
-                layout.addWidget(QLabel("A previous session was found in the folder, but cannot be opened. Would you like to overwrite it?"))
+                layout.addWidget(QLabel("An exception occurred. It is possible a previous session was found in the folder, but cannot be opened. Would you like to overwrite it?"))
                 layout.addWidget(buttonBox)
                 replaceDialog.setLayout(layout)
                     
@@ -69,20 +67,19 @@ class Database():
 
     def addByName(self, name, data):
         self.model[name]=data
-        #print(name)
-        #print(data)
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)
 
     def getModel(self):
         objs=[]
         for item in list(self.model.items()):
-            print(self.filepath)
             spectra = tool.SDSS_spectrum((self.directory / Path(item[0]))) 
             dobject = DataObject(item[0], spectra, item[1])
             objs.append(dobject)
         return objs
 
+    def getFilenames(self):
+        list(self.model.keys())
 
     def addEntry(self, name, fields, data):
         if (len(fields)!=len(data)+1):
@@ -91,7 +88,5 @@ class Database():
         for i in range(len(data)):
             entry[fields[i+1]]=data[i]
         self.model[name]=entry
-        #print(name)
-        #print(data)
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)

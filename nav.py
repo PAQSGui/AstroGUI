@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QPlainTextEdit,
     QWidget,
+    QListWidget,
     )
 
 from PySide6.QtCore import QSize, Signal
@@ -43,6 +44,9 @@ class Navigator(QWidget):
         self.layout.addWidget(yesButton)
         self.layout.addWidget(unsureButton)
         self.layout.addWidget(self.whyInput)
+        filedisplay=QListWidget(self)
+        filedisplay.insertItems(0,self.model.getFileList())
+        self.layout.addWidget(filedisplay)
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":

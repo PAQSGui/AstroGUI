@@ -6,7 +6,6 @@ from os.path import basename
 from astropy.io.fits import getheader
 from re import search
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
-        print(filePath)
         fullList=pipeline.active_templates[:]
         zaltpars=[]
         for i in range(0,len(fullList)):
@@ -14,18 +13,17 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
             pipeline.active_templates=[fullList[i]]
 
             try:
-                print(i) #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
+                #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
                 pipeline.run(filePath, source=src)
                 l2_product=pipeline.catalog_items[0]
                 #l2_product = pipeline.process_target(createTarget(filePath,spec), 0)[0]
                 zaltpars.append((l2_product['zBestSubType'],l2_product['zBestPars']))
                 #pipeline.reset()
             except ValueError as e: #it seemingly cannot fit to galaxies
-                print(len(fullList))
+                print(e)
         pipeline.active_templates=fullList
         pipeline.run(filePath, source=src)
         l2_product=pipeline.catalog_items[0]
-        #print(pipeline.active_templates[0])
         l2_product['zAltPars']=zaltpars
         return l2_product
 

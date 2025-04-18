@@ -46,7 +46,6 @@ class Fitter:
     def populate(self, files, directory):
         for file in files:
             path=Path(directory) / file
-            print(path)
             spectra = tool.SDSS_spectrum(path) 
             fitting = self.fitFile(Path(directory) / file,spectra)
 

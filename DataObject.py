@@ -12,8 +12,6 @@ class DataObject:
         self.name = filename
         self.file = file
         self.fitting = fitting
-        #print(fitting)
-        print(type(fitting))
         self.category = fitting['zBestSubType']
         self.redshift = fitting['zBest']
         #try:

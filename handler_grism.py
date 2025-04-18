@@ -27,12 +27,10 @@ def grismArray(nav, filename):
     nav.plotter.UpdateGrism(grisms)
 
 def loadFile(nav, delta=1):
-    print("Current File: " + nav.getCurrentFile())
 
     while True:
         try:
             nav.current = SDSS_spectrum(nav.directory.absoluteFilePath(nav.getCurrentFile()))
-            print("Current File: " + nav.getCurrentFile())
             nav.UpdateGraph(nav.current)
             break
         except OSError as e:
