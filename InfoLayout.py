@@ -9,7 +9,7 @@ from PySide6.QtGui import (
 )
 
 from Model import Model
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Slot
 
 from ssPicture import loadCoords
 
@@ -40,6 +40,7 @@ class InfoLayout(QHBoxLayout):
         self.layout.addLayout(self.targetLayout)
         self.updateAll()
     
+    @Slot()
     def updateAll(self):
         self.updateNbrLabel()
         self.updateClassProb()

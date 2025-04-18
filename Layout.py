@@ -4,6 +4,7 @@ from InfoLayout import InfoLayout
 from Model import Model
 from PlotLayout import PlotLayout
 from optionsWindow import OptionsWindow
+from ssPicture import SkygrabWindow
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -22,12 +23,13 @@ from PySide6.QtGui import (
 
 class MainWindow(QMainWindow):
 
-    model:      Model
-    navigator:  Navigator
-    plotLayout: PlotLayout
-    fitter:     Fitter
-    infoLayout: InfoLayout
-
+    model:          Model
+    navigator:      Navigator
+    plotLayout:     PlotLayout
+    fitter:         Fitter
+    infoLayout:     InfoLayout
+    optionsWindow:  OptionsWindow
+    skygrabTab:     SkygrabWindow
 
     def openFolder(self):
                 folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
@@ -42,7 +44,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
-        self.navigator.skygrabWindow.close()
+        #self.navigator.skygrabWindow.close()
         
     def __init__(self, app):
         super().__init__()
@@ -53,12 +55,15 @@ class MainWindow(QMainWindow):
         self.infoLayout = InfoLayout(self.model)
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
-        self.navigator = Navigator(self.plotLayout, self.infoLayout, self.model)
-        self.optionsWindow = OptionsWindow(self.model)
+        self.navigator = Navigator(self.model)
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
-
-        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
+        self.navigator.navigated.connect(self.infoLayout.updateAll)
         self.navigator.navigated.connect(self.plotLayout.newFile)
+
+        self.optionsWindow = OptionsWindow(self.model)
+        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
+        self.skygrabTab = SkygrabWindow(self.model)
+        self.navigator.navigated.connect(self.skygrabTab.LoadPicture)
 
         mainLayout = QVBoxLayout()
 
@@ -95,11 +100,9 @@ class MainWindow(QMainWindow):
         #Create tabs for plotlayout and skygrab
         tabs = QTabWidget()
         tabs.addTab(self.plotLayout,"Spectrum Plot")
-        tabs.addTab(self.navigator.skygrabWindow,"SDSS Photo")
-        def loadIfClicked(index):
-            if (index == 1 and self.model.skygrabNotLoaded):
-                self.navigator.skygrabWindow.LoadPicture(self.model)
-        tabs.tabBarClicked.connect(loadIfClicked)
+        tabs.addTab(self.skygrabTab,"SDSS Photo")
+    
+        tabs.tabBarClicked.connect(self.skygrabTab.LoadPicture)
         mainLayout.addWidget(tabs)
         #mainLayout.addLayout(self.plotLayout.layout)
         mainLayout.addLayout(self.navigator.layout)
