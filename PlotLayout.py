@@ -1,7 +1,9 @@
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
 from matplotlib.pyplot import figure
-
+from xpca import config
+from os import listdir
+import re
 from plotter import Plotter
 
 from PySide6.QtWidgets import (
@@ -15,19 +17,22 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QSizePolicy,
-    )
+)
 
 from PySide6.QtGui import (
     Qt,
     QDoubleValidator,
 )
 
-from PySide6.QtCore import QSize
-from PySide6.QtCore import QObject, Signal, Slot
-from xpca import config
-from os import listdir
-import re
+from PySide6.QtCore import (
+    QSize,
+    Slot,
+)
 
+"""
+The PlotLAyout is responsible for the part of the window where the graph is located.
+It should NOT plot or load files.
+"""
 class PlotLayout(QWidget):
     layout: QHBoxLayout
     model: Model
@@ -97,12 +102,9 @@ class PlotLayout(QWidget):
         self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
         self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
-        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) 
         self.model.resetYLimit()
         self.update()
-
-    #def update(self):
-    #    self.plotter.UpdateFigure()
 
     def toggleSN(self):
         new = not self.model.getOption('ShowSN')

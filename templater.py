@@ -6,7 +6,9 @@ from xpca.spectrum import Spectrum
 from xpca import plotting as template
 from Model import Model
 
-
+"""
+templater uses xpca to draw a template over the plot
+"""
 class Templater:
     model: Model
 
