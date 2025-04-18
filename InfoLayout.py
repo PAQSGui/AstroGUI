@@ -1,19 +1,22 @@
+from Model import Model
+from ssPicture import loadCoords
+
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QLabel,
     QWidget,
-    )
+)
+
 from PySide6.QtGui import (
     Qt,
 )
 
-from Model import Model
 from PySide6.QtCore import QSize, Slot
-
-from ssPicture import loadCoords
-
-# Class represents the top of the program and contains the labels used to display meta information
+"""
+This component is placed at the top of the window and displays meta-data from the file.
+It should handle files as loaded by Spec_tools.py
+"""
 class InfoLayout(QHBoxLayout):
     layout = QHBoxLayout()
     model: Model
@@ -32,8 +35,6 @@ class InfoLayout(QHBoxLayout):
         self.model = model
         self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
         self.targetLayout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        
-        
 
         self.layout.addWidget(self.nbrLabel)
         self.layout.addLayout(self.classProbLayout)
