@@ -1,15 +1,18 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
-from spectres import spectres
 from astropy.io.fits import getdata
 from astropy.io.fits import getheader
 
+"""
+This file is a modified version of the file Spec_tools.py written by Fynbo
+It Loads a fit-file based on the specific format:
+4 extensions: flux (Horne extraction), flux (sum extraction), sky-background, 1-sigma flux error   
+
+"""
 class SDSS_spectrum():
     def __init__(self,Filename):
         self.Filename = Filename
 
-        #Read the fits-file
         data = getdata(Filename)
         header = getheader(Filename)
 
@@ -19,12 +22,11 @@ class SDSS_spectrum():
         self.Skybackground = data['Sky']
         self.Objectname = 'SDSS'+header['Name']
 
+
 class Osiris_spectrum():
-    #The fits file is expected to have 4 extensions: flux (Horne extraction), flux (sum extraction), sky-background, 1-sigma flux error    
     def __init__(self,Filename):
         self.Filename = Filename
 
-        #Read the fits-file
         HDU = fits.open(Filename)
         data = HDU[0].data
 
@@ -33,16 +35,12 @@ class Osiris_spectrum():
         self.Skybackground = data[2,0,:]
         self.Noise = data[3,0,:]
         
-        #Read in the Header
         self.Header = HDU[0].header
         try:
             self.Objectname = self.Header['OBJECT']
         except KeyError:
             print('OBJECT keyword not in the header') 
-        #self.TCStarget = self.Header['TCSTGT']
 
-        #Generate the wavelength array based on the HEADER
-        Wavelength = []
         try: 
             startwavelength = self.Header['CRVAL1']
             dispersion = self.Header['CD1_1']
