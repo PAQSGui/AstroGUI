@@ -10,6 +10,9 @@ from PySide6.QtWidgets import (
 
 from handler_xpca import get_all_fits
 
+"""
+This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph
+"""
 class Fitter:
 
     pipe: Pipeline
@@ -39,7 +42,6 @@ class Fitter:
 
     def getBestGuess(self):
         return self.bestdatabase
-        return self.l2_product
 
 
 def convert_l2(row):

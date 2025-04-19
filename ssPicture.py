@@ -10,14 +10,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-def loadCoords(model):
-        dir = QDir(model.path)
-        file = model.getState().name
-        header = getheader(dir.absoluteFilePath(file))
-        ra = header['PLUG_RA']
-        dec = header['PLUG_DEC']
-        return ra,dec
-
+"""
+This class is responsible for grabbing an image of the sky from sdss, with the currently viewed object centered
+"""
 class SkygrabWindow(QWidget):
     ax: plt.Axes
     canv: FigureCanvasQTAgg
@@ -67,3 +62,11 @@ class SkygrabWindow(QWidget):
             self.ax.imshow(region.data)
         plt.axis('off') # new
         self.canv.draw()
+
+def loadCoords(model):
+        dir = QDir(model.path)
+        file = model.getState().name
+        header = getheader(dir.absoluteFilePath(file))
+        ra = header['PLUG_RA']
+        dec = header['PLUG_DEC']
+        return ra,dec

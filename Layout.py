@@ -1,4 +1,4 @@
-from nav import Navigator
+from Navigator import Navigator
 from fitter import Fitter
 from InfoLayout import InfoLayout
 from Model import Model
@@ -21,6 +21,12 @@ from PySide6.QtGui import (
     QFont,
 )
 
+"""
+The main window is resposinble for initializing all other classes and linking them.
+Model is used to share data and state between the different modules.
+Buttons in one class should be linked to methods in other classes via Signals and Slots
+This ensures a low level of coupling neccessary for changing out components
+"""
 class MainWindow(QMainWindow):
 
     model:          Model
@@ -36,7 +42,7 @@ class MainWindow(QMainWindow):
             try:
                 folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
                 if folder_path == "":
-                    # Hacky way of exiting program of dialog is cancelled
+                    # Hacky way of exiting program if dialog is cancelled
                     exit()
                 self.model = Model(folder_path) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
             except FileNotFoundError:
@@ -50,7 +56,6 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
-        #self.navigator.skygrabWindow.close()
         
     def __init__(self, app):
         super().__init__()
@@ -74,7 +79,6 @@ class MainWindow(QMainWindow):
         mainLayout = QVBoxLayout()
 
         self.setStatusBar(QStatusBar(self))
-        # add toolbar
 
         file_menu = self.menuBar()
         file_menu.setFont(QFont("",18))
@@ -90,7 +94,6 @@ class MainWindow(QMainWindow):
 
         addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
         addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
-        #addButton("🌌","Load image cutout from the Sloan Digital Sky Survey (SDSS)",lambda: self.navigator.skygrabWindow.LoadPicture(self.model))
         
         file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
         
@@ -103,14 +106,12 @@ class MainWindow(QMainWindow):
         addButton("🗠","Open a window to manually adjust the template parameters")
         
         mainLayout.addLayout(self.infoLayout)
-        #Create tabs for plotlayout and skygrab
         tabs = QTabWidget()
         tabs.addTab(self.plotLayout,"Spectrum Plot")
         tabs.addTab(self.skygrabTab,"SDSS Photo")
     
         tabs.tabBarClicked.connect(self.skygrabTab.LoadPicture)
         mainLayout.addWidget(tabs)
-        #mainLayout.addLayout(self.plotLayout.layout)
         mainLayout.addLayout(self.navigator.layout)
         
         widget = QWidget()

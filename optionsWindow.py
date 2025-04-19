@@ -12,6 +12,10 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 
+"""
+The option dialog opens in a new window so it's possible to see changes to the graph as they are made
+This class should only update the options by calling the setOption() method from Model
+"""
 class OptionsWindow(QWidget):
 
     optionChanged = Signal()
