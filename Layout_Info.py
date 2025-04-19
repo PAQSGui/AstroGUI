@@ -64,10 +64,13 @@ class InfoLayout(QHBoxLayout):
         probabilities = l2_product['zAltProb']
 
         for i in range(1,len(subTypes)):
-            probability = probabilities[i] * 100
-            if probability > 10:
-                text = subTypes[i] + ': %.2f %%' % probability
-                self.classProbLayout.addWidget(QLabel(text))
+            if probabilities[i]!=None:
+                probability = probabilities[i] * 100
+                if probability > 10:
+                    text = subTypes[i] + ': %.2f %%' % probability
+            else:
+                text = "%s: NaN" % subTypes[i]
+            self.classProbLayout.addWidget(QLabel(text))
 
         return self.classProbLayout
     

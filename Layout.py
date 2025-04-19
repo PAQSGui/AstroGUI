@@ -1,6 +1,6 @@
 from nav import Navigator
 from fitter import Fitter
-from InfoLayout import InfoLayout
+from Layout_Info import InfoLayout
 from Model import Model
 from PlotLayout import PlotLayout
 from optionsWindow import OptionsWindow
@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
 
     def openFiles(self):
             files = QFileDialog.getOpenFileNames(None, "Select Files")
+            print(files[0])
             self.model = Model(files[0])
 
     def closeEvent(self, ev):

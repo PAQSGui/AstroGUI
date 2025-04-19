@@ -1,6 +1,7 @@
 from fitter import Fitter
-from database_csv import Database
+from database_json import Database
 from os.path import dirname
+import DataObject
 
 class Model:
     skygrabNotLoaded = True
@@ -10,8 +11,8 @@ class Model:
     options: dict
     fileFieldNames = ['name', 'file', 'category', 'redshift']
     fileDB : Database
-    catFieldNames = ['name', 'categorized', 'category', 'redshift', 'note']
-    categoryDB : Database
+    objFieldNames = DataObject.FieldNames()
+    validationDB : Database
     fitter: Fitter
     #OPTION Params
     lineThickness = 0.5
@@ -23,7 +24,7 @@ class Model:
         path = dirname(files[0])
         self.path = path
         self.fileDB = Database('files', self.fileFieldNames, path)
-        self.categoryDB = Database('data', self.catFieldNames, path)
+        self.validationDB = Database('validation', self.objFieldNames, path)
         self.fitter = Fitter(path)
 
         #fitter processes files
@@ -80,10 +81,10 @@ class Model:
             category = None
             redshift = None
 
-        self.categoryDB.addEntry(object.name, self.catFieldNames, [categorised, category, redshift, note])
+        self.validationDB.addEntry(object.name, self.catFieldNames, [categorised, category, redshift, note])
 
     def getDBEntry(self, name):
-        row = self.categoryDB.getByName(name,None)
+        row = self.validationDB.getByName(name,None)
         if row is not None:
             return row
         return None

@@ -5,23 +5,26 @@ from xpca.spectrum import Spectrum
 from os.path import basename
 from astropy.io.fits import getheader
 from re import search
+
+from xpca.pipeline import Pipeline
+
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         fullList=pipeline.active_templates[:]
-        zaltpars=[]
+        zaltpars={}
+        altpipe = Pipeline(debug=False)
         for i in range(0,len(fullList)):
-            pipeline.N_targets=1
-            pipeline.active_templates=[fullList[i]]
+            altpipe.N_targets=1
+            altpipe.active_templates=[fullList[i]]
 
             try:
                 #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
-                pipeline.run(filePath, source=src)
-                l2_product=pipeline.catalog_items[0]
+                altpipe.run(filePath, source=src)
+                l2_product=altpipe.catalog_items[0]
                 #l2_product = pipeline.process_target(createTarget(filePath,spec), 0)[0]
-                zaltpars.append((l2_product['zBestSubType'],l2_product['zBestPars']))
+                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']#,l2_product['zBest']
                 #pipeline.reset()
-            except ValueError as e: #it seemingly cannot fit to galaxies
+            except ValueError as e:
                 print(e)
-        pipeline.active_templates=fullList
         pipeline.run(filePath, source=src)
         l2_product=pipeline.catalog_items[0]
         l2_product['zAltPars']=zaltpars

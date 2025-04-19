@@ -23,12 +23,8 @@ class Database():
                     self.model = json.load(file)
                     for file in list(self.model.keys()):
                         values = self.model[file]
-                        for key in list(values.keys()):
-                            if type(values[key]) is list:
-                                try:
-                                    values[key]=array(values[key])
-                                except ValueError:
-                                    continue
+                        convertNPRecursive(values)
+                                
             except Exception as e:
                 self.model = CreateReplaceDialog(self.filepath,lambda file: json.dump({}, file, cls=JsonCustomEncoder),{},e)
         else:
@@ -65,3 +61,13 @@ class Database():
         self.model[name]=entry
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)
+
+def convertNPRecursive(values):
+    for key in list(values.keys()):
+        if type(values[key]) is list:
+            try:
+                values[key]=array(values[key])
+            except ValueError:
+                continue
+        elif type(values[key]) is dict:
+            convertNPRecursive(values[key])

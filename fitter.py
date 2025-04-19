@@ -1,5 +1,5 @@
 from xpca.pipeline import Pipeline
-from database_csv import Database
+from database_json import Database
 import numpy as np
 import Spec_tools as tool
 from pathlib import Path
@@ -38,10 +38,6 @@ class Fitter:
         return l2_product
     def getModel(self):
         return self.preProcess.getModel()
-
-    def getBestGuess(self):
-        return self.best
-        return self.l2_product
 
     def populate(self, files, directory):
         for file in files:

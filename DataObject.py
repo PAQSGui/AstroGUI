@@ -1,10 +1,14 @@
 import Spec_tools as tool
 
+def FieldNames():
+    return ['name', 'categorized', 'params', 'validated', 'validators',  'note']
+
 class DataObject:
 
     name: str
     file: tool.SDSS_spectrum
     fitting: dict
+    userFitting: dict
     category: str
     redshift: float
 
@@ -14,12 +18,6 @@ class DataObject:
         self.fitting = fitting
         self.category = fitting['zBestSubType']
         self.redshift = fitting['zBest']
-        #try:
-        #    self.category = fitting['zBestSubType']
-        #    self.redshift = fitting['zBest']
-        #except:
-        #    self.category = None
-        #    self.redshift = 0
 
     def changeRedshift(self, val):
         self.redshift = val
