@@ -4,6 +4,8 @@ from DataObject import DataObject
 from PySide6.QtCore import (
     QDir,
 )
+import pandas as pd
+import os.path
 
 class Database():
     dataFile = ""
@@ -15,11 +17,17 @@ class Database():
         self.fieldNames = fieldNames
         self.path = path 
 
-        with open(self.dataFile, 'a', newline='') as file:
-            writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-            writer.writeheader()  
+        if not os.path.isfile(dataFile):
+            f = open(dataFile, "a")
+            f.write("name,categorized,category,redshift,note")
+        
+        self.df = pd.read_csv(self.dataFile, index_col="name")
 
+        # with open(self.dataFile, 'a', newline='') as file:
+        #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
+        #     writer.writeheader()  
 
+    # Ignore for now
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
@@ -33,10 +41,16 @@ class Database():
                 writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
                 writer.writerow(dict)
 
+    # needed?
     def extract(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = []
+
+        for row in self.df[:]: # Grab all rows
+            spectra = tool.SDSS_spectrum(directory.absoluteFilePath())
+
+
 
         with open(self.dataFile, 'r', newline='') as file:      
             reader = csv.DictReader(file)
@@ -53,17 +67,25 @@ class Database():
         pass
 
     def addEntry(self, name, categorized, category, note, redshift):
-        with open(self.dataFile, 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([name, categorized, category, note, redshift])
+        entry = pd.DataFrame([name, categorized, category, note, redshift])
+        self.df = pd.concat([self.df, entry], ignore_index=True)
+        # with open(self.dataFile, 'a', newline='') as file:
+        #     writer = csv.writer(file)
+        #     writer.writerow([name, categorized, category, note, redshift])
 
     def getEntry(self, name):
-        with open(self.dataFile, 'r', newline = '') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row[self.fieldNames[0]] == name:
-                    return row
+        try:
+            entry = self.df.loc[name]
+        except KeyError:
             return None
+        return entry
+        
+        # with open(self.dataFile, 'r', newline = '') as file:
+        #     reader = csv.DictReader(file)
+        #     for row in reader:
+        #         if row[self.fieldNames[0]] == name:
+        #             return row
+        #     return None
 
     def addFitting(self, l2):
         with open(self.dataFile, 'a', newline='') as file:
