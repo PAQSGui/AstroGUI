@@ -22,8 +22,7 @@ from PySide6.QtGui import (
     QDoubleValidator,
 )
 
-from PySide6.QtCore import QSize
-from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtCore import QSize, Slot
 from xpca import config
 from os import listdir
 import re
@@ -120,7 +119,7 @@ class PlotLayout(QWidget):
     def sliderChanged(self):
         self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
         self.zTextBox.setText(str(self.model.getRedShift()))
-        self.update()
+        self.plotter.UpdateFigure()
 
     def zTextInput(self):
             conv=float(self.zTextBox.text())
