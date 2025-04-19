@@ -3,6 +3,11 @@ from database_json import Database
 from os.path import dirname
 import DataObject
 
+"""
+Model interfaces between the UI elements and the databases
+It also maintains a dictionary of 'options', which are used to change behaviours in the program
+Any new options should be added to the dictionary and only accesed with the methods
+"""
 class Model:
     skygrabNotLoaded = True
 
@@ -14,11 +19,6 @@ class Model:
     objFieldNames = DataObject.FieldNames()
     validationDB : Database
     fitter: Fitter
-    #OPTION Params
-    lineThickness = 0.5
-    redshiftRez = 1e4
-    redshiftMax = 6
-    redshiftMin = 0
 
     def __init__(self, files, fromFile = False):
         path = dirname(files[0])
@@ -109,6 +109,9 @@ class Model:
             'yLimit' : False,
             'ymin' : 0,
             'ymax' : 0,
+            'zResolution' : 1e4,
+            'zMax' : 6,
+            'zMin' : 0,
             }
         self.options = options
 

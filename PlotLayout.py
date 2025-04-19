@@ -1,7 +1,9 @@
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
 from matplotlib.pyplot import figure
-
+from xpca import config
+from os import listdir
+import re
 from plotter import Plotter
 
 from PySide6.QtWidgets import (
@@ -15,19 +17,22 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QSizePolicy,
-    )
+)
 
 from PySide6.QtGui import (
     Qt,
     QDoubleValidator,
 )
 
-from PySide6.QtCore import QSize
-from PySide6.QtCore import QObject, Signal, Slot
-from xpca import config
-from os import listdir
-import re
+from PySide6.QtCore import (
+    QSize,
+    Slot,
+)
 
+"""
+The PlotLayout is responsible for the part of the window where the graph is located.
+It should NOT plot or load files.
+"""
 class PlotLayout(QWidget):
     layout: QHBoxLayout
     model: Model
@@ -44,11 +49,14 @@ class PlotLayout(QWidget):
         fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
+        redshiftResolution = self.model.getOption('zResolution') 
+        redshiftMax = self.model.getOption('zMax')
+
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
-        zSlider.setMaximum(self.model.redshiftMax*self.model.redshiftRez)
-        zSlider.setValue(model.getRedShift()*self.model.redshiftRez)
+        zSlider.setMaximum(redshiftMax*redshiftResolution)
+        zSlider.setValue(model.getRedShift()*redshiftResolution)
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
 
@@ -94,10 +102,10 @@ class PlotLayout(QWidget):
 
     @Slot()
     def newFile(self):
-        self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
+        self.zSlider.setValue(self.model.getRedShift()*self.model.getOption('zResolution'))
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
         self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
-        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) 
         self.model.resetYLimit()
         self.update()
 
@@ -115,24 +123,23 @@ class PlotLayout(QWidget):
         return self.plotter.getYLim()
 
     def sliderChanged(self):
-        self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
+        self.model.changeRedShift(float(self.zSlider.value())/self.model.getOption('zResolution'))
         self.zTextBox.setText(str(self.model.getRedShift()))
         self.update()
 
     def zTextInput(self):
-            conv=float(self.zTextBox.text())
-            if conv>self.model.redshiftMax:
-                conv=self.model.redshiftMax
-                self.zTextBox.setText(str(conv))
-            elif conv<self.model.redshiftMin:
-                conv=self.model.redshiftMin
-                self.zTextBox.setText(str(conv))
+            input = float(self.zTextBox.text())
+            if input > self.model.getOption('zMax'):
+                input = self.model.getOption('zMax')
+                self.zTextBox.setText(str(input))
+            elif input < 0:
+                input = 0
+                self.zTextBox.setText(str(input))
 
-            self.model.changeRedShift(conv)
-            self.zSlider.setValue(int(conv*self.model.redshiftRez))
+            self.model.changeRedShift(input)
+            self.zSlider.setValue(int(input*self.model.getOption('zResolution')))
             self.update()
 
-    
     def dropboxSelect(self, s):
         print("what")
 

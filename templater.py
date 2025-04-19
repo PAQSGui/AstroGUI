@@ -7,7 +7,9 @@ from xpca import plotting as template
 from Model import Model
 
 from re import search
-
+"""
+templater uses xpca to draw a template over the plot
+"""
 class Templater:
     model: Model
 
@@ -48,7 +50,7 @@ class Templater:
             name = l2_product['zBestSubType']
             l2_product['zBestSubType']=f'new-{name}'
             wave, model = template.create_PCA_model(target,l2_product)
-        plt.plot(wave, model, color='r', lw=self.model.lineThickness, alpha=0.7, label = l2_product['zBestSubType'])
+        plt.plot(wave, model, color='r', lw=self.model.getOption('LineWidth'), alpha=0.7, label = l2_product['zBestSubType'])
 
             
 

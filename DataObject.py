@@ -3,6 +3,9 @@ import Spec_tools as tool
 def FieldNames():
     return ['name', 'categorized', 'params', 'validated', 'validators',  'note']
 
+"""
+auxiliary class used by Model to store data for fits-files
+"""
 class DataObject:
 
     name: str

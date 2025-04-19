@@ -12,6 +12,9 @@ from PySide6.QtWidgets import (
 
 from handler_xpca import get_all_fits
 
+"""
+This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph
+"""
 class Fitter:
 
     pipe: Pipeline
@@ -44,5 +47,7 @@ class Fitter:
             path=Path(directory) / file
             spectra = tool.SDSS_spectrum(path) 
             fitting = self.fitFile(Path(directory) / file,spectra)
+    def getBestGuess(self):
+        return self.bestdatabase
 
     

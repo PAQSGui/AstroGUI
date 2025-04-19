@@ -7,7 +7,9 @@ from astropy.io.fits import getheader
 from re import search
 
 from xpca.pipeline import Pipeline
-
+"""
+Helper-class for fitter
+"""
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         fullList=pipeline.active_templates[:]
         zaltpars={}

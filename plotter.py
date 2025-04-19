@@ -4,6 +4,11 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
 from templater import Templater
 
+"""
+plotter is more tightly bound to the fits file format.
+It should be able to plot files loaded by Spec_tools.py
+The template is drawn by another class to achieve a level of modularity
+"""
 class Plotter:
     model:  Model   
     figure: FigureCanvasQTAgg  

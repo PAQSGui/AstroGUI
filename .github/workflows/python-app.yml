@@ -24,7 +24,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        pip install -r requirements-linux.txt
+        pip install -r requirements/requirements-linux.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -48,7 +48,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        pip install -r requirements-macos.txt
+        pip install -r requirements/requirements-macos.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -72,7 +72,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        pip install -r requirements-windows.txt
+        pip install -r requirements/requirements-windows.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
