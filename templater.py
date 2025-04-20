@@ -29,12 +29,14 @@ class Templater:
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         
         try:
-            wave, model = template.create_PCA_model(target,l2_product)
+            wave, model = template.create_PCA_model(target, l2_product)
         except FileNotFoundError as e:
             name = l2_product['zBestSubType']
-            l2_product['zBestSubType']=f'new-{name}'
-            wave, model = template.create_PCA_model(target,l2_product)
-        plt.plot(wave, model, color='r', lw=self.model.getOption('LineWidth'), alpha=0.7, label = l2_product['zBestSubType'])
+            l2_product['zBestSubType'] = f'new-{name}'
+            wave, model = template.create_PCA_model(target, l2_product)
+
+        label = l2_product['zBestSubType']
+        return plt.plot(wave, model, color='r', lw=self.model.getOption('LineWidth'), alpha=0.7, label = label)
 
             
 
