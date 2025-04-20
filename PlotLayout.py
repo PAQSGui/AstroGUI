@@ -125,7 +125,7 @@ class PlotLayout(QWidget):
     def sliderChanged(self):
         self.model.changeRedShift(float(self.zSlider.value())/self.model.getOption('zResolution'))
         self.zTextBox.setText(str(self.model.getRedShift()))
-        self.update()
+        self.plotter.UpdateFigure()
 
     def zTextInput(self):
             input = float(self.zTextBox.text())
