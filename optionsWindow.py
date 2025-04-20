@@ -1,5 +1,5 @@
 from Model import Model
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Slot
 
 from PySide6.QtWidgets import (
     QWidget,
@@ -30,25 +30,18 @@ class OptionsWindow(QWidget):
 
         lineWidth = QHBoxLayout()
         lineWidth.addWidget(QLabel('Line width'))
-        ltEdit = QLineEdit()
-        ltEdit.setText(str(model.getOption('LineWidth')*10))
-        ltEdit.setInputMask('D')
-        ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
-        lineWidth.addWidget(ltEdit)
-
-        graphColor = self.colorChooser("Graph:",'GraphColor')
-        noiseColor = self.colorChooser("Noise:",'NoiseColor')
-
-        snColor = self.colorChooser("S/N:", 'SNColor')
-        skyColor = self.colorChooser("Sky:", 'SkyColor')
+        self.ltEdit = QLineEdit()
+        self.ltEdit.setInputMask('D')
+        self.ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
+        lineWidth.addWidget(self.ltEdit)
 
         graphHeight = QHBoxLayout()
         minEdit = QLineEdit()
-        minEdit.setText(str(model.getOption('ymin')))
+        self.minEdit=minEdit
         minEdit.setInputMask('900')
         minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', minEdit.text()))
         maxEdit = QLineEdit()
-        maxEdit.setText(str(model.getOption('ymax')))
+        self.maxEdit=maxEdit
         maxEdit.setInputMask('900')
         maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
         button = QPushButton('Adjust')
@@ -63,14 +56,36 @@ class OptionsWindow(QWidget):
         layout.addLayout(lineWidth)
 
         layout.addWidget(QLabel('Colors'))
-        layout.addWidget(graphColor)
-        layout.addWidget(noiseColor)
-        layout.addWidget(snColor)
-        layout.addWidget(skyColor)
+        self.CClayout = QVBoxLayout()
+        layout.addLayout(self.CClayout)
         layout.addLayout(graphHeight)
 
         self.setLayout(layout)
         
+    @Slot()
+    def setupSession(self,list):
+        self.ltEdit.setText(str(self.model.getOption('LineWidth')*10))
+        self.minEdit.setText(str(self.model.getOption('ymin')))
+        self.maxEdit.setText(str(model.getOption('ymax')))
+
+        graphColor = self.colorChooser("Graph:",'GraphColor')
+        noiseColor = self.colorChooser("Noise:",'NoiseColor')
+
+        snColor = self.colorChooser("S/N:", 'SNColor')
+        skyColor = self.colorChooser("Sky:", 'SkyColor')
+        
+        self.CClayout.addWidget(graphColor)
+        self.CClayout.addWidget(noiseColor)
+        self.CClayout.addWidget(snColor)
+        self.CClayout.addWidget(skyColor)
+
+    
+    @Slot()
+    def shutDownSession(self,list):
+        self.ltEdit.setText("")
+        self.CClayout.clearLayout()
+    
+
     def colorChooser(self, text, key):
         layout = QHBoxLayout()
         widget = QWidget()

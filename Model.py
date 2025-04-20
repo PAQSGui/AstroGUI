@@ -3,12 +3,16 @@ from database_json import Database
 from os.path import dirname
 import DataObject
 
+from PySide6.QtCore import (
+    QObject,
+    Signal,
+)
 """
 Model interfaces between the UI elements and the databases
 It also maintains a dictionary of 'options', which are used to change behaviours in the program
 Any new options should be added to the dictionary and only accesed with the methods
 """
-class Model:
+class Model(QObject):
     skygrabNotLoaded = True
 
     cursor = 0
@@ -20,7 +24,11 @@ class Model:
     validationDB : Database
     fitter: Fitter
 
-    def __init__(self, files, fromFile = False):
+    openedSession = Signal(list)
+    closedSession = Signal(list)
+
+    def openFiles(self, files, fromFile = False):
+        self.closedSession.emit(files)
         path = dirname(files[0])
         self.path = path
         self.fileDB = Database('files', self.fileFieldNames, path)
@@ -33,13 +41,13 @@ class Model:
             for file in files:
                 data = self.fileDB.getByName(file)
                 if data == []:
-                        self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])
-                
+                        self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])               
         
         #get objects from fitter
         self.objects = self.fitter.getModel()
 
         self.initOptions()
+        self.openedSession.emit(files)
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 

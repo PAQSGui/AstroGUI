@@ -39,7 +39,7 @@ class InfoLayout(QHBoxLayout):
         self.layout.addWidget(self.nbrLabel)
         self.layout.addLayout(self.classProbLayout)
         self.layout.addLayout(self.targetLayout)
-        self.updateAll()
+        self.model.openedSession[list].connect(self.updateAll)
     
     @Slot()
     def updateAll(self):

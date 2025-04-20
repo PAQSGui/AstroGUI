@@ -46,15 +46,15 @@ class MainWindow(QMainWindow):
 
     def openFiles(self):
             files = QFileDialog.getOpenFileNames(None, "Select Files")
-            print(files[0])
-            self.model = Model(files[0])
+            self.model.openFiles(files[0])
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
         
     def __init__(self, app):
         super().__init__()
-        self.openFiles()
+        self.model = Model()
+        #self.openFiles()
         self.setWindowTitle("AstroGUI")
 
         self.plotLayout = PlotLayout(self.model)
@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
             file_menu.addAction(button)
 
 
-        addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
+        addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFiles())
         addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
         
         file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
