@@ -163,21 +163,9 @@ class PlotLayout(QWidget):
             self.update()
 
     def dropboxSelect(self, s):
-        print("what")
-
+        redshiftResolution = self.model.getOption('zResolution') 
         result = re.search(f'template-(.+).fits', s)
         self.model.changeCategory(result.group(1))
-        print(self.model.getRedShift())
         self.update()
-        print(self.model.getRedShift())
-        self.zSlider.setValue(int(self.model.getRedShift()*self.model.redshiftRez))
+        self.zSlider.setValue(int(self.model.getRedShift()*redshiftResolution))
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
-        
-        #try:
-        #except FileNotFoundError as e:
-        #    for file in listdir(config.TEMPLATE_PATH):
-        #        if file.lower()==s:
-        #            result = re.search(f'template-(.+).fits', file)
-        #            self.l2_current['zBestSubType']=result.group(1)
-        #            self.plotter.PlotFile(self.l2_current)
-        #            break
