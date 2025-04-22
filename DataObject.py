@@ -15,12 +15,13 @@ class DataObject:
     category: str
     redshift: float
 
-    def __init__(self, filename, file, fitting):
+    def __init__(self, filename, file, fitting = None):
         self.name = filename
         self.file = file
         self.fitting = fitting
-        self.category = fitting['zBestSubType']
-        self.redshift = fitting['zBest']
+        if fitting!=None:
+            self.category = fitting['zBestSubType']
+            self.redshift = fitting['zBest']
 
     def changeRedshift(self, val):
         self.redshift = val

@@ -24,3 +24,6 @@ run.spec
 /build/
 /dist/
 /run.*/
+preProcess.json
+validation.json
+files.json

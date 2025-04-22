@@ -46,9 +46,14 @@ class Plotter:
         noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
         spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
 
-        template, = self.templater.plotTemplate()
+        if self.model.getState().fitting!=None:
+
+            template, = self.templater.plotTemplate()
+            hands=[spectra, template, noise]
+        else:
+            hands=[spectra, noise]
 
         plt.title(file.Objectname)         
-        plt.legend(handles=[spectra, template, noise])
+        plt.legend(handles=hands)
         self.figure.draw()
 

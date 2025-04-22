@@ -20,9 +20,9 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
 
             try:
                 #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
-                altpipe.run(filePath, source=src)
+                l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
+                #altpipe.run(filePath, source=src)
                 l2_product=altpipe.catalog_items[0]
-                #l2_product = pipeline.process_target(createTarget(filePath,spec), 0)[0]
                 zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']#,l2_product['zBest']
                 #pipeline.reset()
             except ValueError as e:

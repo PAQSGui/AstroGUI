@@ -7,6 +7,10 @@ from PySide6.QtCore import (
     QObject,
     Signal,
 )
+
+import Spec_tools as tool
+from pathlib import Path
+
 """
 Model interfaces between the UI elements and the databases
 It also maintains a dictionary of 'options', which are used to change behaviours in the program
@@ -36,18 +40,27 @@ class Model(QObject):
         self.fitter = Fitter(path)
 
         #fitter processes files
-        if not fromFile:
-            self.fitter.populate(files,path)
-            for file in files:
-                data = self.fileDB.getByName(file)
-                if data == []:
-                        self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])               
+        #if not fromFile:
+        #    self.fitter.populate(files,path)
+        #    for file in files:
+        #        data = self.fileDB.getByName(file)
+        #        if data == []:
+        #                self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])               
         
         #get objects from fitter
-        self.objects = self.fitter.getModel()
+        self.objects = self.getEmptyModel(files)
 
         self.initOptions()
         self.openedSession.emit(files)
+
+    def getEmptyModel(self,files):
+        objs=[]
+        for item in list(files):
+            print(item)
+            spectra = tool.SDSS_spectrum(self.path / Path(item))
+            dobject = DataObject.DataObject(item, spectra, None)
+            objs.append(dobject)
+        return objs
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
@@ -68,10 +81,18 @@ class Model(QObject):
         return self.options
 
     def getRedShift(self):
-        return float(self.objects[self.cursor].redshift)
+        obj=self.objects[self.cursor]
+        if obj.fitting!=None:
+            return float(self.objects[self.cursor].redshift)
+        else:
+            return 0
     
     def getCategory(self):
-        return self.objects[self.cursor].category
+        obj=self.objects[self.cursor]
+        if obj.fitting!=None:
+            return self.objects[self.cursor].category
+        else:
+            return ""
     
     def getState(self):
         return self.objects[self.cursor]

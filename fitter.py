@@ -39,8 +39,6 @@ class Fitter:
             l2_product = l2#convert_l2(l2)
 
         return l2_product
-    def getModel(self):
-        return self.preProcess.getModel()
 
     def populate(self, files, directory):
         for file in files:

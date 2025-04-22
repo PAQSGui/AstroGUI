@@ -54,24 +54,27 @@ class InfoLayout(QHBoxLayout):
         self.classProbLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         data = self.model.getState()
         l2_product = data.fitting
+        if l2_product!=None:
 
-        classification = l2_product['zBestSubType']
-        probability    = l2_product['zBestProb'] * 100
+            classification = l2_product['zBestSubType']
+            probability    = l2_product['zBestProb'] * 100
 
-        clearLayout(self.classProbLayout)
-        self.classProbLayout.addWidget(QLabel(classification + ': %.2f %%' % probability))
+            subTypes = l2_product['zAltSubType']
+            probabilities = l2_product['zAltProb']
 
-        subTypes = l2_product['zAltSubType']
-        probabilities = l2_product['zAltProb']
+            clearLayout(self.classProbLayout)
+            self.classProbLayout.addWidget(QLabel(classification + ': %.2f %%' % probability))
 
-        for i in range(1,len(subTypes)):
-            if probabilities[i]!=None:
-                probability = probabilities[i] * 100
-                if probability > 10:
-                    text = subTypes[i] + ': %.2f %%' % probability
-            else:
-                text = "%s: NaN" % subTypes[i]
-            self.classProbLayout.addWidget(QLabel(text))
+            for i in range(1,len(subTypes)):
+                if probabilities[i]!=None:
+                    probability = probabilities[i] * 100
+                    if probability > 10:
+                        text = subTypes[i] + ': %.2f %%' % probability
+                else:
+                    text = "%s: NaN" % subTypes[i]
+                self.classProbLayout.addWidget(QLabel(text))
+        else:
+            clearLayout(self.classProbLayout)
 
         return self.classProbLayout
     

@@ -3,7 +3,6 @@ from astropy.utils.misc import JsonCustomEncoder #https://docs.astropy.org/en/st
 from os import makedirs
 from pathlib import Path
 
-import Spec_tools as tool
 from DataObject import DataObject
 from numpy import array
 
@@ -40,14 +39,6 @@ class Database():
         self.model[name]=data
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)
-
-    def getModel(self):
-        objs=[]
-        for item in list(self.model.items()):
-            spectra = tool.SDSS_spectrum((self.directory / Path(item[0]))) 
-            dobject = DataObject(item[0], spectra, item[1])
-            objs.append(dobject)
-        return objs
 
     def getFilenames(self):
         list(self.model.keys())
