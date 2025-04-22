@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QSizePolicy,
+    QCheckBox,
 )
 
 from PySide6.QtGui import (
@@ -68,9 +69,9 @@ class PlotLayout(QWidget):
         self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
         self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower())
 
-        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton = QCheckBox("S/N spec")
         signoiseButton.clicked.connect(lambda: self.toggleSN())
-        showskybutton = QPushButton("Toggle Sky")
+        showskybutton = QCheckBox("Sky")
         showskybutton.clicked.connect(lambda: self.toggleSky())
 
         sliderLayout = QHBoxLayout()
