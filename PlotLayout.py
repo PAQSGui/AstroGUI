@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QSizePolicy,
+    QCheckBox,
 )
 
 from PySide6.QtGui import (
@@ -59,8 +60,8 @@ class PlotLayout(QWidget):
 
         self.dropdown = QComboBox()
 
-        self.signoiseButton = QPushButton("Toggle S/N spec")
-        self.showskybutton = QPushButton("Toggle Sky")
+        self.signoiseButton = QCheckBox("Toggle S/N spec")
+        self.showskybutton = QCheckBox("Toggle Sky")
 
         sliderLayout = QHBoxLayout()
         sliderLayout.addWidget(self.dropdown)
