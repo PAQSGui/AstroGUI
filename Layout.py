@@ -51,6 +51,11 @@ class MainWindow(QMainWindow):
             files = QFileDialog.getOpenFileNames(None, "Select Files")
             self.model.openFiles(files[0])
 
+    def saveFiles(self):
+            path = QFileDialog.getSaveFileName(None, "Save as...")
+            with open(path[0], 'w') as file:
+                self.model.preProcess.saveModelToFile(file)
+
     def closeEvent(self, ev):
         self.optionsWindow.close()
         self.xpcaWindow.close()
@@ -99,7 +104,7 @@ class MainWindow(QMainWindow):
         
         #file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
         
-        #addButton("💾","Save current workspace")
+        addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
         #addButton("📜","Review evaluated spectra")
         #addButton("🥞","Load other spectra of the same object and overplot them for comparison")
         #addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")

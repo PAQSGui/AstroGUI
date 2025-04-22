@@ -27,8 +27,8 @@ class Database():
             except Exception as e:
                 self.model = CreateReplaceDialog(self.filepath,lambda file: json.dump({}, file, cls=JsonCustomEncoder),{},e)
         else:
+            self.model = {} #dictionary
             with open(self.filepath, 'w') as file:
-                self.model = {} #dictionary
                 json.dump(self.model, file, cls=JsonCustomEncoder)
 
 
@@ -52,6 +52,9 @@ class Database():
         self.model[dataObj.name]=entry
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)
+
+    def saveModelToFile(self,file):
+        json.dump(self.model, file, cls=JsonCustomEncoder)
 
 def convertNPRecursive(values):
     for key in list(values.keys()):

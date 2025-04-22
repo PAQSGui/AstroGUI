@@ -17,6 +17,7 @@ class SkygrabWindow(QWidget):
     ax: plt.Axes
     canv: FigureCanvasQTAgg
     model: Model
+    loadedFile=None
 
     def __init__(self, model):
         super().__init__()
@@ -35,7 +36,8 @@ class SkygrabWindow(QWidget):
 
     @Slot()
     def LoadPicture(self):
-        if self.isHidden():
+        file = self.model.getState().file
+        if not self.isVisible() or file==self.loadedFile:
             return
         ra,dec=loadCoords(self.model)
         #https://github.com/behrouzz/sdss
@@ -43,9 +45,9 @@ class SkygrabWindow(QWidget):
         
         self.Update(reg)
 
-        file = self.model.getState().file
         plt.title(file.Objectname)  
-        self.model.skygrabNotLoaded=False
+        self.canv.draw()
+        self.loadedFile=file
         #self.show()
 
     def Update(self, region, band='all'):
@@ -61,7 +63,6 @@ class SkygrabWindow(QWidget):
         else:
             self.ax.imshow(region.data)
         plt.axis('off') # new
-        self.canv.draw()
 
 def loadCoords(model):
         dir = QDir(model.path)

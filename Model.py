@@ -17,8 +17,6 @@ It also maintains a dictionary of 'options', which are used to change behaviours
 Any new options should be added to the dictionary and only accesed with the methods
 """
 class Model(QObject):
-    skygrabNotLoaded = True
-
     cursor = 0
     objects = []
     options: dict
