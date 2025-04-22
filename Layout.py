@@ -19,7 +19,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import (
     QAction,
     QFont,
+    QIcon
 )
+
+from handler_xpca import xpcaWindow
 
 """
 The main window is resposinble for initializing all other classes and linking them.
@@ -50,6 +53,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
+        self.xpcaWindow.close()
         
     def __init__(self, app):
         super().__init__()
@@ -65,12 +69,15 @@ class MainWindow(QMainWindow):
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator.navigated.connect(self.infoLayout.updateAll)
         self.navigator.navigated.connect(self.plotLayout.newFile)
+        self.model.xpcaDone.connect(self.infoLayout.updateAll)
+        self.model.xpcaDone.connect(self.plotLayout.newFile)
 
         self.optionsWindow = OptionsWindow(self.model)
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
         self.skygrabTab = SkygrabWindow(self.model)
         self.navigator.navigated.connect(self.skygrabTab.LoadPicture)
 
+        self.xpcaWindow = xpcaWindow(self.model)
         mainLayout = QVBoxLayout()
 
         self.setStatusBar(QStatusBar(self))
@@ -78,8 +85,8 @@ class MainWindow(QMainWindow):
         file_menu = self.menuBar()
         file_menu.setFont(QFont("",18))
 
-        def addButton(emoji,tooltip,func=None):
-            button = QAction(emoji, self)
+        def addButton(icon,tooltip,func=None):
+            button = QAction(icon,tooltip, self)
             button.setStatusTip(tooltip)
             button.setToolTip(tooltip) #seemingly not working, at least not on Linux
             if func != None:
@@ -87,18 +94,18 @@ class MainWindow(QMainWindow):
             file_menu.addAction(button)
 
 
-        addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFiles())
-        addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
+        addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFiles())
+        addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
         
-        file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
+        #file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
         
-        addButton("💾","Save current workspace")
-        addButton("📜","Review evaluated spectra")
-        addButton("🥞","Load other spectra of the same object and overplot them for comparison")
-        addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")
-        addButton("🌈","Open a wizard to merge a set of grisms into a single spectrum")
-        addButton("🏭","Open a wizard to process targets using xpca")
-        addButton("🗠","Open a window to manually adjust the template parameters")
+        #addButton("💾","Save current workspace")
+        #addButton("📜","Review evaluated spectra")
+        #addButton("🥞","Load other spectra of the same object and overplot them for comparison")
+        #addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")
+        #addButton("🌈","Open a wizard to merge a set of grisms into a single spectrum")
+        addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
+        #addButton("🗠","Open a window to manually adjust the template parameters")
         
         mainLayout.addLayout(self.infoLayout)
         tabs = QTabWidget()

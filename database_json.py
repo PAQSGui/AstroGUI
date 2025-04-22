@@ -43,13 +43,13 @@ class Database():
     def getFilenames(self):
         list(self.model.keys())
 
-    def addEntry(self, name, fields, data):
+    def addEntry(self, dataObj, fields, data):
         if (len(fields)!=len(data)+1):
             raise Exception("Expected fields to be one longer than data because of name field, but it is "+ len(fields))
         entry={}
         for i in range(len(data)):
             entry[fields[i+1]]=data[i]
-        self.model[name]=entry
+        self.model[dataObj.name]=entry
         with open(self.filepath, 'w') as file:
             json.dump(self.model, file, cls=JsonCustomEncoder)
 

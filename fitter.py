@@ -24,27 +24,24 @@ class Fitter:
     layout: QVBoxLayout
     templateInfo: QLabel
 
-    def __init__(self,path):
+    def __init__(self,path, database):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-        self.preProcess = Database("preProcess",fields,path)
+        self.preProcess = database
 
-    def fitFile(self, filePath, spec):
-        obj_nme = basename(filePath)
-        l2 = self.preProcess.getByName(obj_nme)
+    def fitFile(self, dataObj, path):
+        filePath = Path(path) / Path(dataObj.name)
+        l2 = self.preProcess.getByName(dataObj.name)
         if l2 == []:
-            l2_product = get_all_fits(self.pipe,str(filePath), spec)
-            self.preProcess.addByName(obj_nme,l2_product)
+            dataObj.fitting = get_all_fits(self.pipe,str(filePath), dataObj.file)
+            self.preProcess.addByName(dataObj.name,dataObj.fitting)
         else:
-            l2_product = l2#convert_l2(l2)
+            dataObj.fitting = l2
+        dataObj.category = dataObj.fitting['zBestSubType']
+        dataObj.redshift = dataObj.fitting['zBest']
 
-        return l2_product
+        return dataObj
 
-    def populate(self, files, directory):
-        for file in files:
-            path=Path(directory) / file
-            spectra = tool.SDSS_spectrum(path) 
-            fitting = self.fitFile(Path(directory) / file,spectra)
     def getBestGuess(self):
         return self.bestdatabase
 

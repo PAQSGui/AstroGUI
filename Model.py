@@ -23,6 +23,7 @@ class Model(QObject):
     objects = []
     options: dict
     fileFieldNames = ['name', 'file', 'category', 'redshift']
+    l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     fileDB : Database
     objFieldNames = DataObject.FieldNames()
     validationDB : Database
@@ -30,6 +31,7 @@ class Model(QObject):
 
     openedSession = Signal(list)
     closedSession = Signal(list)
+    xpcaDone = Signal(int)
 
     def openFiles(self, files, fromFile = False):
         self.closedSession.emit(files)
@@ -37,15 +39,8 @@ class Model(QObject):
         self.path = path
         self.fileDB = Database('files', self.fileFieldNames, path)
         self.validationDB = Database('validation', self.objFieldNames, path)
-        self.fitter = Fitter(path)
-
-        #fitter processes files
-        #if not fromFile:
-        #    self.fitter.populate(files,path)
-        #    for file in files:
-        #        data = self.fileDB.getByName(file)
-        #        if data == []:
-        #                self.fileDB.addEntry(file, self.fileFieldNames, [path, None, None])               
+        self.preProcess = Database("preProcess",self.l2FieldNames, path)
+        self.fitter = Fitter(path, self.preProcess)          
         
         #get objects from fitter
         self.objects = self.getEmptyModel(files)
@@ -56,11 +51,23 @@ class Model(QObject):
     def getEmptyModel(self,files):
         objs=[]
         for item in list(files):
-            print(item)
-            spectra = tool.SDSS_spectrum(self.path / Path(item))
-            dobject = DataObject.DataObject(item, spectra, None)
-            objs.append(dobject)
+                obj = self.preProcess.getByName(item)
+                spectra = tool.SDSS_spectrum(self.path / Path(item))
+                
+                if obj == []:
+                    dobject = DataObject.DataObject(item, spectra, None)
+                else:
+                    dobject = DataObject.DataObject(item, spectra, obj)
+                objs.append(dobject)
         return objs
+
+    def populate(self):
+        #fitter processes files
+            for obj in self.objects:
+                obj = self.fitter.fitFile(obj,Path(self.path))
+                data = self.fileDB.getByName(obj)
+                if data == []:
+                    self.fileDB.addEntry(obj, self.fileFieldNames, [self.path, obj.category, obj.redshift])     
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 

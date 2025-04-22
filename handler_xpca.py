@@ -7,9 +7,53 @@ from astropy.io.fits import getheader
 from re import search
 
 from xpca.pipeline import Pipeline
+
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QCheckBox,
+    QLabel,
+    QPushButton,
+)
+
+from PySide6.QtCore import Signal, Slot
 """
 Helper-class for fitter
 """
+class xpcaWindow(QWidget):
+
+    def __init__(self, model):
+        super().__init__()
+
+        self.setWindowTitle("XPCA Wizard")
+        self.model = model
+
+        layout = QVBoxLayout()
+        saveAll=QCheckBox("Save all template fits")
+        self.startbtn=QPushButton("Start")
+        canclbtn=QPushButton("Cancel")
+
+        layout.addWidget(saveAll)
+        layout.addWidget(QLabel("Run xpca on all loaded files?"))
+        layout.addWidget(self.startbtn)
+        layout.addWidget(canclbtn)
+        canclbtn.clicked.connect(lambda: self.close())
+
+        self.setLayout(layout)
+
+        self.model.openedSession[list].connect(self.setupSession)
+
+    def start(self):
+        self.model.populate()
+        self.model.xpcaDone.emit(0)
+        self.close()
+        
+    @Slot()
+    def setupSession(self,list):
+        self.startbtn.clicked.connect(lambda: self.start())
+
+
+
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         fullList=pipeline.active_templates[:]
         zaltpars={}
@@ -21,8 +65,9 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
             try:
                 #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
                 l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
+                print(l2_product)
                 #altpipe.run(filePath, source=src)
-                l2_product=altpipe.catalog_items[0]
+                #l2_product=altpipe.catalog_items[0]
                 zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']#,l2_product['zBest']
                 #pipeline.reset()
             except ValueError as e:
