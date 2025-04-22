@@ -56,6 +56,10 @@ class Database():
     def saveModelToFile(self,file):
         json.dump(self.model, file, cls=JsonCustomEncoder)
 
+def getModelFromDatabase(filepath):
+    with open(filepath, 'r') as file:
+                    return json.load(file)
+
 def convertNPRecursive(values):
     for key in list(values.keys()):
         if type(values[key]) is list:
@@ -65,3 +69,4 @@ def convertNPRecursive(values):
                 continue
         elif type(values[key]) is dict:
             convertNPRecursive(values[key])
+    return values
