@@ -50,10 +50,11 @@ class DataObject:
         return object
     
     
-    def fromSeries(name, series, fitting):
-        file = series["file"]
-        category = series["category"]
-        redshift = series["redshift"]
+    def fromSeries(series, fitting):
+        name = series['name']
+        file = series['file']
+        category = series['category']
+        redshift = series['redshift']
 
         object = DataObject(name, file, fitting)
         object.changeCategory(category)

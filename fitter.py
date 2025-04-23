@@ -27,7 +27,7 @@ class Fitter:
     def fitFile(self, filePath, spec):
         obj_nme = filePath[-21:][:-5]
         l2 = self.database.getFitting(obj_nme)
-        if l2 == []:
+        if l2 is None:
             #self.pipe.run(filePath, source='sdss')
             l2_product = get_all_fits(self.pipe,filePath, spec)
             self.database.addFitting(l2_product)

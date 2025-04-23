@@ -26,7 +26,8 @@ class Database():
         # By using name as the index, we might lose some value by not being fully able to pass around the series
         # But using name also makes it super easy to look up the object in the DataFrame, so I'm not sure what to do
         # since otherwise we would have to go back to linear search
-        self.df = pd.read_csv(self.dataFile, index_col=index) 
+        self.df = pd.read_csv(self.dataFile)
+        #self.df = pd.read_csv(self.dataFile, index_col=index) 
 
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
@@ -46,7 +47,7 @@ class Database():
             # with open(self.dataFile, 'a', newline='') as dataFile:
             #     writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
             #     writer.writerow(dict)
-        self.df = pd.concat([self.df, pd.DataFrame([dicts])])
+        self.df = pd.concat([self.df, pd.DataFrame([dicts])], ignore_index=True)
         self.df.to_csv(self.dataFile)
 
     def extract(self, fitter):
@@ -54,11 +55,11 @@ class Database():
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = []
 
-        for index, row in self.df.iterrows(): # Grab all rows
-            name = str(index)
+        for _, row in self.df.iterrows(): # Grab all rows
+            name = row['name']
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
             fitting = fitter.fitFile(directory.absoluteFilePath(name), spectra)
-            object = DataObject.fromSeries(name, row, fitting) # Why is it angery
+            object = DataObject.fromSeries(row, fitting) # Why is it angery
             object.file = spectra #Why are we even even using file in fromDict if we're changing it here?
             files.append(object)
         return files
@@ -91,12 +92,17 @@ class Database():
         #     writer.writerow([name, categorized, category, note, redshift])
 
     def getEntry(self, name):
+        for _, row in self.df.iterrows():
+            if row['name'] == name:
+                return row.to_dict()
+        return None
+        
         # Too much? Tried to make it match where it returns None if the row isn't found
-        try:
-            entry = self.df.loc[name]
-        except KeyError:
-            return None
-        return entry
+        # try:
+        #     entry = self.df.loc[name]
+        # except KeyError:
+        #     return None
+        # return entry
         
         # with open(self.dataFile, 'r', newline = '') as file:
         #     reader = csv.DictReader(file)
@@ -113,11 +119,15 @@ class Database():
         #     writer.writerow(l2)
 
     def getFitting(self, name):
-        try:
-            entry = self.df.loc[name]
-        except KeyError:
-            return None
-        return entry
+        for _, row in self.df.iterrows():
+            if row['OBJ_NME'] == name:
+                return row.to_dict()
+        return None
+        # try:
+        #     entry = self.df.loc[name]
+        # except KeyError:
+        #     return None
+        # return entry
         # with open(self.dataFile, 'r', newline='') as file:
         #     reader = csv.DictReader(file)
         #     for row in reader:
