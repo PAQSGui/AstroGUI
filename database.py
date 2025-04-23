@@ -16,20 +16,17 @@ class Database():
         self.dataFile = dataFile
         self.fieldNames = fieldNames
         self.path = path
+        index = "OBJ_NAME" if type == "fitter" else "name"
 
         if not os.path.isfile(dataFile):
             f = open(dataFile, 'a')
-            if type == 'file':
-                f.write('name,file,category,redshift')
-            elif type == 'category':
-                f.write('name,categorized,category,redshift,note')
-            else:
-                f.write('OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBestPars')
+            header = ", ".join(self.fieldNames)
+            f.write(header)
         
         # By using name as the index, we might lose some value by not being fully able to pass around the series
         # But using name also makes it super easy to look up the object in the DataFrame, so I'm not sure what to do
         # since otherwise we would have to go back to linear search
-        self.df = pd.read_csv(self.dataFile, index_col="name") 
+        self.df = pd.read_csv(self.dataFile, index_col=index) 
 
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
