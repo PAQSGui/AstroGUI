@@ -12,68 +12,89 @@ class Database():
     fieldNames = ""
     path : str
 
-    def __init__(self, dataFile, fieldNames, path = ''):
+    def __init__(self, dataFile, fieldNames, type, path = ''):
         self.dataFile = dataFile
         self.fieldNames = fieldNames
-        self.path = path 
+        self.path = path
 
         if not os.path.isfile(dataFile):
-            f = open(dataFile, "a")
-            f.write("name,categorized,category,redshift,note")
+            f = open(dataFile, 'a')
+            if type == 'file':
+                f.write('name,file,category,redshift')
+            elif type == 'category':
+                f.write('name,categorized,category,redshift,note')
+            else:
+                f.write('OBJ_NME,zBest,zBestProb,zBestType,zBestSubType,zAltProb,zAltType,zAltSubType,zBestPars')
         
-        self.df = pd.read_csv(self.dataFile, index_col="name")
+        # By using name as the index, we might lose some value by not being fully able to pass around the series
+        # But using name also makes it super easy to look up the object in the DataFrame, so I'm not sure what to do
+        # since otherwise we would have to go back to linear search
+        self.df = pd.read_csv(self.dataFile, index_col="name") 
 
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
         #     writer.writeheader()  
 
-    # Ignore for now
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = directory.entryList()[0:10]
+        dicts = []
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
             fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
             object = DataObject(file, spectra, fitting)
             dict = object.toDict()
-            with open(self.dataFile, 'a', newline='') as dataFile:
-                writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
-                writer.writerow(dict)
+            dicts.append(dict)
+            # with open(self.dataFile, 'a', newline='') as dataFile:
+            #     writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
+            #     writer.writerow(dict)
+        self.df = pd.concat([self.df, pd.DataFrame([dicts])])
+        self.df.to_csv(self.dataFile)
 
-    # needed?
     def extract(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = []
 
-        for row in self.df[:]: # Grab all rows
-            spectra = tool.SDSS_spectrum(directory.absoluteFilePath())
-
-
-
-        with open(self.dataFile, 'r', newline='') as file:      
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row['name'] != self.fieldNames[0]:
-                    spectra = tool.SDSS_spectrum(directory.absoluteFilePath(row['name']))
-                    fitting = fitter.fitFile(directory.absoluteFilePath(row['name']), spectra)
-                    object = DataObject.fromDict(row, fitting)
-                    object.file = spectra
-                    files.append(object)     
+        for index, row in self.df.iterrows(): # Grab all rows
+            name = str(index)
+            spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
+            fitting = fitter.fitFile(directory.absoluteFilePath(name), spectra)
+            object = DataObject.fromSeries(name, row, fitting) # Why is it angery
+            object.file = spectra #Why are we even even using file in fromDict if we're changing it here?
+            files.append(object)
         return files
 
-    def getFile(self, name):
-        pass
+
+
+        # with open(self.dataFile, 'r', newline='') as file:      
+        #     reader = csv.DictReader(file)
+        #     for row in reader:
+        #         if row['name'] != self.fieldNames[0]:
+        #             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(row['name']))
+        #             fitting = fitter.fitFile(directory.absoluteFilePath(row['name']), spectra)
+        #             object = DataObject.fromDict(row, fitting)
+        #             object.file = spectra
+        #             files.append(object)
+        # return files
 
     def addEntry(self, name, categorized, category, note, redshift):
-        entry = pd.DataFrame([name, categorized, category, note, redshift])
-        self.df = pd.concat([self.df, entry], ignore_index=True)
+        new_row = {
+            "name": name,
+            "categorized": categorized,
+            "category": category,
+            "note": note,
+            "redshift": redshift
+        }
+        self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
+        self.df.to_csv(self.dataFile)
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.writer(file)
         #     writer.writerow([name, categorized, category, note, redshift])
 
     def getEntry(self, name):
+        # Too much? Tried to make it match where it returns None if the row isn't found
         try:
             entry = self.df.loc[name]
         except KeyError:
@@ -88,14 +109,21 @@ class Database():
         #     return None
 
     def addFitting(self, l2):
-        with open(self.dataFile, 'a', newline='') as file:
-            writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-            writer.writerow(l2)
+        self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
+        self.df.to_csv(self.dataFile)
+        # with open(self.dataFile, 'a', newline='') as file:
+        #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
+        #     writer.writerow(l2)
 
     def getFitting(self, name):
-        with open(self.dataFile, 'r', newline='') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row[self.fieldNames[0]] == name:
-                    return row
-            return []        
+        try:
+            entry = self.df.loc[name]
+        except KeyError:
+            return None
+        return entry
+        # with open(self.dataFile, 'r', newline='') as file:
+        #     reader = csv.DictReader(file)
+        #     for row in reader:
+        #         if row[self.fieldNames[0]] == name:
+        #             return row
+        #     return []

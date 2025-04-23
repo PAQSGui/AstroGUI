@@ -22,7 +22,7 @@ class Fitter:
     def __init__(self):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-        self.database = Database("preProcess.csv",fields)
+        self.database = Database('preProcess.csv', fields, 'fitter')
 
     def fitFile(self, filePath, spec):
         obj_nme = filePath[-21:][:-5]
@@ -39,7 +39,7 @@ class Fitter:
 
     def getBestGuess(self):
         return self.bestdatabase
-        return self.l2_product
+        return self.l2_product #?
 
 
 def convert_l2(row):
