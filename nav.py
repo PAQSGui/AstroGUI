@@ -27,7 +27,7 @@ class Navigator:
 
         whyInput = QPlainTextEdit()
         note = self.model.getNote()
-        if note == "":
+        if note == 'no-note':
             whyInput.setPlaceholderText("Write your notes here")
         else:
             whyInput.setPlainText(note)
@@ -55,8 +55,11 @@ class Navigator:
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-        self.plotter.update()
+        #self.plotter.update()
         note = self.model.getNote()
-        self.whyInput.setPlainText(note)
+        if note == 'no-note':
+            self.whyInput.setPlaceholderText("Write your notes here")
+        else:
+            self.whyInput.setPlainText(note)
         self.plotlayout.newFile()
         self.infoLayout.updateAll()
