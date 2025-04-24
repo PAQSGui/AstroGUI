@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
     def saveFiles(self):
             path = QFileDialog.getSaveFileName(None, "Save as...")
             with open(path[0], 'w') as file:
-                self.model.preProcess.saveModelToFile(file)
+                self.model.preProcess.savedataFrameToFile(file)
 
     def closeEvent(self, ev):
         self.optionsWindow.close()

@@ -35,12 +35,12 @@ class Database():
             try:
                 with open(self.filepath, 'r', newline='') as file:
                     reader = csv.DictReader(file)
-                    self.model = {}
+                    self.dataFrame = {}
                     for row in reader:
                         if row['name'] != self.fieldNames[0]:
-                            self.model[row[0]]={fieldNames[i]: row[i] for i in range(len(fieldNames))}
+                            self.dataFrame[row[0]]={fieldNames[i]: row[i] for i in range(len(fieldNames))}
             except Exception as e:
-                self.model = CreateReplaceDialog(self.filepath,lambda file: writeEmpty(file),{},e)
+                self.dataFrame = CreateReplaceDialog(self.filepath,lambda file: writeEmpty(file),{},e)
         else:
             writeEmpty()
     def populate(self, fitter):
@@ -81,7 +81,7 @@ class Database():
         entry={}
         for i in range(len(data)):
             entry[fields[i+1]]=data[i]
-        self.model[name]=entry
+        self.dataFrame[name]=entry
         with open(self.filepath, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(list(entry.values()))
@@ -108,17 +108,17 @@ class Database():
             return []        
 
     def getByName(self, name, default=[]):
-        return self.model.get(name,default)
+        return self.dataFrame.get(name,default)
 
     def addByName(self, name, data):
-        self.model[name]=data
+        self.dataFrame[name]=data
         with open(self.filepath, 'a', newline='') as file:
             writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
             writer.writerow(data)
 
-    def getModel(self):
+    def getdataFrame(self):
         objs=[]
-        for item in list(self.model.items()):
+        for item in list(self.dataFrame.items()):
             spectra = tool.SDSS_spectrum((self.directory / Path(item[0]))) 
             dobject = DataObject(item[0], spectra, item[1])
             objs.append(dobject)

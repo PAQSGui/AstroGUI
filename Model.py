@@ -1,5 +1,5 @@
 from fitter import Fitter
-from database_json import Database, getModelFromDatabase
+from database_json import Database, getdataFrameFromDatabase
 from os.path import dirname
 import DataObject
 
@@ -41,21 +41,21 @@ class Model(QObject):
         self.fitter = Fitter(path, self.preProcess)          
         
         #get objects from fitter
-        self.objects = self.getEmptyModel(files)
+        self.objects = self.getEmptydataFrame(files)
 
         self.initOptions()
         self.openedSession.emit(files)
 
-    def getEmptyModel(self,files):
+    def getEmptydataFrame(self,files):
         objs=[]
         for item in list(files):
             #print(item)
             try: #replace with typecheck
-                modelDict=getModelFromDatabase(item)
-                #print(modelDict)
-                for name in list(modelDict.keys()):
+                dataFrame=getdataFrameFromDatabase(item)
+                #print(dataFrame)
+                for name in list(dataFrame.keys()):
                     spectra = tool.SDSS_spectrum(self.path / Path(name))
-                    objs.append(DataObject.DataObject(name, spectra, modelDict[name]))
+                    objs.append(DataObject.DataObject(name, spectra, dataFrame[name]))
             except UnicodeDecodeError:
                 obj = self.preProcess.getByName(item)
                 spectra = tool.SDSS_spectrum(self.path / Path(item))
@@ -163,4 +163,4 @@ class Model(QObject):
         self.options['ymax'] = 0
 
     def getFileList(self):
-        return list(self.fitter.preProcess.model.keys())
+        return list(self.fitter.preProcess.dataFrame.keys())
