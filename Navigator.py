@@ -86,3 +86,8 @@ class Navigator(QWidget):
         self.whyInput.setPlainText(note)
 
         self.navigated.emit(delta)
+        note = self.model.getNote()
+        if note == 'no-note':
+            self.whyInput.setPlaceholderText("Write your notes here")
+        else:
+            self.whyInput.setPlainText(note)

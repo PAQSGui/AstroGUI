@@ -52,3 +52,15 @@ class DataObject:
         object.changeRedshift(redshift)
 
         return object
+    
+    
+    def fromSeries(series, fitting):
+        name = series['name']
+        file = series['file']
+        category = series['category']
+        redshift = series['redshift']
+
+        object = DataObject(name, file, fitting)
+        object.changeCategory(category)
+        object.changeRedshift(redshift)
+        return object

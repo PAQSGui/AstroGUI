@@ -32,7 +32,7 @@ class Fitter:
     def fitFile(self, dataObj, path):
         filePath = Path(path) / Path(dataObj.name)
         l2 = self.preProcess.getByName(dataObj.name)
-        if l2 == []:
+        if l2 is None:
             dataObj.fitting = get_all_fits(self.pipe,str(filePath), dataObj.file)
             self.preProcess.addByName(dataObj.name,dataObj.fitting)
         else:
