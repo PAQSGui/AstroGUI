@@ -1,4 +1,5 @@
 from Model import Model
+from PySide6.QtCore import Signal
 
 from PySide6.QtWidgets import (
     QWidget,
@@ -11,16 +12,21 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 
+"""
+The option dialog opens in a new window so it's possible to see changes to the graph as they are made
+This class should only update the options by calling the setOption() method from Model
+"""
 class OptionsWindow(QWidget):
+
+    optionChanged = Signal()
     model: Model
     colors = ['Grey', 'Black','Purple', 'Blue', 'Green', 'Yellow', 'Orange', 'Red',]
 
-    def __init__(self, model, plo):
+    def __init__(self, model):
         super().__init__()
 
         self.setWindowTitle("Options")
         self.model = model
-        self.plo = plo
 
         lineWidth = QHBoxLayout()
         lineWidth.addWidget(QLabel('Line width'))
@@ -37,13 +43,12 @@ class OptionsWindow(QWidget):
         skyColor = self.colorChooser("Sky:", 'SkyColor')
 
         graphHeight = QHBoxLayout()
-        min, max = plo.getYLimit()
         minEdit = QLineEdit()
-        minEdit.setText(str(min))
+        minEdit.setText(str(model.getOption('ymin')))
         minEdit.setInputMask('900')
         minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', minEdit.text()))
         maxEdit = QLineEdit()
-        maxEdit.setText(str(max))
+        maxEdit.setText(str(model.getOption('ymax')))
         maxEdit.setInputMask('900')
         maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
         button = QPushButton('Adjust')
@@ -89,6 +94,6 @@ class OptionsWindow(QWidget):
 
     def updateOption(self, opt, val):
         self.model.setOption(opt, val)
-        self.plo.update()
+        self.optionChanged.emit()
 
 

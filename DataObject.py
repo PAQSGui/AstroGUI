@@ -1,5 +1,8 @@
 import Spec_tools as tool
 
+"""
+auxiliary class used by Model to store data for fits-files
+"""
 class DataObject:
 
     name: str

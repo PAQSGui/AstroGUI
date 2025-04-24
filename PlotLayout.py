@@ -1,7 +1,9 @@
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
 from matplotlib.pyplot import figure
-
+from xpca import config
+from os import listdir
+import re
 from plotter import Plotter
 
 from PySide6.QtWidgets import (
@@ -15,19 +17,24 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QSizePolicy,
-    )
+    QCheckBox,
+)
 
 from PySide6.QtGui import (
     Qt,
     QDoubleValidator,
 )
 
-from PySide6.QtCore import QSize
-from xpca import config
-from os import listdir
-import re
+from PySide6.QtCore import (
+    QSize,
+    Slot,
+)
 
-class PlotLayout:
+"""
+The PlotLayout is responsible for the part of the window where the graph is located.
+It should NOT plot or load files.
+"""
+class PlotLayout(QWidget):
     layout: QHBoxLayout
     model: Model
     plotter: Plotter
@@ -35,6 +42,7 @@ class PlotLayout:
     zTextBox: QLineEdit
 
     def __init__(self, model):
+        super().__init__()
         self.model = model
         self.layout = QVBoxLayout()
 
@@ -42,11 +50,14 @@ class PlotLayout:
         fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
+        redshiftResolution = self.model.getOption('zResolution') 
+        redshiftMax = self.model.getOption('zMax')
+
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
-        zSlider.setMaximum(self.model.redshiftMax*self.model.redshiftRez)
-        zSlider.setValue(model.getRedShift()*self.model.redshiftRez)
+        zSlider.setMaximum(redshiftMax*redshiftResolution)
+        zSlider.setValue(model.getRedShift()*redshiftResolution)
         zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
 
@@ -58,9 +69,9 @@ class PlotLayout:
         self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
         self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower())
 
-        signoiseButton = QPushButton("Toggle S/N spec")
+        signoiseButton = QCheckBox("S/N spec")
         signoiseButton.clicked.connect(lambda: self.toggleSN())
-        showskybutton = QPushButton("Toggle Sky")
+        showskybutton = QCheckBox("Sky")
         showskybutton.clicked.connect(lambda: self.toggleSky())
 
         sliderLayout = QHBoxLayout()
@@ -84,17 +95,20 @@ class PlotLayout:
         self.layout.addLayout(plotLayout)
         self.layout.addLayout(sliderLayout)
         self.update()
+        self.setLayout(self.layout)
 
-    def newFile(self):
-        self.zSlider.setValue(self.model.getRedShift()*self.model.redshiftRez)
-        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
-        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
-        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) #lazy solution
-        self.model.resetYLimit()
-        self.update()
-
+    @Slot()
     def update(self):
         self.plotter.UpdateFigure()
+
+    @Slot()
+    def newFile(self):
+        self.zSlider.setValue(self.model.getRedShift()*self.model.getOption('zResolution'))
+        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) 
+        self.model.resetYLimit()
+        self.update()
 
     def toggleSN(self):
         new = not self.model.getOption('ShowSN')
@@ -110,24 +124,23 @@ class PlotLayout:
         return self.plotter.getYLim()
 
     def sliderChanged(self):
-        self.model.changeRedShift(float(self.zSlider.value())/self.model.redshiftRez)
+        self.model.changeRedShift(float(self.zSlider.value())/self.model.getOption('zResolution'))
         self.zTextBox.setText(str(self.model.getRedShift()))
-        self.update()
+        self.plotter.UpdateFigure()
 
     def zTextInput(self):
-            conv=float(self.zTextBox.text())
-            if conv>self.model.redshiftMax:
-                conv=self.model.redshiftMax
-                self.zTextBox.setText(str(conv))
-            elif conv<self.model.redshiftMin:
-                conv=self.model.redshiftMin
-                self.zTextBox.setText(str(conv))
+            input = float(self.zTextBox.text())
+            if input > self.model.getOption('zMax'):
+                input = self.model.getOption('zMax')
+                self.zTextBox.setText(str(input))
+            elif input < 0:
+                input = 0
+                self.zTextBox.setText(str(input))
 
-            self.model.changeRedShift(conv)
-            self.zSlider.setValue(int(conv*self.model.redshiftRez))
+            self.model.changeRedShift(input)
+            self.zSlider.setValue(int(input*self.model.getOption('zResolution')))
             self.update()
 
-    
     def dropboxSelect(self, s):
 
         result = re.search(f'template-(.+).fits', s)

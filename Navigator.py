@@ -1,29 +1,28 @@
 
-from PlotLayout import PlotLayout
 from Model import Model
-import Spec_tools as tool
 
 from PySide6.QtWidgets import (
     QPushButton,
     QHBoxLayout,
     QPlainTextEdit,
+    QWidget,
     )
 
-import re
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Signal
 
-
-class Navigator:
+"""
+Navigator is responsible for navigating between files
+"""
+class Navigator(QWidget):
 
     layout: QHBoxLayout
     model: Model
-    plotlayout: PlotLayout
+    navigated = Signal(int)
 
-    def __init__(self, plotlayout, infoLayout, model):
+    def __init__(self, model):
+        super().__init__()
         self.model = model
-        self.plotlayout = plotlayout
         self.layout = QHBoxLayout()
-        self.infoLayout=infoLayout
 
         whyInput = QPlainTextEdit()
         note = self.model.getNote()
@@ -55,11 +54,9 @@ class Navigator:
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-        #self.plotter.update()
+        self.navigated.emit(delta)
         note = self.model.getNote()
         if note == 'no-note':
             self.whyInput.setPlaceholderText("Write your notes here")
         else:
             self.whyInput.setPlainText(note)
-        self.plotlayout.newFile()
-        self.infoLayout.updateAll()
