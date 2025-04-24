@@ -20,7 +20,6 @@ class Model:
     fitter: Fitter
 
     def __init__(self, path, fromCSV = False):
-
         self.path = path
         self.fileDB = Database('files.csv', self.fileFieldNames, path)
         self.categoryDB = Database('data.csv', self.catFieldNames, path)

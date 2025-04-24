@@ -26,7 +26,7 @@ class Navigator(QWidget):
 
         whyInput = QPlainTextEdit()
         note = self.model.getNote()
-        if note == "":
+        if note == 'no-note':
             whyInput.setPlaceholderText("Write your notes here")
         else:
             whyInput.setPlainText(note)
@@ -54,8 +54,9 @@ class Navigator(QWidget):
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-
-        note = self.model.getNote()
-        self.whyInput.setPlainText(note)
-
         self.navigated.emit(delta)
+        note = self.model.getNote()
+        if note == 'no-note':
+            self.whyInput.setPlaceholderText("Write your notes here")
+        else:
+            self.whyInput.setPlainText(note)
