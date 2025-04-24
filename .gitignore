@@ -19,3 +19,6 @@ run.spec
 /run.*/
 *.json
 *.csv
+files
+preProcess
+validation

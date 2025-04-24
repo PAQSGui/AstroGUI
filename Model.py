@@ -1,5 +1,5 @@
 from fitter import Fitter
-from database_json import Database, getdataFrameFromDatabase
+from database import Database, getdataModelFromDatabase
 from os.path import dirname
 import DataObject
 
@@ -41,26 +41,26 @@ class Model(QObject):
         self.fitter = Fitter(path, self.preProcess)          
         
         #get objects from fitter
-        self.objects = self.getEmptydataFrame(files)
+        self.objects = self.getEmptydataModel(files)
 
         self.initOptions()
         self.openedSession.emit(files)
 
-    def getEmptydataFrame(self,files):
+    def getEmptydataModel(self,files):
         objs=[]
         for item in list(files):
             #print(item)
             try: #replace with typecheck
-                dataFrame=getdataFrameFromDatabase(item)
-                #print(dataFrame)
-                for name in list(dataFrame.keys()):
+                dataModel=getdataModelFromDatabase(item)
+                #print(dataModel)
+                for name in list(dataModel.keys()):
                     spectra = tool.SDSS_spectrum(self.path / Path(name))
-                    objs.append(DataObject.DataObject(name, spectra, dataFrame[name]))
+                    objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             except UnicodeDecodeError:
                 obj = self.preProcess.getByName(item)
                 spectra = tool.SDSS_spectrum(self.path / Path(item))
                 
-                if obj == []:
+                if obj is None:
                     dobject = DataObject.DataObject(item, spectra, None)
                 else:
                     dobject = DataObject.DataObject(item, spectra, obj)
@@ -72,7 +72,7 @@ class Model(QObject):
             for obj in self.objects:
                 obj = self.fitter.fitFile(obj,Path(self.path))
                 data = self.fileDB.getByName(obj)
-                if data == []:
+                if data is None:
                     self.fileDB.addEntry(obj, self.fileFieldNames, [self.path, obj.category, obj.redshift])     
 
     def updateCursor(self, delta):
@@ -108,8 +108,13 @@ class Model(QObject):
             return ""
     
     def getState(self):
-        return self.objects[self.cursor]
-    
+        try:
+            return self.objects[self.cursor]
+        except IndexError as e:
+            print(self.objects)
+            print(self.cursor)
+            raise e
+
     def getFile(self):
         return self.objects[self.cursor].file
 
@@ -163,4 +168,4 @@ class Model(QObject):
         self.options['ymax'] = 0
 
     def getFileList(self):
-        return list(self.fitter.preProcess.dataFrame.keys())
+        return list(self.fitter.preProcess.df.keys())

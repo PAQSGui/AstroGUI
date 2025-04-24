@@ -68,13 +68,18 @@ class Database():
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
-    def getEntry(self, name):
-        for _, row in self.df.iterrows():
-            if row['name'] == name:
-                return row.to_dict()
-        return None
+    def getByName(self, name, default=None):
+        try:
+            for _, row in self.df.iterrows():
+                if row['name'] == name:
+                    return row.to_dict()
+            return default
+        except KeyError:
+            print("Error: 'name' is not a valid key")
 
-    def addFitting(self, l2):
+            return self.df.get(name,default)
+    def addByName(self, name, l2):
+        self.df[name]=l2
         self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
         self.write()
 
@@ -83,3 +88,6 @@ class Database():
             if row['OBJ_NME'] == name:
                 return row.to_dict()
         return None
+
+def getdataModelFromDatabase(filepath):
+    return pd.read_csv(filepath)

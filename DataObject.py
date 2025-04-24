@@ -19,9 +19,14 @@ class DataObject:
         self.name = filename
         self.file = file
         self.fitting = fitting
-        if fitting!=None:
-            self.category = fitting['zBestSubType']
-            self.redshift = fitting['zBest']
+        try:
+            if fitting is not None:
+                self.category = fitting['zBestSubType']
+                self.redshift = fitting['zBest']
+        except Exception as e:
+            print(type(fitting))
+            print(fitting)
+            raise e
 
     def changeRedshift(self, val):
         self.redshift = val

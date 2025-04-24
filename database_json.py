@@ -19,29 +19,29 @@ class Database():
         if self.filepath.is_file():
             try:
                 with open(self.filepath, 'r') as file:
-                    self.dataFrame = json.load(file)
-                    for file in list(self.dataFrame.keys()):
-                        values = self.dataFrame[file]
+                    self.datamodel = json.load(file)
+                    for file in list(self.datamodel.keys()):
+                        values = self.datamodel[file]
                         convertNPRecursive(values)
                                 
             except Exception as e:
-                self.dataFrame = CreateReplaceDialog(self.filepath,lambda file: json.dump({}, file, cls=JsonCustomEncoder),{},e)
+                self.datamodel = CreateReplaceDialog(self.filepath,lambda file: json.dump({}, file, cls=JsonCustomEncoder),{},e)
         else:
-            self.dataFrame = {} #dictionary
+            self.datamodel = {} #dictionary
             with open(self.filepath, 'w') as file:
-                json.dump(self.dataFrame, file, cls=JsonCustomEncoder)
+                json.dump(self.datamodel, file, cls=JsonCustomEncoder)
 
 
-    def getByName(self, name, default=[]):
-        return self.dataFrame.get(name,default)
+    def getByName(self, name, default=None):
+        return self.datamodel.get(name,default)
 
     def addByName(self, name, data):
-        self.dataFrame[name]=data
+        self.datamodel[name]=data
         with open(self.filepath, 'w') as file:
-            json.dump(self.dataFrame, file, cls=JsonCustomEncoder)
+            json.dump(self.datamodel, file, cls=JsonCustomEncoder)
 
     def getFilenames(self):
-        list(self.dataFrame.keys())
+        list(self.datamodel.keys())
 
     def addEntry(self, dataObj, fields, data):
         if (len(fields)!=len(data)+1):
@@ -49,14 +49,14 @@ class Database():
         entry={}
         for i in range(len(data)):
             entry[fields[i+1]]=data[i]
-        self.dataFrame[dataObj.name]=entry
+        self.datamodel[dataObj.name]=entry
         with open(self.filepath, 'w') as file:
-            json.dump(self.dataFrame, file, cls=JsonCustomEncoder)
+            json.dump(self.datamodel, file, cls=JsonCustomEncoder)
 
-    def savedataFrameToFile(self,file):
-        json.dump(self.dataFrame, file, cls=JsonCustomEncoder)
+    def savedataModelToFile(self,file):
+        json.dump(self.datamodel, file, cls=JsonCustomEncoder)
 
-def getdataFrameFromDatabase(filepath):
+def getdataModelFromDatabase(filepath):
     with open(filepath, 'r') as file:
                     data = json.load(file)
                     for file in list(data.keys()):
