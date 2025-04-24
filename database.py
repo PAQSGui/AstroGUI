@@ -34,6 +34,10 @@ class Database():
         #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
         #     writer.writeheader()  
 
+    def write(self):
+        self.df = self.df.drop_duplicates(subset=['name'], keep='last')
+        self.df.to_csv(self.dataFile, index=False)
+
     def populate(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
@@ -47,7 +51,7 @@ class Database():
             # with open(self.dataFile, 'a', newline='') as dataFile:
             #     writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
             #     writer.writerow(dict)
-        self.df.to_csv(self.dataFile, index=False)
+        self.write()
 
     def extract(self, fitter):
         directory = QDir(self.path)
@@ -87,7 +91,7 @@ class Database():
             "note": note
         }
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
-        self.df.to_csv(self.dataFile, index = False)
+        self.write()
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.writer(file)
         #     writer.writerow([name, categorized, category, note, redshift])
@@ -114,7 +118,7 @@ class Database():
 
     def addFitting(self, l2):
         self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
-        self.df.to_csv(self.dataFile, index = False)
+        self.write()
         # with open(self.dataFile, 'a', newline='') as file:
         #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
         #     writer.writerow(l2)
