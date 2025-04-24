@@ -25,7 +25,7 @@ class Fitter:
     def __init__(self):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-        self.database = Database('preProcess.csv', fields, 'fitter')
+        self.database = Database('preProcess.csv', fields)
 
     def fitFile(self, filePath, spec):
         obj_nme = filePath[-21:][:-5]

@@ -20,11 +20,9 @@ class Model:
     fitter: Fitter
 
     def __init__(self, path, fromCSV = False):
-        fromCSV = True
-
         self.path = path
-        self.fileDB = Database('files.csv', self.fileFieldNames, 'file', path)
-        self.categoryDB = Database('data.csv', self.catFieldNames, 'category', path)
+        self.fileDB = Database('files.csv', self.fileFieldNames, path)
+        self.categoryDB = Database('data.csv', self.catFieldNames, path)
         self.fitter = Fitter()
 
         if not fromCSV:

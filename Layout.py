@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
                 if folder_path == "":
                     # Hacky way of exiting program if dialog is cancelled
                     exit()
-                self.model = Model(folder_path) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
+                self.model = Model(folder_path, True) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
             except FileNotFoundError:
                 popup = QMessageBox()
                 popup.setWindowTitle("Error")

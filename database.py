@@ -12,11 +12,10 @@ class Database():
     fieldNames = ""
     path : str
 
-    def __init__(self, dataFile, fieldNames, type, path = ''):
+    def __init__(self, dataFile, fieldNames, path = ''):
         self.dataFile = dataFile
         self.fieldNames = fieldNames
         self.path = path
-        index = "OBJ_NAME" if type == "fitter" else "name"
 
         if not os.path.isfile(dataFile):
             f = open(dataFile, 'a')
@@ -24,18 +23,10 @@ class Database():
             f.write(header)
             f.close()
         
-        # By using name as the index, we might lose some value by not being fully able to pass around the series
-        # But using name also makes it super easy to look up the object in the DataFrame, so I'm not sure what to do
-        # since otherwise we would have to go back to linear search
-        self.df = pd.read_csv(self.dataFile)
-        #self.df = pd.read_csv(self.dataFile, index_col=index) 
-
-        # with open(self.dataFile, 'a', newline='') as file:
-        #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-        #     writer.writeheader()  
+        self.df = pd.read_csv(self.dataFile) 
 
     def write(self):
-        self.df = self.df.drop_duplicates(subset=['name'], keep='last')
+        self.df = self.df.drop_duplicates(subset=[self.fieldNames[0]], keep='last')
         self.df.to_csv(self.dataFile, index=False)
 
     def populate(self, fitter):
@@ -48,9 +39,6 @@ class Database():
             object = DataObject(file, spectra, fitting)
             dict = object.toDict()
             self.df = pd.concat([self.df, pd.DataFrame([dict])], ignore_index=True)
-            # with open(self.dataFile, 'a', newline='') as dataFile:
-            #     writer = csv.DictWriter(dataFile, self.fieldNames, extrasaction = 'ignore')
-            #     writer.writerow(dict)
         self.write()
 
     def extract(self, fitter):
@@ -58,7 +46,7 @@ class Database():
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = []
 
-        for _, row in self.df.iterrows(): # Grab all rows
+        for _, row in self.df.iterrows():
             name = row['name']
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
             fitting = fitter.fitFile(directory.absoluteFilePath(name), spectra)
@@ -66,19 +54,6 @@ class Database():
             object.file = spectra #Why are we even even using file in fromDict if we're changing it here?
             files.append(object)
         return files
-
-
-
-        # with open(self.dataFile, 'r', newline='') as file:      
-        #     reader = csv.DictReader(file)
-        #     for row in reader:
-        #         if row['name'] != self.fieldNames[0]:
-        #             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(row['name']))
-        #             fitting = fitter.fitFile(directory.absoluteFilePath(row['name']), spectra)
-        #             object = DataObject.fromDict(row, fitting)
-        #             object.file = spectra
-        #             files.append(object)
-        # return files
 
     def addEntry(self, name, categorized, category, redshift, note):
         if note == '':
@@ -92,50 +67,19 @@ class Database():
         }
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
-        # with open(self.dataFile, 'a', newline='') as file:
-        #     writer = csv.writer(file)
-        #     writer.writerow([name, categorized, category, note, redshift])
 
     def getEntry(self, name):
         for _, row in self.df.iterrows():
             if row['name'] == name:
                 return row.to_dict()
         return None
-        
-        # Too much? Tried to make it match where it returns None if the row isn't found
-        # try:
-        #     entry = self.df.loc[name]
-        # except KeyError:
-        #     return None
-        # return entry
-        
-        # with open(self.dataFile, 'r', newline = '') as file:
-        #     reader = csv.DictReader(file)
-        #     for row in reader:
-        #         if row[self.fieldNames[0]] == name:
-        #             return row
-        #     return None
 
     def addFitting(self, l2):
         self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
         self.write()
-        # with open(self.dataFile, 'a', newline='') as file:
-        #     writer = csv.DictWriter(file, self.fieldNames, extrasaction = 'ignore')
-        #     writer.writerow(l2)
 
     def getFitting(self, name):
         for _, row in self.df.iterrows():
             if row['OBJ_NME'] == name:
                 return row.to_dict()
         return None
-        # try:
-        #     entry = self.df.loc[name]
-        # except KeyError:
-        #     return None
-        # return entry
-        # with open(self.dataFile, 'r', newline='') as file:
-        #     reader = csv.DictReader(file)
-        #     for row in reader:
-        #         if row[self.fieldNames[0]] == name:
-        #             return row
-        #     return []
