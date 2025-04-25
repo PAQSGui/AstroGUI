@@ -1,5 +1,5 @@
 from Model import Model
-from ssPicture import loadCoords
+from SkyGrabWidget import loadCoords
 
 from PySide6.QtWidgets import (
     QVBoxLayout,

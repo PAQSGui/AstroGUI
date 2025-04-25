@@ -1,10 +1,10 @@
-from Navigator import Navigator
-from fitter import Fitter
-from Layout_Info import InfoLayout
+from NavigateWidget import Navigator
+from Fitter import Fitter
+from InfoWidget import InfoLayout
 from Model import Model
-from PlotLayout import PlotLayout
-from optionsWindow import OptionsWindow
-from ssPicture import SkygrabWindow
+from PlotWidget import PlotLayout
+from OptionsWindow import OptionsWindow
+from SkyGrabWidget import SkygrabWindow
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -22,7 +22,7 @@ from PySide6.QtGui import (
     QIcon
 )
 
-from handler_xpca import xpcaWindow
+from xpcaWidget import xpcaWindow
 
 """
 The main window is resposinble for initializing all other classes and linking them.

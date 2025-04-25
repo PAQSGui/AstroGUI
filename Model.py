@@ -1,6 +1,6 @@
-from fitter import Fitter
-from database_csv import Database
-from database_common import getdataModelFromDatabase
+from Fitter import Fitter
+from CSVDatabase import Database
+from DatabaseUtility import getdataModelFromDatabase
 from os.path import dirname
 import DataObject
 

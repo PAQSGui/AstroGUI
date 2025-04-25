@@ -4,7 +4,7 @@ from matplotlib.pyplot import figure
 from xpca import config
 from os import listdir
 import re
-from plotter import Plotter
+from Plotter import Plotter
 
 from PySide6.QtWidgets import (
     QLayout,
