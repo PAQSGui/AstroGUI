@@ -14,7 +14,6 @@ from PySide6.QtWidgets import (
     QSlider,
     QLabel,
     QComboBox,
-    QPushButton,
     QLineEdit,
     QSizePolicy,
     QCheckBox,
@@ -95,10 +94,11 @@ class PlotLayout(QWidget):
 
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
-                self.dropdown.addItem(file)
+                text = file[:-5]
+                self.dropdown.addItem(text)
         self.dropdown.textActivated.connect(self.dropboxSelect)
-        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
-        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower())
+        self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
+
 
         self.signoiseButton.clicked.connect(lambda: self.toggleSN())
         self.showskybutton.clicked.connect(lambda: self.toggleSky())
@@ -127,8 +127,7 @@ class PlotLayout(QWidget):
     def newFile(self):
         self.zSlider.setValue(self.model.getRedShift()*self.model.getOption('zResolution'))
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
-        self.dropdown.setCurrentText(f'template-%s.fits' % (self.model.getCategory()).lower())
-        self.dropdown.setCurrentText(f'template-new-%s.fits' % (self.model.getCategory()).lower()) 
+        self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
         self.model.resetYLimit()
         self.update()
 

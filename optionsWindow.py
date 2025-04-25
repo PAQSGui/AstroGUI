@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QRadioButton,
     QButtonGroup,
     QPushButton,
+    QGroupBox,
 )
 
 """
@@ -68,16 +69,11 @@ class OptionsWindow(QWidget):
         self.minEdit.setText(str(self.model.getOption('ymin')))
         self.maxEdit.setText(str(model.getOption('ymax')))
 
-        graphColor = self.colorChooser("Graph:",'GraphColor')
-        noiseColor = self.colorChooser("Noise:",'NoiseColor')
-
-        snColor = self.colorChooser("S/N:", 'SNColor')
-        skyColor = self.colorChooser("Sky:", 'SkyColor')
-        
-        self.CClayout.addWidget(graphColor)
-        self.CClayout.addWidget(noiseColor)
-        self.CClayout.addWidget(snColor)
-        self.CClayout.addWidget(skyColor)
+        self.CClayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
+        self.CClayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
+        self.CClayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
+        self.CClayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
+        self.CClayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
 
     
     @Slot()
@@ -87,13 +83,11 @@ class OptionsWindow(QWidget):
     
 
     def colorChooser(self, text, key):
-        layout = QHBoxLayout()
-        widget = QWidget()
-        widget.setLayout(layout)
+        layout = QVBoxLayout()
+        box = QGroupBox(text)
+        box.setLayout(layout)
 
-        colorGroup = QButtonGroup(widget)
-
-        layout.addWidget(QLabel(text))
+        colorGroup = QButtonGroup(box)
 
         current = self.model.getOption(key)
 
@@ -105,7 +99,7 @@ class OptionsWindow(QWidget):
             layout.addWidget(button)
 
         colorGroup.buttonClicked.connect(lambda button: self.updateOption(key, button.text()))
-        return widget
+        return box
 
     def updateOption(self, opt, val):
         self.model.setOption(opt, val)

@@ -97,6 +97,7 @@ class MainWindow(QMainWindow):
         self.setStatusBar(QStatusBar(self))
 
         file_menu = self.menuBar()
+        file_menu.setNativeMenuBar(False)
         file_menu.setFont(QFont("",18))
 
         def addButton(icon,tooltip,func=None):
