@@ -51,9 +51,17 @@ class Plotter:
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
 
-        plt.title(file.Objectname)  
+        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
+        spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
 
+        if self.model.getState().fitting is not None:
 
+            template, = self.templater.plotTemplate()
+            handles=[spectra, template, noise]
+        else:
+            handles=[spectra, noise]
+
+        plt.title(file.Objectname)         
         plt.legend(handles=handles)
         self.figure.draw()
 

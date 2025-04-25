@@ -49,43 +49,31 @@ class PlotLayout(QWidget):
         fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
-        redshiftResolution = self.model.getOption('zResolution') 
-        redshiftMax = self.model.getOption('zMax')
+        self.model.openedSession[list].connect(self.setupSession)
+        self.model.closedSession[list].connect(self.shutDownSession)
 
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
         zSlider.setMinimum(0)
-        zSlider.setMaximum(redshiftMax*redshiftResolution)
-        zSlider.setValue(model.getRedShift()*redshiftResolution)
-        zSlider.sliderMoved.connect(self.sliderChanged)
         self.zSlider = zSlider
 
         self.dropdown = QComboBox()
-        for file in listdir(config.TEMPLATE_PATH):
-            if file.endswith(".fits"):
-                text = file[:-5]
-                self.dropdown.addItem(text)
-        self.dropdown.textActivated.connect(self.dropboxSelect)
-        self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
 
-        signoiseButton = QCheckBox("S/N spec")
-        signoiseButton.clicked.connect(lambda: self.toggleSN())
-        showskybutton = QCheckBox("Sky")
-        showskybutton.clicked.connect(lambda: self.toggleSky())
+        self.signoiseButton = QCheckBox("Toggle S/N spec")
+        self.showskybutton = QCheckBox("Toggle Sky")
 
         sliderLayout = QHBoxLayout()
         sliderLayout.addWidget(self.dropdown)
         sliderLayout.addWidget(zSlider)
 
         sliderLayout.addWidget(QLabel("z ="))
-        self.zTextBox=QLineEdit(text=str(round(model.getRedShift(),4)))
+        self.zTextBox=QLineEdit()
         self.zTextBox.setValidator(QDoubleValidator())
-        self.zTextBox.editingFinished.connect(self.zTextInput)
         self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sliderLayout.addWidget(self.zTextBox)
 
-        sliderLayout.addWidget(signoiseButton)
-        sliderLayout.addWidget(showskybutton)
+        sliderLayout.addWidget(self.signoiseButton)
+        sliderLayout.addWidget(self.showskybutton)
 
         plotLayout = QHBoxLayout()
         plotLayout.addWidget(fig)
@@ -93,8 +81,43 @@ class PlotLayout(QWidget):
 
         self.layout.addLayout(plotLayout)
         self.layout.addLayout(sliderLayout)
-        self.update()
         self.setLayout(self.layout)
+
+    @Slot()
+    def setupSession(self,files):
+        redshiftResolution = self.model.getOption('zResolution') 
+        redshiftMax = self.model.getOption('zMax')
+
+        self.zSlider.setMaximum(redshiftMax*redshiftResolution)
+        self.zSlider.setValue(self.model.getRedShift()*redshiftResolution)
+        self.zSlider.sliderMoved.connect(self.sliderChanged)
+
+        for file in listdir(config.TEMPLATE_PATH):
+            if file.endswith(".fits"):
+                text = file[:-5]
+                self.dropdown.addItem(text)
+        self.dropdown.textActivated.connect(self.dropboxSelect)
+        self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
+
+
+        self.signoiseButton.clicked.connect(lambda: self.toggleSN())
+        self.showskybutton.clicked.connect(lambda: self.toggleSky())
+
+        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.zTextBox.editingFinished.connect(self.zTextInput)
+        self.update()
+    @Slot()
+    def shutDownSession(self,files):
+        self.zSlider.sliderMoved.disconnect(self.sliderChanged)
+
+        self.dropdown.textActivated.disconnect(self.dropboxSelect)
+        self.dropdown.clear()
+
+        self.signoiseButton.clicked.disconnect(lambda: self.toggleSN())
+        self.showskybutton.clicked.disconnect(lambda: self.toggleSky())
+
+        self.zTextBox.setText()
+        self.zTextBox.editingFinished.disconnect(self.zTextInput)
 
     @Slot()
     def update(self):
@@ -140,16 +163,9 @@ class PlotLayout(QWidget):
             self.update()
 
     def dropboxSelect(self, s):
-
-        result = re.search(f'template-(.+)', s)
+        redshiftResolution = self.model.getOption('zResolution') 
+        result = re.search(f'template-(.+).fits', s)
         self.model.changeCategory(result.group(1))
-        
-        try:
-            self.update()
-        except FileNotFoundError as e:
-            for file in listdir(config.TEMPLATE_PATH):
-                if file.lower()==s:
-                    result = re.search(f'template-(.+).fits', file)
-                    self.l2_current['zBestSubType']=result.group(1)
-                    self.plotter.PlotFile(self.l2_current)
-                    break
+        self.update()
+        self.zSlider.setValue(int(self.model.getRedShift()*redshiftResolution))
+        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))

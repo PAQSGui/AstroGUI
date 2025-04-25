@@ -6,6 +6,7 @@ from PySide6.QtCore import (
 )
 import pandas as pd
 import os.path
+import numpy as np
 
 class Database():
     dataFile = ""
@@ -25,6 +26,10 @@ class Database():
         
         self.df = pd.read_csv(self.dataFile) 
 
+    def load(self,dataFile):
+        #load a file and return it as a dict
+        df = pd.read_csv(dataFile)
+
     def write(self):
         self.df = self.df.drop_duplicates(subset=[self.fieldNames[0]], keep='last')
         self.df.to_csv(self.dataFile, index=False)
@@ -33,13 +38,15 @@ class Database():
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = directory.entryList()[0:5]
+        objs = []
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
-            fitting = fitter.fitFile(directory.absoluteFilePath(file),spectra)
-            object = DataObject(file, spectra, fitting)
-            dict = object.toDict()
+            obj = fitter.fitFile(directory.absoluteFilePath(file),spectra)
+            dict = obj.toDict()
+            objs.append(obj)
             self.df = pd.concat([self.df, pd.DataFrame([dict])], ignore_index=True)
         self.write()
+        return objs
 
     def extract(self, fitter):
         directory = QDir(self.path)
@@ -47,12 +54,11 @@ class Database():
         files = []
 
         for _, row in self.df.iterrows():
-            name = row['name']
+            name = row['path']
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
-            fitting = fitter.fitFile(directory.absoluteFilePath(name), spectra)
-            object = DataObject.fromSeries(row, fitting) # Why is it angery
-            object.file = spectra #Why are we even even using file in fromDict if we're changing it here?
-            files.append(object)
+            obj = fitter.fitFile(directory.absoluteFilePath(name), spectra)
+            obj.file = spectra #Why are we even even using file in fromDict if we're changing it here?
+            files.append(obj)
         return files
 
     def addEntry(self, name, categorized, category, redshift, note):
@@ -68,11 +74,11 @@ class Database():
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
-    def getEntry(self, name):
+    def getEntry(self, name, default):
         for _, row in self.df.iterrows():
-            if row['name'] == name:
+            if row['path'] == name:
                 return row.to_dict()
-        return None
+        return default
 
     def addFitting(self, l2):
         self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
@@ -81,5 +87,40 @@ class Database():
     def getFitting(self, name):
         for _, row in self.df.iterrows():
             if row['OBJ_NME'] == name:
-                return row.to_dict()
+                l2 = row.to_dict()
+                return convert_l2(l2)
         return None
+
+def convert_l2(row):
+    l2_product = dict()
+    l2_product['OBJ_NME']       = row['OBJ_NME']
+    l2_product['zBest']         = float(row['zBest'])
+    l2_product['zBestProb']     = float(row['zBestProb'])
+    l2_product['zBestType']     = row['zBestType']
+    l2_product['zBestSubType']  = row['zBestSubType']
+    
+    def auxInsert(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  x.strip("'")) 
+    
+    def auxInsertFloat(temp,i,new):
+        x = temp[i]
+        if x != '--':
+            new.insert(i,  float(x.strip(','))) 
+
+    def aux(key, func):
+        temp = row[key].strip('[]').split()
+        new = []
+        for i in range(len(temp)):
+            func(temp,i,new)
+        return new
+
+    l2_product['zAltType'] = aux('zAltType',lambda temp,i,new: new.insert(i,  temp[i].strip("'")))
+
+    l2_product['zAltSubType'] = aux('zAltSubType',auxInsert)
+
+    l2_product['zAltProb'] = aux('zAltProb',auxInsertFloat)
+
+    l2_product['zBestPars'] = np.array(aux('zBestPars',lambda temp,i,new: new.insert(i, float(temp[i].strip(',')))))
+    return l2_product

@@ -1,6 +1,6 @@
 from Navigator import Navigator
 from fitter import Fitter
-from InfoLayout import InfoLayout
+from Layout_Info import InfoLayout
 from Model import Model
 from PlotLayout import PlotLayout
 from optionsWindow import OptionsWindow
@@ -19,7 +19,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import (
     QAction,
     QFont,
+    QIcon
 )
+
+from handler_xpca import xpcaWindow
 
 """
 The main window is resposinble for initializing all other classes and linking them.
@@ -44,7 +47,7 @@ class MainWindow(QMainWindow):
                 if folder_path == "":
                     # Hacky way of exiting program if dialog is cancelled
                     exit()
-                self.model = Model(folder_path, True) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
+                self.model = Model(folder_path) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
             except FileNotFoundError:
                 popup = QMessageBox()
                 popup.setWindowTitle("Error")
@@ -53,13 +56,22 @@ class MainWindow(QMainWindow):
                 popup.exec()
             else:
                 break
+    def openFiles(self):
+            files = QFileDialog.getOpenFileNames(None, "Select Files")
+            self.model.openFiles(files[0])
+
+    def saveFiles(self):
+            path = QFileDialog.getSaveFileName(None, "Save as...")
+            with open(path[0], 'w') as file:
+                self.model.preProcess.savedataModelToFile(file)
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
+        self.xpcaWindow.close()
         
     def __init__(self, app):
         super().__init__()
-        self.openFolder()
+        self.model = Model()
         self.setWindowTitle("AstroGUI")
 
         self.plotLayout = PlotLayout(self.model)
@@ -70,12 +82,15 @@ class MainWindow(QMainWindow):
         self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
         self.navigator.navigated.connect(self.infoLayout.updateAll)
         self.navigator.navigated.connect(self.plotLayout.newFile)
+        self.model.xpcaDone.connect(self.infoLayout.updateAll)
+        self.model.xpcaDone.connect(self.plotLayout.newFile)
 
         self.optionsWindow = OptionsWindow(self.model)
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
         self.skygrabTab = SkygrabWindow(self.model)
         self.navigator.navigated.connect(self.skygrabTab.LoadPicture)
 
+        self.xpcaWindow = xpcaWindow(self.model)
         mainLayout = QVBoxLayout()
 
         self.setStatusBar(QStatusBar(self))
@@ -84,8 +99,8 @@ class MainWindow(QMainWindow):
         file_menu.setNativeMenuBar(False)
         file_menu.setFont(QFont("",18))
 
-        def addButton(emoji,tooltip,func=None):
-            button = QAction(emoji, self)
+        def addButton(icon,tooltip,func=None):
+            button = QAction(icon,tooltip, self)
             button.setStatusTip(tooltip)
             button.setToolTip(tooltip) #seemingly not working, at least not on Linux
             if func != None:
@@ -93,18 +108,12 @@ class MainWindow(QMainWindow):
             file_menu.addAction(button)
 
 
-        addButton("📂","Open a folder and plot FITS files inside",lambda: self.openFolder())
-        addButton("⚙️","Open a window to configure the program",lambda: self.optionsWindow.show())
+        addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFiles())
+        addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
+    
         
-        file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
-        
-        addButton("💾","Save current workspace")
-        addButton("📜","Review evaluated spectra")
-        addButton("🥞","Load other spectra of the same object and overplot them for comparison")
-        addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")
-        addButton("🌈","Open a wizard to merge a set of grisms into a single spectrum")
-        addButton("🏭","Open a wizard to process targets using xpca")
-        addButton("🗠","Open a window to manually adjust the template parameters")
+        addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
+        addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
         
         mainLayout.addLayout(self.infoLayout)
         tabs = QTabWidget()

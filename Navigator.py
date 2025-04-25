@@ -6,9 +6,10 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QPlainTextEdit,
     QWidget,
+    QListWidget,
     )
 
-from PySide6.QtCore import QSize, Signal
+from PySide6.QtCore import QSize, Signal, Slot
 
 """
 Navigator is responsible for navigating between files
@@ -22,30 +23,54 @@ class Navigator(QWidget):
     def __init__(self, model):
         super().__init__()
         self.model = model
+        self.model.openedSession[list].connect(self.setupSession)
+        self.model.closedSession[list].connect(self.shutDownSession)
         self.layout = QHBoxLayout()
 
         whyInput = QPlainTextEdit()
-        note = self.model.getNote()
-        if note == 'no-note':
-            whyInput.setPlaceholderText("Write your notes here")
-        else:
-            whyInput.setPlainText(note)
         whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
-        backButton = QPushButton("Back")
-        backButton.clicked.connect(lambda: self.NavBtn(msg="Back",delta=-1))
+        self.backButton = QPushButton("Previous")
 
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(lambda: self.NavBtn( msg="Yes",delta=1))
+        self.yesButton = QPushButton("Next")
 
-        unsureButton = QPushButton("Unsure")
-        unsureButton.clicked.connect(lambda: self.NavBtn(msg="Unsure",delta=1))
-
-        self.layout.addWidget(backButton)
-        self.layout.addWidget(yesButton)
-        self.layout.addWidget(unsureButton)
+        self.layout.addWidget(self.backButton)
+        self.layout.addWidget(self.yesButton)
         self.layout.addWidget(self.whyInput)
+
+        self.filedisplay=QListWidget(self)
+        
+        self.layout.addWidget(self.filedisplay)
+        
+    @Slot()
+    def setupSession(self,files):
+        self.backButton.clicked.connect(lambda: self.NavBtn(msg="Previous",delta=-1))
+        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Next",delta=1))
+        note = self.model.getNote()
+        if note == "":
+            self.whyInput.setPlaceholderText("Write your notes here")
+        else:
+            self.whyInput.setPlainText(note)
+
+        self.filedisplay.insertItems(0,self.model.getFileList())
+        self.filedisplay.itemActivated.connect(self.setSelected)
+    @Slot()
+    def shutDownSession(self,files):
+        self.backButton.clicked.disconnect(lambda: self.NavBtn(msg="Previous",delta=-1))
+        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Next",delta=1))
+        self.whyInput.setPlainText("")
+
+        self.filedisplay.clear()
+        self.filedisplay.itemActivated.disconnect(self.setSelected)
+
+
+    def setSelected(self,item):
+        itemIndex=self.filedisplay.indexFromItem(item).row()
+        self.model.cursor=itemIndex #update cursor
+        note = self.model.getNote()
+        self.whyInput.setPlainText(note)
+        self.navigated.emit(itemIndex)
  
     def NavBtn (self, msg, delta):
         if msg == "Yes":
@@ -54,6 +79,11 @@ class Navigator(QWidget):
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
+        self.filedisplay.setCurrentRow(self.model.cursor)
+
+        note = self.model.getNote()
+        self.whyInput.setPlainText(note)
+
         self.navigated.emit(delta)
         note = self.model.getNote()
         if note == 'no-note':

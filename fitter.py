@@ -1,7 +1,11 @@
-
 from xpca.pipeline import Pipeline
-from database import Database
+from database_csv import Database
 import numpy as np
+import Spec_tools as tool
+from pathlib import Path
+from os.path import basename
+
+from DataObject import DataObject
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -16,64 +20,35 @@ This class interfaces with XPCA and is responisble for retrieving fittings which
 class Fitter:
 
     pipe: Pipeline
-    database: Database
+    preProcess: Database
     best : str
     redshift: float
     layout: QVBoxLayout
     templateInfo: QLabel
 
-    def __init__(self):
+    def __init__(self,path, database):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-        self.database = Database('preProcess.csv', fields)
+        self.preProcess = database
 
-    def fitFile(self, filePath, spec):
-        obj_nme = filePath[-21:][:-5]
-        l2 = self.database.getFitting(obj_nme)
+    def fitFile(self, path, spectra, dataObj=None):
+        if dataObj is None:
+            obj_nme = path[-21:][:-5]
+            l2 = self.preProcess.getFitting(obj_nme)
+            dataObj=DataObject(obj_nme,spectra,l2,path)
+        filePath = Path(path)# / Path(dataObj.name)
+        l2 = self.preProcess.getFitting(dataObj.name)
         if l2 is None:
-            #self.pipe.run(filePath, source='sdss')
-            l2_product = get_all_fits(self.pipe,filePath, spec)
-            self.database.addFitting(l2_product)
-            #print(self.pipe.full_results)
+            dataObj.fitting = get_all_fits(self.pipe,str(filePath), dataObj.file)
+            self.preProcess.addFitting(dataObj.fitting)
         else:
-            l2_product = convert_l2(l2)
+            dataObj.fitting = l2
+        dataObj.category = dataObj.fitting['zBestSubType']
+        dataObj.redshift = dataObj.fitting['zBest']
 
-        return l2_product
+        return dataObj
 
     def getBestGuess(self):
         return self.bestdatabase
 
-
-def convert_l2(row):
-    l2_product = dict()
-    l2_product['OBJ_NME']       = row['OBJ_NME']
-    l2_product['zBest']         = float(row['zBest'])
-    l2_product['zBestProb']     = float(row['zBestProb'])
-    l2_product['zBestType']     = row['zBestType']
-    l2_product['zBestSubType']  = row['zBestSubType']
     
-    def auxInsert(temp,i,new):
-        x = temp[i]
-        if x != '--':
-            new.insert(i,  x.strip("'")) 
-    
-    def auxInsertFloat(temp,i,new):
-        x = temp[i]
-        if x != '--':
-            new.insert(i,  float(x.strip(','))) 
-
-    def aux(key, func):
-        temp = row[key].strip('[]').split()
-        new = []
-        for i in range(len(temp)):
-            func(temp,i,new)
-        return new
-
-    l2_product['zAltType'] = aux('zAltType',lambda temp,i,new: new.insert(i,  temp[i].strip("'")))
-
-    l2_product['zAltSubType'] = aux('zAltSubType',auxInsert)
-
-    l2_product['zAltProb'] = aux('zAltProb',auxInsertFloat)
-
-    l2_product['zBestPars'] = np.array(aux('zBestPars',lambda temp,i,new: new.insert(i, float(temp[i].strip(',')))))
-    return l2_product

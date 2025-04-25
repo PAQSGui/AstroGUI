@@ -1,5 +1,5 @@
 from Model import Model
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Slot
 
 from PySide6.QtWidgets import (
     QWidget,
@@ -31,29 +31,18 @@ class OptionsWindow(QWidget):
 
         lineWidth = QHBoxLayout()
         lineWidth.addWidget(QLabel('Line width'))
-        ltEdit = QLineEdit()
-        ltEdit.setText(str(model.getOption('LineWidth')*10))
-        ltEdit.setInputMask('D')
-        ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
-        lineWidth.addWidget(ltEdit)
-
-        colorsLayout = QHBoxLayout()
-        colorsLayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
-        colorsLayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
-        colorsLayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
-        colorsLayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
-        colorsLayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
-
-        colors = QGroupBox('Colors')
-        colors.setLayout(colorsLayout)
+        self.ltEdit = QLineEdit()
+        self.ltEdit.setInputMask('D')
+        self.ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
+        lineWidth.addWidget(self.ltEdit)
 
         graphHeight = QHBoxLayout()
         minEdit = QLineEdit()
-        minEdit.setText(str(model.getOption('ymin')))
+        self.minEdit=minEdit
         minEdit.setInputMask('900')
         minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', minEdit.text()))
         maxEdit = QLineEdit()
-        maxEdit.setText(str(model.getOption('ymax')))
+        self.maxEdit=maxEdit
         maxEdit.setInputMask('900')
         maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
         button = QPushButton('Adjust')
@@ -67,11 +56,32 @@ class OptionsWindow(QWidget):
         layout = QVBoxLayout()
         layout.addLayout(lineWidth)
 
-        layout.addWidget(colors)
+        layout.addWidget(QLabel('Colors'))
+        self.CClayout = QVBoxLayout()
+        layout.addLayout(self.CClayout)
         layout.addLayout(graphHeight)
 
         self.setLayout(layout)
         
+    @Slot()
+    def setupSession(self,list):
+        self.ltEdit.setText(str(self.model.getOption('LineWidth')*10))
+        self.minEdit.setText(str(self.model.getOption('ymin')))
+        self.maxEdit.setText(str(model.getOption('ymax')))
+
+        self.CClayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
+        self.CClayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
+        self.CClayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
+        self.CClayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
+        self.CClayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
+
+    
+    @Slot()
+    def shutDownSession(self,list):
+        self.ltEdit.setText("")
+        self.CClayout.clearLayout()
+    
+
     def colorChooser(self, text, key):
         layout = QVBoxLayout()
         box = QGroupBox(text)

@@ -8,20 +8,18 @@ class DataObject:
     name: str
     file: tool.SDSS_spectrum
     fitting: dict
+    userFitting: dict
     category: str
     redshift: float
 
-    def __init__(self, filename, file, fitting):
+    def __init__(self, filename, file, fitting = None, path = None):
         self.name = filename
         self.file = file
         self.fitting = fitting
-        try:
+        self.path=path
+        if fitting is not None:
             self.category = fitting['zBestSubType']
             self.redshift = fitting['zBest']
-        except:
-            self.category = None
-            self.redshift = 0
-
     def changeRedshift(self, val):
         self.redshift = val
 
@@ -33,20 +31,22 @@ class DataObject:
 
     def toDict(self):
         selfDict = {
-        'name': self.name,
+        'path': self.path,
         'file' : self.file,
         'category' : self.category,
         'redshift' : self.redshift}
 
+        
         return selfDict
     
     def fromDict(dict, fitting):
-        name = dict['name']
+        path = dict['path']
+        name = path[-21:][:-5]  
         file = dict['file']
         category = dict['category']
         redshift = dict['redshift']
-
-        object = DataObject(name, file, fitting)
+        
+        object = DataObject(name, file, fitting, path)
         object.changeCategory(category)
         object.changeRedshift(redshift)
 
@@ -54,12 +54,12 @@ class DataObject:
     
     
     def fromSeries(series, fitting):
-        name = series['name']
+        path = series['path']
         file = series['file']
         category = series['category']
         redshift = series['redshift']
 
-        object = DataObject(name, file, fitting)
+        object = DataObject(path, file, fitting)
         object.changeCategory(category)
         object.changeRedshift(redshift)
         return object
