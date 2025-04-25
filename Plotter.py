@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
-from templater import Templater
+from Templater import Templater
 
 """
 plotter is more tightly bound to the fits file format.

@@ -1,5 +1,5 @@
 from xpca.pipeline import Pipeline
-from database_csv import Database
+from CSVDatabase import Database
 import numpy as np
 import Spec_tools as tool
 from pathlib import Path
@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     )
 
-from handler_xpca import get_all_fits
+from xpcaWidget import get_all_fits
 
 """
 This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph

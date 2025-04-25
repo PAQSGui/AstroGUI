@@ -6,7 +6,7 @@ from pathlib import Path
 from DataObject import DataObject
 from numpy import array
 
-from database_common import CreateReplaceDialog
+from DatabaseUtility import CreateReplaceDialog
 
 class Database():
     filepath : Path

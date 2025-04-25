@@ -1,5 +1,5 @@
 
-from Layout import MainWindow
+from MainWindow import MainWindow
 from PySide6.QtWidgets import (
     QApplication, 
 )
