@@ -15,10 +15,11 @@ class DataObject:
     category: str
     redshift: float
 
-    def __init__(self, filename, file, fitting = None):
+    def __init__(self, filename, file, fitting = None, path = None):
         self.name = filename
         self.file = file
         self.fitting = fitting
+        self.path=path
         try:
             if fitting is not None:
                 self.category = fitting['zBestSubType']
@@ -39,20 +40,22 @@ class DataObject:
 
     def toDict(self):
         selfDict = {
-        'name': self.name,
+        'name': self.path,
         'file' : self.file,
         'category' : self.category,
         'redshift' : self.redshift}
 
+        
         return selfDict
     
     def fromDict(dict, fitting):
-        name = dict['name']
+        path = dict['name']
+        name = path[-21:][:-5]  
         file = dict['file']
         category = dict['category']
         redshift = dict['redshift']
-
-        object = DataObject(name, file, fitting)
+        
+        object = DataObject(name, file, fitting,path)
         object.changeCategory(category)
         object.changeRedshift(redshift)
 

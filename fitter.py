@@ -1,9 +1,11 @@
 from xpca.pipeline import Pipeline
-from database import Database
+from database_csv import Database
 import numpy as np
 import Spec_tools as tool
 from pathlib import Path
 from os.path import basename
+
+from DataObject import DataObject
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -29,12 +31,16 @@ class Fitter:
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
         self.preProcess = database
 
-    def fitFile(self, dataObj, path):
-        filePath = Path(path) / Path(dataObj.name)
-        l2 = self.preProcess.getByName(dataObj.name)
+    def fitFile(self, path, spectra, dataObj=None):
+        if dataObj is None:
+            obj_nme = path[-21:][:-5]
+            l2 = self.preProcess.getFitting(obj_nme)
+            dataObj=DataObject(obj_nme,spectra,l2,path)
+        filePath = Path(path)# / Path(dataObj.name)
+        l2 = self.preProcess.getFitting(dataObj.name)
         if l2 is None:
             dataObj.fitting = get_all_fits(self.pipe,str(filePath), dataObj.file)
-            self.preProcess.addByName(dataObj.name,dataObj.fitting)
+            self.preProcess.addFitting(dataObj.fitting)
         else:
             dataObj.fitting = l2
         dataObj.category = dataObj.fitting['zBestSubType']

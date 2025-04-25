@@ -30,3 +30,8 @@ def CreateReplaceDialog(filepath,func,default,exc):
             return default
     else:
         raise exc
+
+def getdataModelFromDatabase(filepath, database):
+    with open(filepath, 'r') as file:
+                    data = database.load(file)
+                    return data

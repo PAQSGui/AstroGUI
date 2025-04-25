@@ -1,5 +1,6 @@
 from fitter import Fitter
-from database import Database, getdataModelFromDatabase
+from database_csv import Database
+from database_common import getdataModelFromDatabase
 from os.path import dirname
 import DataObject
 
@@ -48,24 +49,28 @@ class Model(QObject):
 
     def getEmptydataModel(self,files):
         objs=[]
-        for item in list(files):
+        try: #replace with typecheck
+            for item in list(files):
             #print(item)
-            try: #replace with typecheck
-                dataModel=getdataModelFromDatabase(item)
+            
+                dataModel=getdataModelFromDatabase(item,self.fitter.preProcess)
                 #print(dataModel)
                 for name in list(dataModel.keys()):
                     spectra = tool.SDSS_spectrum(self.path / Path(name))
                     objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
-            except UnicodeDecodeError:
-                obj = self.preProcess.getByName(item)
-                spectra = tool.SDSS_spectrum(self.path / Path(item))
+            return objs
+        except UnicodeDecodeError:
                 
-                if obj is None:
-                    dobject = DataObject.DataObject(item, spectra, None)
-                else:
-                    dobject = DataObject.DataObject(item, spectra, obj)
-                objs.append(dobject)
-        return objs
+            return self.fileDB.populate(self.fitter)
+            
+            
+            #spectra = tool.SDSS_spectrum(self.path / Path(item))
+            
+            #if obj is None:
+            #    dobject = DataObject.DataObject(item, spectra, None)
+            #else:
+            #    dobject = DataObject.DataObject(item, spectra, obj)
+            #objs.append(dobject)
 
     def populate(self):
         #fitter processes files
@@ -94,8 +99,9 @@ class Model(QObject):
         return self.options
 
     def getRedShift(self):
+        print(self.objects)
         obj=self.objects[self.cursor]
-        if obj.fitting!=None:
+        if obj.fitting is not None:
             return float(self.objects[self.cursor].redshift)
         else:
             return 0
@@ -108,12 +114,7 @@ class Model(QObject):
             return ""
     
     def getState(self):
-        try:
             return self.objects[self.cursor]
-        except IndexError as e:
-            print(self.objects)
-            print(self.cursor)
-            raise e
 
     def getFile(self):
         return self.objects[self.cursor].file
@@ -131,7 +132,7 @@ class Model(QObject):
         self.validationDB.addEntry(object.name, self.catFieldNames, [categorised, category, redshift, note])
 
     def getDBEntry(self, name):
-        row = self.validationDB.getByName(name,None)
+        row = self.validationDB.getEntry(name,None)
         if row is not None:
             return row
         return None
