@@ -34,21 +34,26 @@ class Plotter:
         else:
             plt.ylim([0,np.max(file.Flux)])
 
+        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
+        spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
+        template, = self.templater.plotTemplate()
+
+        handles = [spectra, template, noise]
+
         if options['ShowSN']:
-            self.snPlot = plt.step(file.Wavelength, file.Flux/file.Noise, color = options['SNColor'], label="Signal / Noise",  alpha=0.25, linewidth=lineWidth)
+            snPlot, = plt.step(file.Wavelength, file.Flux/file.Noise, color = options['SNColor'], label="Signal / Noise",  alpha=0.25, linewidth=lineWidth)
+            handles.append(snPlot)
 
         if options['ShowSky']:
-            self.skyPlot = plt.step(file.Wavelength, file.Skybackground, color = options['SkyColor'], label="Sky Background",  alpha=0.25, linewidth=lineWidth)
+            skyPlot, = plt.step(file.Wavelength, file.Skybackground, color = options['SkyColor'], label="Sky Background",  alpha=0.25, linewidth=lineWidth)
+            handles.append(skyPlot)
 
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
 
-        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
-        spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
+        plt.title(file.Objectname)  
 
-        template, = self.templater.plotTemplate()
 
-        plt.title(file.Objectname)         
-        plt.legend(handles=[spectra, template, noise])
+        plt.legend(handles=handles)
         self.figure.draw()
 
