@@ -24,7 +24,7 @@ class Model(QObject):
     fileFieldNames = ['name', 'file', 'category', 'redshift']
     l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     fileDB : Database
-    objFieldNames = DataObject.FieldNames()
+    objFieldNames = ['name', 'categorized', 'params', 'validated', 'validators',  'note']
     validationDB : Database
     fitter: Fitter
 
