@@ -129,7 +129,8 @@ class PlotLayout(QWidget):
         self.plotter.UpdateFigure()
 
     def zTextInput(self):
-            input = float(self.zTextBox.text())
+            text = self.zTextBox.text().replace(',', '.')
+            input = float(text)
             if input > self.model.getOption('zMax'):
                 input = self.model.getOption('zMax')
                 self.zTextBox.setText(str(input))
