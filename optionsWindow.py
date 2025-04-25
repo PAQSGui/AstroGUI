@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QRadioButton,
     QButtonGroup,
     QPushButton,
+    QGroupBox,
 )
 
 """
@@ -36,11 +37,15 @@ class OptionsWindow(QWidget):
         ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
         lineWidth.addWidget(ltEdit)
 
-        graphColor = self.colorChooser("Graph:",'GraphColor')
-        noiseColor = self.colorChooser("Noise:",'NoiseColor')
+        colorsLayout = QHBoxLayout()
+        colorsLayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
+        colorsLayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
+        colorsLayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
+        colorsLayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
+        colorsLayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
 
-        snColor = self.colorChooser("S/N:", 'SNColor')
-        skyColor = self.colorChooser("Sky:", 'SkyColor')
+        colors = QGroupBox('Colors')
+        colors.setLayout(colorsLayout)
 
         graphHeight = QHBoxLayout()
         minEdit = QLineEdit()
@@ -62,23 +67,21 @@ class OptionsWindow(QWidget):
         layout = QVBoxLayout()
         layout.addLayout(lineWidth)
 
-        layout.addWidget(QLabel('Colors'))
-        layout.addWidget(graphColor)
-        layout.addWidget(noiseColor)
-        layout.addWidget(snColor)
-        layout.addWidget(skyColor)
+        layout.addWidget(colors)
+        #layout.addWidget(graphColor)
+        #layout.addWidget(noiseColor)
+        #layout.addWidget(snColor)
+        #layout.addWidget(skyColor)
         layout.addLayout(graphHeight)
 
         self.setLayout(layout)
         
     def colorChooser(self, text, key):
-        layout = QHBoxLayout()
-        widget = QWidget()
-        widget.setLayout(layout)
+        layout = QVBoxLayout()
+        box = QGroupBox(text)
+        box.setLayout(layout)
 
-        colorGroup = QButtonGroup(widget)
-
-        layout.addWidget(QLabel(text))
+        colorGroup = QButtonGroup(box)
 
         current = self.model.getOption(key)
 
@@ -90,7 +93,7 @@ class OptionsWindow(QWidget):
             layout.addWidget(button)
 
         colorGroup.buttonClicked.connect(lambda button: self.updateOption(key, button.text()))
-        return widget
+        return box
 
     def updateOption(self, opt, val):
         self.model.setOption(opt, val)

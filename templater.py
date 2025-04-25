@@ -36,7 +36,7 @@ class Templater:
             wave, model = template.create_PCA_model(target, l2_product)
 
         label = l2_product['zBestSubType']
-        return plt.plot(wave, model, color='r', lw=self.model.getOption('LineWidth'), alpha=0.7, label = label)
+        return plt.plot(wave, model, color=self.model.getOption('TemplateColor'), lw=self.model.getOption('LineWidth'), alpha=0.7, label = label)
 
             
 
