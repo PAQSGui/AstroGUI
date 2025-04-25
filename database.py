@@ -55,16 +55,8 @@ class Database():
             files.append(object)
         return files
 
-    def addEntry(self, name, categorized, category, redshift, note):
-        if note == '':
-            note = 'no-note'
-        new_row = {
-            "name": name,
-            "categorized": categorized,
-            "category": category,
-            "redshift": redshift,
-            "note": note
-        }
+    def addEntry(self, name, fields, data):
+        new_row={fields[i+i]: data[i] for i in range(len(data))}
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
