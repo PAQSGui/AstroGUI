@@ -57,11 +57,11 @@ class Plotter:
         if self.model.getState().fitting is not None:
 
             template, = self.templater.plotTemplate()
-            hands=[spectra, template, noise]
+            handles=[spectra, template, noise]
         else:
-            hands=[spectra, noise]
+            handles=[spectra, noise]
 
         plt.title(file.Objectname)         
-        plt.legend(handles=hands)
+        plt.legend(handles=handles)
         self.figure.draw()
 

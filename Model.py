@@ -21,10 +21,10 @@ class Model(QObject):
     cursor = 0
     objects = []
     options: dict
-    fileFieldNames = ['name', 'file', 'category', 'redshift']
+    fileFieldNames = ['path', 'file', 'category', 'redshift']
     l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     fileDB : Database
-    objFieldNames = ['name', 'categorized', 'params', 'validated', 'validators',  'note']
+    objFieldNames = ['path', 'categorized', 'params', 'validated', 'validators',  'note']
     validationDB : Database
     fitter: Fitter
 
@@ -51,10 +51,8 @@ class Model(QObject):
         objs=[]
         try: #replace with typecheck
             for item in list(files):
-            #print(item)
             
                 dataModel=getdataModelFromDatabase(item,self.fitter.preProcess)
-                #print(dataModel)
                 for name in list(dataModel.keys()):
                     spectra = tool.SDSS_spectrum(self.path / Path(name))
                     objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
@@ -62,15 +60,6 @@ class Model(QObject):
         except UnicodeDecodeError:
                 
             return self.fileDB.populate(self.fitter)
-            
-            
-            #spectra = tool.SDSS_spectrum(self.path / Path(item))
-            
-            #if obj is None:
-            #    dobject = DataObject.DataObject(item, spectra, None)
-            #else:
-            #    dobject = DataObject.DataObject(item, spectra, obj)
-            #objs.append(dobject)
 
     def populate(self):
         #fitter processes files
@@ -99,7 +88,6 @@ class Model(QObject):
         return self.options
 
     def getRedShift(self):
-        print(self.objects)
         obj=self.objects[self.cursor]
         if obj.fitting is not None:
             return float(self.objects[self.cursor].redshift)

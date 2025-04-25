@@ -22,12 +22,7 @@ class SkygrabWindow(QWidget):
     def __init__(self, model):
         super().__init__()
         self.model = model
-        #self.setWindowTitle("SDSS Sky Picture")
         fig, self.ax = plt.subplots()
-        #if isinstance(figsize, tuple) and len(figsize)==2:
-        #    fig, self.ax = plt.subplots(figsize=figsize)
-        #else:
-        #    fig, self.ax = plt.subplots()
         self.canv=FigureCanvasQTAgg(fig)
         layout = QVBoxLayout()
         #add labels describing the object and its coordinates

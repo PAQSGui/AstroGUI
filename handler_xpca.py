@@ -63,13 +63,8 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
             altpipe.active_templates=[fullList[i]]
 
             try:
-                #pipeline.process_target is much faster, but it spams logs, so lets just use run for now
                 l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
-                print(l2_product)
-                #altpipe.run(filePath, source=src)
-                #l2_product=altpipe.catalog_items[0]
-                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']#,l2_product['zBest']
-                #pipeline.reset()
+                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
             except ValueError as e:
                 print(e)
         pipeline.run(filePath, source=src)
@@ -102,3 +97,40 @@ def createTarget(filename,spec, fscale=1.):
                     #meta=row.meta,
                     info=primary_header,
                     )
+def findRedshiftForTemplate(templater, l2_product):
+    for i in range(len(l2_product['zAlt'])):
+            result=search(f'(NEW-)?(.+)', templater.model.getCategory().upper())
+            if l2_product['zAltSubType'][i]==result.group(2):
+                return l2_product['zAlt'][i]
+    return None
+
+def plotTemplate(templater):
+
+    state = templater.model.getState()
+    spec = state.file
+    l2_product = state.fitting
+    if l2_product['zBestSubType'].upper() != templater.model.getCategory().upper():
+        l2_product['zBestSubType'] = templater.model.getCategory()
+        newRedshift=templater.findRedshiftForTemplate(l2_product)
+        if newRedshift is not None:
+            templater.model.changeRedShift(newRedshift)
+            l2_product['zBest'] = newRedshift
+        try:
+            l2_product['zBestPars'] = l2_product['zAltPars'][templater.model.getCategory().upper()]
+        except Exception: #replace with a contains check
+            result=search(f'NEW-(.+)', templater.model.getCategory().upper())
+            l2_product['zBestSubType'] = result.group(1)
+            l2_product['zBestPars'] = l2_product['zAltPars'][result.group(1)]
+    
+    l2_product['zBest'] = templater.model.getRedShift()
+    target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
+    
+    try:
+        wave, model = template.create_PCA_model(target, l2_product)
+    except FileNotFoundError as e: #replace with a file exists check
+        name = l2_product['zBestSubType']
+        l2_product['zBestSubType'] = f'new-{name}'
+        wave, model = template.create_PCA_model(target, l2_product)
+
+    label = l2_product['zBestSubType']
+    return plt.plot(wave, model, color=templater.model.getOption('TemplateColor'), lw=templater.model.getOption('LineWidth'), alpha=0.7, label = label)

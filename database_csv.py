@@ -29,7 +29,6 @@ class Database():
     def load(self,dataFile):
         #load a file and return it as a dict
         df = pd.read_csv(dataFile)
-        print(type(df))
 
     def write(self):
         self.df = self.df.drop_duplicates(subset=[self.fieldNames[0]], keep='last')
@@ -43,7 +42,6 @@ class Database():
         for file in files:
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(file)) 
             obj = fitter.fitFile(directory.absoluteFilePath(file),spectra)
-            #obj = DataObject(file, spectra, fitting)
             dict = obj.toDict()
             objs.append(obj)
             self.df = pd.concat([self.df, pd.DataFrame([dict])], ignore_index=True)
@@ -56,8 +54,7 @@ class Database():
         files = []
 
         for _, row in self.df.iterrows():
-            name = row['name']
-            print(name)
+            name = row['path']
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
             obj = fitter.fitFile(directory.absoluteFilePath(name), spectra)
             obj.file = spectra #Why are we even even using file in fromDict if we're changing it here?
@@ -79,7 +76,7 @@ class Database():
 
     def getEntry(self, name, default):
         for _, row in self.df.iterrows():
-            if row['name'] == name:
+            if row['path'] == name:
                 return row.to_dict()
         return default
 

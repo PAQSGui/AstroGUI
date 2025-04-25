@@ -72,7 +72,6 @@ class MainWindow(QMainWindow):
     def __init__(self, app):
         super().__init__()
         self.model = Model()
-        #self.openFiles()
         self.setWindowTitle("AstroGUI")
 
         self.plotLayout = PlotLayout(self.model)
@@ -111,16 +110,10 @@ class MainWindow(QMainWindow):
 
         addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFiles())
         addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
-        
-        #file_menu.addAction(QAction("ᴹⁱˢˢⁱⁿᵍ⌥", self))
+    
         
         addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
-        #addButton("📜","Review evaluated spectra")
-        #addButton("🥞","Load other spectra of the same object and overplot them for comparison")
-        #addButton("🌇","Open a window to correct for telluric absorption and interstellar extinction")
-        #addButton("🌈","Open a wizard to merge a set of grisms into a single spectrum")
         addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
-        #addButton("🗠","Open a window to manually adjust the template parameters")
         
         mainLayout.addLayout(self.infoLayout)
         tabs = QTabWidget()

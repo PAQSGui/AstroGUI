@@ -17,15 +17,9 @@ class DataObject:
         self.file = file
         self.fitting = fitting
         self.path=path
-        try:
-            if fitting is not None:
-                self.category = fitting['zBestSubType']
-                self.redshift = fitting['zBest']
-        except Exception as e:
-            print(type(fitting))
-            print(fitting)
-            raise e
-
+        if fitting is not None:
+            self.category = fitting['zBestSubType']
+            self.redshift = fitting['zBest']
     def changeRedshift(self, val):
         self.redshift = val
 
@@ -37,7 +31,7 @@ class DataObject:
 
     def toDict(self):
         selfDict = {
-        'name': self.path,
+        'path': self.path,
         'file' : self.file,
         'category' : self.category,
         'redshift' : self.redshift}
@@ -46,13 +40,13 @@ class DataObject:
         return selfDict
     
     def fromDict(dict, fitting):
-        path = dict['name']
+        path = dict['path']
         name = path[-21:][:-5]  
         file = dict['file']
         category = dict['category']
         redshift = dict['redshift']
         
-        object = DataObject(name, file, fitting,path)
+        object = DataObject(name, file, fitting, path)
         object.changeCategory(category)
         object.changeRedshift(redshift)
 
@@ -60,12 +54,12 @@ class DataObject:
     
     
     def fromSeries(series, fitting):
-        name = series['name']
+        path = series['path']
         file = series['file']
         category = series['category']
         redshift = series['redshift']
 
-        object = DataObject(name, file, fitting)
+        object = DataObject(path, file, fitting)
         object.changeCategory(category)
         object.changeRedshift(redshift)
         return object

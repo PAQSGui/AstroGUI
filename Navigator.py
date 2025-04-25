@@ -79,7 +79,6 @@ class Navigator(QWidget):
             self.model.addDBEntry(False, self.whyInput.toPlainText())
 
         self.model.updateCursor(delta)
-        #print(self.model.getState().name)
         self.filedisplay.setCurrentRow(self.model.cursor)
 
         note = self.model.getNote()
