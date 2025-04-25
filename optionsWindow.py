@@ -68,10 +68,6 @@ class OptionsWindow(QWidget):
         layout.addLayout(lineWidth)
 
         layout.addWidget(colors)
-        #layout.addWidget(graphColor)
-        #layout.addWidget(noiseColor)
-        #layout.addWidget(snColor)
-        #layout.addWidget(skyColor)
         layout.addLayout(graphHeight)
 
         self.setLayout(layout)
