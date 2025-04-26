@@ -52,8 +52,9 @@ class Navigator(QWidget):
             self.whyInput.setPlaceholderText("Write your notes here")
         else:
             self.whyInput.setPlainText(note)
-
-        self.filedisplay.insertItems(0,self.model.getFileList())
+        for obj in self.model.objects:
+            self.filedisplay.insertItem(0,obj.name)
+        
         self.filedisplay.itemActivated.connect(self.setSelected)
     @Slot()
     def shutDownSession(self,files):
@@ -66,7 +67,7 @@ class Navigator(QWidget):
 
 
     def setSelected(self,item):
-        itemIndex=self.filedisplay.indexFromItem(item).row()
+        itemIndex=self.filedisplay.indexFromItem(item.name).row()
         self.model.cursor=itemIndex #update cursor
         note = self.model.getNote()
         self.whyInput.setPlainText(note)

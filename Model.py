@@ -80,7 +80,11 @@ class Model(QObject):
             return self.fileDB.populate(self.fitter, files, Path(self.path))   
 
     def updateCursor(self, delta):
-        self.cursor = self.cursor + delta 
+        self.cursor = self.cursor + delta
+        if self.cursor<0:
+            self.cursor=len(self.objects)-1
+        elif self.cursor>=len(self.objects):
+            self.cursor=0
 
     def setOption(self, opt, val):
         self.options[opt] = val
@@ -165,6 +169,3 @@ class Model(QObject):
         self.options['yLimit'] = False
         self.options['ymin'] = 0
         self.options['ymax'] = 0
-
-    def getFileList(self):
-        return list(self.fitter.preProcess.df.keys())
