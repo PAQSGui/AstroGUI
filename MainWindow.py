@@ -41,21 +41,15 @@ class MainWindow(QMainWindow):
     skygrabTab:     SkygrabWindow
 
     def openFolder(self):
-        while True:
-            try:
-                folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-                if folder_path == "":
-                    # Hacky way of exiting program if dialog is cancelled
-                    exit()
-                self.model = Model(folder_path) #We have to make something that actually checks if it has already preprocessed. I spent way too long trying to figure out why my program wasn't working.
-            except FileNotFoundError:
-                popup = QMessageBox()
-                popup.setWindowTitle("Error")
-                popup.setText("Folder does not contain any FITS files")
-                popup.setIcon(QMessageBox.Icon.Critical)
-                popup.exec()
-            else:
-                break
+        try:
+            folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
+            self.model.openFolder(folder_path)
+        except FileNotFoundError as e:
+            popup = QMessageBox()
+            popup.setWindowTitle("Error")
+            popup.setText(str(e))
+            popup.setIcon(QMessageBox.Icon.Critical)
+            popup.exec()
     def openFiles(self):
             files = QFileDialog.getOpenFileNames(None, "Select Files")
             self.model.openFiles(files[0])
@@ -108,7 +102,7 @@ class MainWindow(QMainWindow):
             file_menu.addAction(button)
 
 
-        addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFiles())
+        addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFolder())
         addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
     
         

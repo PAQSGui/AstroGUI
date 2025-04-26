@@ -26,7 +26,7 @@ class Fitter:
     layout: QVBoxLayout
     templateInfo: QLabel
 
-    def __init__(self,path, database):
+    def __init__(self, database):
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
         self.preProcess = database
