@@ -44,7 +44,7 @@ class xpcaWindow(QWidget):
         self.model.openedSession[list].connect(self.setupSession)
 
     def start(self):
-        self.model.fileDB.populate()
+        #self.model.fileDB.populate()
         self.model.xpcaDone.emit(0)
         self.close()
         

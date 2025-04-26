@@ -22,10 +22,9 @@ class Model(QObject):
     cursor = 0
     objects = []
     options: dict
-    fileFieldNames = ['path', 'file', 'category', 'redshift']
     l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
-    fileDB : Database
-    objFieldNames = ['path', 'categorized', 'params', 'validated', 'validators',  'note']
+    
+    objFieldNames = ['categorized', 'params', 'validated', 'validators',  'note']
     validationDB : Database
     fitter: Fitter
 
@@ -60,10 +59,9 @@ class Model(QObject):
         self.openedSession.emit(files)
 
     def startup(self):
-        self.fileDB = Database('files', self.fileFieldNames, self.path)
         self.validationDB = Database('validation', self.objFieldNames, self.path)
-        self.preProcess = Database("preProcess",self.l2FieldNames, self.path)
-        self.fitter = Fitter(self.preProcess)   
+        preProcess = Database("preProcess",self.l2FieldNames, self.path)
+        self.fitter = Fitter(preProcess)   
 
     def getEmptydataModel(self,files):
         objs=[]
@@ -77,7 +75,7 @@ class Model(QObject):
             return objs
         except UnicodeDecodeError:
                 
-            return self.fileDB.populate(self.fitter, files, Path(self.path))   
+            return self.fitter.populate(files, Path(self.path))   
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta

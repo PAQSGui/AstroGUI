@@ -4,6 +4,7 @@ from Model import Model
 from PySide6.QtWidgets import (
     QPushButton,
     QHBoxLayout,
+    QVBoxLayout,
     QPlainTextEdit,
     QWidget,
     QListWidget,
@@ -31,12 +32,18 @@ class Navigator(QWidget):
         whyInput.setMaximumSize(QSize(9999999, 50))
         self.whyInput = whyInput
 
-        self.backButton = QPushButton("Previous")
+        evalLayout = QVBoxLayout()
+        buttonLayout = QHBoxLayout()
+        checkboxLayout = QHBoxLayout()
+        self.layout.addLayout(evalLayout)
+        evalLayout.addLayout(buttonLayout)
+        evalLayout.addLayout(checkboxLayout)
 
+        self.backButton = QPushButton("Previous")
         self.yesButton = QPushButton("Next")
 
-        self.layout.addWidget(self.backButton)
-        self.layout.addWidget(self.yesButton)
+        buttonLayout.addWidget(self.backButton)
+        buttonLayout.addWidget(self.yesButton)
         self.layout.addWidget(self.whyInput)
 
         self.filedisplay=QListWidget(self)
@@ -67,7 +74,7 @@ class Navigator(QWidget):
 
 
     def setSelected(self,item):
-        itemIndex=self.filedisplay.indexFromItem(item.name).row()
+        itemIndex=self.filedisplay.indexFromItem(item).row()
         self.model.cursor=itemIndex #update cursor
         note = self.model.getNote()
         self.whyInput.setPlainText(note)

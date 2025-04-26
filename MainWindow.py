@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
         self.optionsWindow = OptionsWindow(self.model)
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
         self.skygrabTab = SkygrabWindow(self.model)
-        self.navigator.navigated.connect(self.skygrabTab.LoadPicture)
+        self.navigator.navigated.connect(lambda:self.skygrabTab.LoadPicture(self.skygrabTab.isVisible()))
 
         self.xpcaWindow = xpcaWindow(self.model)
         mainLayout = QVBoxLayout()
@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
         tabs.addTab(self.plotLayout,"Spectrum Plot")
         tabs.addTab(self.skygrabTab,"SDSS Photo")
     
-        tabs.tabBarClicked.connect(self.skygrabTab.LoadPicture)
+        tabs.tabBarClicked.connect(lambda: self.skygrabTab.LoadPicture(True))
         mainLayout.addWidget(tabs)
         mainLayout.addLayout(self.navigator.layout)
         

@@ -116,7 +116,7 @@ class PlotLayout(QWidget):
         self.signoiseButton.clicked.disconnect(lambda: self.toggleSN())
         self.showskybutton.clicked.disconnect(lambda: self.toggleSky())
 
-        self.zTextBox.setText()
+        self.zTextBox.setText('')
         self.zTextBox.editingFinished.disconnect(self.zTextInput)
 
     @Slot()
