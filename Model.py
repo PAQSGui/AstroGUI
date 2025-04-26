@@ -7,6 +7,7 @@ import DataObject
 from PySide6.QtCore import (
     QObject,
     Signal,
+    QDir,
 )
 
 import Spec_tools as tool
@@ -32,42 +33,51 @@ class Model(QObject):
     closedSession = Signal(list)
     xpcaDone = Signal(int)
 
-    def openFiles(self, files, fromFile = False):
-        self.closedSession.emit(files)
-        path = dirname(files[0])
+    def openFiles(self, files):
+        path = dirname(files)
+        if len(files)==0:
+            return
         self.path = path
-        self.fileDB = Database('files', self.fileFieldNames, path)
-        self.validationDB = Database('validation', self.objFieldNames, path)
-        self.preProcess = Database("preProcess",self.l2FieldNames, path)
-        self.fitter = Fitter(path, self.preProcess)          
-        
-        #get objects from fitter
+        self.closedSession.emit(files)
+        self.startup()        
         self.objects = self.getEmptydataModel(files)
 
         self.initOptions()
         self.openedSession.emit(files)
+
+    def openFolder(self, path):
+        directory = QDir(path)
+        directory.setNameFilters(["([^.]*)","*.fits"])
+        files = directory.entryList()[0:5] #Currently only analyses the first 5 elements
+        if len(files)==0:
+            raise FileNotFoundError("Folder '%s' does not contain any FITS files" %path)
+        self.path = path
+        self.closedSession.emit(path)
+        self.startup()
+        self.objects = self.getEmptydataModel(files)
+
+        self.initOptions()
+        self.openedSession.emit(files)
+
+    def startup(self):
+        self.fileDB = Database('files', self.fileFieldNames, self.path)
+        self.validationDB = Database('validation', self.objFieldNames, self.path)
+        self.preProcess = Database("preProcess",self.l2FieldNames, self.path)
+        self.fitter = Fitter(self.preProcess)   
 
     def getEmptydataModel(self,files):
         objs=[]
         try: #replace with typecheck
             for item in list(files):
             
-                dataModel=getdataModelFromDatabase(item,self.fitter.preProcess)
+                dataModel=getdataModelFromDatabase(self.path / Path(item),self.fitter.preProcess)
                 for name in list(dataModel.keys()):
                     spectra = tool.SDSS_spectrum(self.path / Path(name))
                     objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             return objs
         except UnicodeDecodeError:
                 
-            return self.fileDB.populate(self.fitter)
-
-    def populate(self):
-        #fitter processes files
-            for obj in self.objects:
-                obj = self.fitter.fitFile(obj,Path(self.path))
-                data = self.fileDB.getByName(obj)
-                if data is None:
-                    self.fileDB.addEntry(obj, self.fileFieldNames, [self.path, obj.category, obj.redshift])     
+            return self.fileDB.populate(self.fitter, files, Path(self.path))   
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta 
