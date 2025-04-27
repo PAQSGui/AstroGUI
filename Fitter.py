@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     )
 
-from xpcaWidget import get_all_fits
+from xpcaWidget import get_all_fits, createTarget
 
 import Spec_tools as tool
 """
@@ -49,7 +49,8 @@ class Fitter:
         filePath = Path(path)# / Path(dataObj.name)
         l2 = self.preProcess.getFitting(dataObj.name)
         if l2 is None:
-            dataObj.fitting = get_all_fits(self.pipe,str(filePath), dataObj.file)
+            self.pipe.N_targets=1
+            dataObj.fitting = self.pipe.process_target(createTarget(str(filePath),dataObj.file), 0)[0]
             self.preProcess.addFitting(dataObj.fitting)
         else:
             dataObj.fitting = l2
