@@ -22,7 +22,7 @@ class Model(QObject):
     cursor = 0
     objects = []
     options: dict
-    l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
+    l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
     
     objFieldNames = ['categorized', 'params', 'validated', 'validators',  'note']
     validationDB : Database

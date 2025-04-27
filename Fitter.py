@@ -29,7 +29,6 @@ class Fitter:
 
     def __init__(self, database):
         self.pipe = Pipeline(debug=False)
-        fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
         self.preProcess = database
 
     def populate(self, files, path):
