@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
     QWidget,
     QListWidget,
+    QCheckBox
     )
 
 from PySide6.QtCore import QSize, Signal, Slot
@@ -39,8 +40,9 @@ class Navigator(QWidget):
         evalLayout.addLayout(buttonLayout)
         evalLayout.addLayout(checkboxLayout)
 
-        self.backButton = QPushButton("Previous")
-        self.yesButton = QPushButton("Next")
+        self.backButton = QPushButton("Go Back")
+        self.yesButton = QPushButton("Yes")
+        self.unsureButton = QPushButton("Unsure")
 
         buttonLayout.addWidget(self.backButton)
         buttonLayout.addWidget(self.yesButton)
@@ -52,8 +54,9 @@ class Navigator(QWidget):
         
     @Slot()
     def setupSession(self,files):
-        self.backButton.clicked.connect(lambda: self.NavBtn(msg="Previous",delta=-1))
-        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Next",delta=1))
+        self.backButton.clicked.connect(lambda: self.NavBtn(msg="Go Back",delta=-1))
+        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Yes",delta=1))
+        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Unsure",delta=1))
         note = self.model.getNote()
         if note == "":
             self.whyInput.setPlaceholderText("Write your notes here")
@@ -65,8 +68,9 @@ class Navigator(QWidget):
         self.filedisplay.itemActivated.connect(self.setSelected)
     @Slot()
     def shutDownSession(self,files):
-        self.backButton.clicked.disconnect(lambda: self.NavBtn(msg="Previous",delta=-1))
-        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Next",delta=1))
+        self.backButton.clicked.disconnect(lambda: self.NavBtn(msg="Go Back",delta=-1))
+        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Yes",delta=1))
+        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Unsure",delta=1))
         self.whyInput.setPlainText("")
 
         self.filedisplay.clear()

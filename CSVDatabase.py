@@ -47,22 +47,20 @@ class Database():
             files.append(obj)
         return files
 
-    def addEntry(self, name, categorized, category, redshift, note):
+    def addEntry(self, name, note, fieldnames, fields):
         if note == '':
             note = 'no-note'
         new_row = {
             "name": name,
-            "categorized": categorized,
-            "category": category,
-            "redshift": redshift,
             "note": note
         }
+        new_row.update({fieldnames[i]: fields[i] for i in range(len(fieldnames))})
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
     def getEntry(self, name, default):
         for _, row in self.df.iterrows():
-            if row['path'] == name:
+            if row['name'] == name:
                 return row.to_dict()
         return default
 
