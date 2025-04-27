@@ -18,10 +18,14 @@ The option dialog opens in a new window so it's possible to see changes to the g
 This class should only update the options by calling the setOption() method from Model
 """
 class OptionsWindow(QWidget):
-
     optionChanged = Signal()
     model: Model
     colors = ['Grey', 'Black','Purple', 'Blue', 'Green', 'Yellow', 'Orange', 'Red',]
+
+    lwEdit: QLineEdit
+    minEdit: QLineEdit
+    maxEdit: QLineEdit
+    colorLayout = QHBoxLayout()
 
     def __init__(self, model):
         super().__init__()
@@ -31,55 +35,55 @@ class OptionsWindow(QWidget):
 
         lineWidth = QHBoxLayout()
         lineWidth.addWidget(QLabel('Line width'))
-        self.ltEdit = QLineEdit()
-        self.ltEdit.setInputMask('D')
-        self.ltEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(ltEdit.text())/10))
-        lineWidth.addWidget(self.ltEdit)
+
+        self.lwEdit = QLineEdit()
+        self.lwEdit.setInputMask('D')
+        self.lwEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(self.lwEdit.text())/10))
+
+        lineWidth.addWidget(self.lwEdit)
 
         graphHeight = QHBoxLayout()
-        minEdit = QLineEdit()
-        self.minEdit=minEdit
-        minEdit.setInputMask('900')
-        minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', minEdit.text()))
-        maxEdit = QLineEdit()
-        self.maxEdit=maxEdit
-        maxEdit.setInputMask('900')
-        maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', maxEdit.text()))
+
+        self.minEdit = QLineEdit()
+        self.minEdit.setInputMask('900')
+        self.minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', self.minEdit.text()))
+
+        self.maxEdit = QLineEdit()
+        self.maxEdit.setInputMask('900')
+        self.maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', self.maxEdit.text()))
         button = QPushButton('Adjust')
         button.clicked.connect(lambda: self.updateOption('yLimit', True))
 
         graphHeight.addWidget(QLabel('Y-axis:'))
-        graphHeight.addWidget(minEdit)
-        graphHeight.addWidget(maxEdit)
+        graphHeight.addWidget(self.minEdit)
+        graphHeight.addWidget(self.maxEdit)
         graphHeight.addWidget(button)
 
         layout = QVBoxLayout()
-        layout.addLayout(lineWidth)
 
+        layout.addLayout(lineWidth)
         layout.addWidget(QLabel('Colors'))
-        self.CClayout = QVBoxLayout()
-        layout.addLayout(self.CClayout)
+        layout.addLayout(self.colorLayout)
         layout.addLayout(graphHeight)
 
         self.setLayout(layout)
         
     @Slot()
     def setupSession(self,list):
-        self.ltEdit.setText(str(self.model.getOption('LineWidth')*10))
+        self.lwEdit.setText(str(self.model.getOption('LineWidth')*10))
         self.minEdit.setText(str(self.model.getOption('ymin')))
-        self.maxEdit.setText(str(model.getOption('ymax')))
+        self.maxEdit.setText(str(self.model.getOption('ymax')))
 
-        self.CClayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
-        self.CClayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
-        self.CClayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
-        self.CClayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
-        self.CClayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
+        self.colorLayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
+        self.colorLayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
+        self.colorLayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
+        self.colorLayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
+        self.colorLayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
 
-    
     @Slot()
     def shutDownSession(self,list):
         self.ltEdit.setText("")
-        self.CClayout.clearLayout()
+        self.colorLayout.clearLayout()
     
 
     def colorChooser(self, text, key):
