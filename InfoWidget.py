@@ -70,9 +70,7 @@ class InfoLayout(QHBoxLayout):
                     probability = probabilities[i] * 100
                     if probability > 10:
                         text = subTypes[i] + ': %.2f %%' % probability
-                else:
-                    text = "%s: NaN" % subTypes[i]
-                self.classProbLayout.addWidget(QLabel(text))
+                        self.classProbLayout.addWidget(QLabel(text))
         else:
             clearLayout(self.classProbLayout)
 

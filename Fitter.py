@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 
 from xpcaWidget import get_all_fits
 
+import Spec_tools as tool
 """
 This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph
 """
@@ -30,6 +31,15 @@ class Fitter:
         self.pipe = Pipeline(debug=False)
         fields = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
         self.preProcess = database
+
+    def populate(self, files, path):
+        objs = []
+        for file in files:
+            spectra = tool.SDSS_spectrum(path / file) 
+            obj = self.fitFile(str(path / file),spectra)
+            dict = obj.toDict()
+            objs.append(obj)
+        return objs
 
     def fitFile(self, path, spectra, dataObj=None):
         if dataObj is None:

@@ -34,17 +34,6 @@ class Database():
         self.df = self.df.drop_duplicates(subset=[self.fieldNames[0]], keep='last')
         self.df.to_csv(self.dataFile, index=False)
 
-    def populate(self, fitter, files, path):
-        objs = []
-        for file in files:
-            spectra = tool.SDSS_spectrum(path / file) 
-            obj = fitter.fitFile(str(path / file),spectra)
-            dict = obj.toDict()
-            objs.append(obj)
-            self.df = pd.concat([self.df, pd.DataFrame([dict])], ignore_index=True)
-        self.write()
-        return objs
-
     def extract(self, fitter):
         directory = QDir(self.path)
         directory.setNameFilters(["([^.]*)","*.fits"])

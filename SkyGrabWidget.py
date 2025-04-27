@@ -30,9 +30,9 @@ class SkygrabWindow(QWidget):
         self.setLayout(layout)
 
     @Slot()
-    def LoadPicture(self):
+    def LoadPicture(self, visible):
         file = self.model.getState().file
-        if not self.isVisible() or file==self.loadedFile:
+        if not visible or file==self.loadedFile:
             return
         ra,dec=loadCoords(self.model)
         #https://github.com/behrouzz/sdss
