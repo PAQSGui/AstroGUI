@@ -29,15 +29,16 @@ class Templater:
         l2_product['zBest'] = self.model.getRedShift()
         target=Target(uid=0,name="temp",spectrum=Spectrum(spec.Wavelength*Unit("AA"),spec.Flux*Unit("erg/(s cm2 AA)"),spec.Noise*Unit("erg/(s cm2 AA)")))
         
+        l2_product['zBestSubType']=state.category
         try:
             wave, model = template.create_PCA_model(target, l2_product)
         except FileNotFoundError as e: #replace with a file exists check
-            name = l2_product['zBestSubType']
-            l2_product['zBestSubType'] = f'new-{name}'
+            l2_product['zBestSubType'] = f'new-{state.category}'
             wave, model = template.create_PCA_model(target, l2_product)
+            l2_product['zBestSubType'] = state.category
 
-        label = l2_product['zBestSubType']
-        return plt.plot(wave, model, color=self.model.getOption('TemplateColor'), lw=self.model.getOption('LineWidth'), alpha=0.7, label = label)
+        
+        return plt.plot(wave, model, color=self.model.getOption('TemplateColor'), lw=self.model.getOption('LineWidth'), alpha=0.7, label = state.category)
 
             
 

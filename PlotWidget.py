@@ -3,7 +3,7 @@ from Model import Model
 from matplotlib.pyplot import figure
 from xpca import config
 from os import listdir
-import re
+from re import search
 from Plotter import Plotter
 
 from PySide6.QtWidgets import (
@@ -94,7 +94,8 @@ class PlotLayout(QWidget):
 
         for file in listdir(config.TEMPLATE_PATH):
             if file.endswith(".fits"):
-                text = file[:-5]
+                result = search(f'template-(new-)?(.+).fits', file)
+                text = result[2]
                 self.dropdown.addItem(text)
         self.dropdown.textActivated.connect(self.dropboxSelect)
         self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
@@ -163,9 +164,8 @@ class PlotLayout(QWidget):
             self.update()
 
     def dropboxSelect(self, s):
-        redshiftResolution = self.model.getOption('zResolution') 
-        result = re.search(f'template-(.+).fits', s)
-        self.model.changeCategory(result.group(1))
+        redshiftResolution = self.model.getOption('zResolution')
+        self.model.changeCategory(s)
         self.update()
         self.zSlider.setValue(int(self.model.getRedShift()*redshiftResolution))
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
