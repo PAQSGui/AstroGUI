@@ -73,20 +73,27 @@ class MainWindow(QMainWindow):
         self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
         self.navigator = Navigator(self.model)
-        self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+        self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize) 
+
+        self.optionsWindow = OptionsWindow(self.model)
+
+        self.skygrabTab = SkygrabWindow(self.model)
+
+        self.xpcaWindow = xpcaWindow(self.model)
+
+        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
+
+        self.navigator.navigated.connect(lambda:self.skygrabTab.LoadPicture(self.skygrabTab.isVisible()))
         self.navigator.navigated.connect(self.infoLayout.updateAll)
         self.navigator.navigated.connect(self.plotLayout.newFile)
+
+               
         self.model.xpcaDone.connect(self.infoLayout.updateAll)
         self.model.xpcaDone.connect(self.plotLayout.newFile)
 
-        self.optionsWindow = OptionsWindow(self.model)
-        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
-        self.skygrabTab = SkygrabWindow(self.model)
-        self.navigator.navigated.connect(lambda:self.skygrabTab.LoadPicture(self.skygrabTab.isVisible()))
+        self.model.openedSession.connect(self.optionsWindow.setupSession)
 
-        self.xpcaWindow = xpcaWindow(self.model)
         mainLayout = QVBoxLayout()
-
         self.setStatusBar(QStatusBar(self))
 
         file_menu = self.menuBar()
@@ -101,11 +108,9 @@ class MainWindow(QMainWindow):
                 button.triggered.connect(func)
             file_menu.addAction(button)
 
-
         addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFolder())
         addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
     
-        
         addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
         addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
         
