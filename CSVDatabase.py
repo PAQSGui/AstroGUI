@@ -40,29 +40,21 @@ class Database():
         files = []
 
         for _, row in self.df.iterrows():
-            name = row['path']
-            spectra = tool.SDSS_spectrum(directory.absoluteFilePath(name))
-            obj = fitter.fitFile(directory.absoluteFilePath(name), spectra)
+            path = row['path']
+            spectra = tool.SDSS_spectrum(directory.absoluteFilePath(path))
+            obj = fitter.fitFile(directory.absoluteFilePath(path), spectra)
             obj.file = spectra #Why are we even even using file in fromDict if we're changing it here?
             files.append(obj)
         return files
 
-    def addEntry(self, name, categorized, category, redshift, note):
-        if note == '':
-            note = 'no-note'
-        new_row = {
-            "name": name,
-            "categorized": categorized,
-            "category": category,
-            "redshift": redshift,
-            "note": note
-        }
+    def addEntry(self, fieldnames, fields):
+        new_row ={fieldnames[i]: fields[i] for i in range(len(fieldnames))}
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
     def getEntry(self, name, default):
         for _, row in self.df.iterrows():
-            if row['path'] == name:
+            if row['name'] == name:
                 return row.to_dict()
         return default
 
