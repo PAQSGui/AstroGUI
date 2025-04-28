@@ -13,6 +13,10 @@ from PySide6.QtWidgets import (
     QGroupBox,
 )
 
+from PySide6.QtGui import (
+    QIntValidator,
+)
+
 """
 The option dialog opens in a new window so it's possible to see changes to the graph as they are made
 This class should only update the options by calling the setOption() method from Model
@@ -37,7 +41,7 @@ class OptionsWindow(QWidget):
         lineWidth.addWidget(QLabel('Line width'))
 
         self.lwEdit = QLineEdit()
-        self.lwEdit.setInputMask('D')
+        self.lwEdit.setValidator(QIntValidator(0, 9))
         self.lwEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(self.lwEdit.text())/10))
 
         lineWidth.addWidget(self.lwEdit)
@@ -45,11 +49,11 @@ class OptionsWindow(QWidget):
         graphHeight = QHBoxLayout()
 
         self.minEdit = QLineEdit()
-        self.minEdit.setInputMask('900')
+        self.minEdit.setValidator(QIntValidator(0, 900))
         self.minEdit.editingFinished.connect(lambda: self.model.setOption('ymin', self.minEdit.text()))
 
         self.maxEdit = QLineEdit()
-        self.maxEdit.setInputMask('900')
+        self.maxEdit.setValidator(QIntValidator(0, 900))
         self.maxEdit.editingFinished.connect(lambda: self.model.setOption('ymax', self.maxEdit.text()))
         button = QPushButton('Adjust')
         button.clicked.connect(lambda: self.updateOption('yLimit', True))
@@ -85,7 +89,6 @@ class OptionsWindow(QWidget):
         self.ltEdit.setText("")
         self.colorLayout.clearLayout()
     
-
     def colorChooser(self, text, key):
         layout = QVBoxLayout()
         box = QGroupBox(text)
