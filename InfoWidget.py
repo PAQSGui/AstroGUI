@@ -74,7 +74,7 @@ class InfoLayout(QHBoxLayout):
         else:
             clearLayout(self.classProbLayout)
 
-        return self.classProbLayout
+        #return self.classProbLayout
     
     def updateTarget(self):
         clearLayout(self.targetLayout)
