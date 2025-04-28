@@ -47,7 +47,7 @@ class Model(QObject):
     def openFolder(self, path):
         directory = QDir(path)
         directory.setNameFilters(["([^.]*)","*.fits"])
-        files = directory.entryList()[0:5] #Currently only analyses the first 5 elements
+        files = directory.entryList()[0:100]#Currently only analyses the first 5 elements
         if len(files)==0:
             raise FileNotFoundError("Folder '%s' does not contain any FITS files" %path)
         self.path = path

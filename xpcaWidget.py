@@ -14,9 +14,14 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QLabel,
     QPushButton,
+    QLineEdit,
 )
 
 from PySide6.QtCore import Signal, Slot
+
+from PySide6.QtGui import (
+    QIntValidator,
+)
 """
 Helper-class for fitter
 """
@@ -31,7 +36,11 @@ class xpcaWindow(QWidget):
         layout = QVBoxLayout()
         self.startbtn=QPushButton("Start")
 
-        layout.addWidget(QLabel("Run xpca on all loaded files?"))
+        self.NumBox=QLineEdit()
+        self.NumBox.setValidator(QIntValidator())
+        layout.addWidget(self.NumBox)
+
+        layout.addWidget(QLabel("Run xpca on this amount of files? (-1 for all)"))
         layout.addWidget(self.startbtn)
 
         self.setLayout(layout)
@@ -39,7 +48,8 @@ class xpcaWindow(QWidget):
         self.model.openedSession[list].connect(self.setupSession)
 
     def start(self):
-        self.model.fitter.populate(self.model.path,objs=self.model.objects)
+        num_to_analyze=int(self.NumBox.text())
+        self.model.fitter.populate(self.model.path,objs=self.model.objects,N=int(self.NumBox.text()))
         self.model.xpcaDone.emit(0)
         self.close()
         

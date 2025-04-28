@@ -37,18 +37,25 @@ class Fitter:
         l2 = self.preProcess.getFitting(obj_nme)
         return DataObject(obj_nme,spectra,l2,itempath)  
 
-    def populate(self, path, files=None, objs=[]):
+    def populate(self, path, files=None, objs=[], N=-1):
         if objs == []:
-            print("if objs == []:")
             for file in files:
-                print("for file in files:")
-                obj = loadDataObject(self, itempath)
-                obj = self.fitFile(obj.path,obj)
-                objs.append(obj)
+                if N!=0:
+                    obj = loadDataObject(self, itempath)
+                    if obj.fitting is None:
+                        N=N-1
+                    obj = self.fitFile(obj.path,obj)
+                    objs.append(obj)
+                else:
+                    break
         else:
-            print("for obj in objs:")
             for obj in objs:
-                obj = self.fitFile(obj.path,obj)
+                if N!=0:
+                    if obj.fitting is None:
+                        N=N-1
+                    obj = self.fitFile(obj.path,obj)
+                else:
+                    break
         return objs
 
     def fitFile(self, path, dataObj=None):
@@ -58,8 +65,6 @@ class Fitter:
             self.pipe.N_targets=1
             dataObj.fitting = self.pipe.process_target(createTarget(dataObj.path,dataObj.file), 0)[0]
             self.preProcess.addFitting(dataObj.name, dataObj.fitting)
-        else:
-            dataObj.fitting = l2
         dataObj.category = dataObj.fitting['zBestSubType']
         dataObj.redshift = dataObj.fitting['zBest']
 
