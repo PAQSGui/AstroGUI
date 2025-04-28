@@ -31,11 +31,15 @@ class Fitter:
         self.pipe = Pipeline(debug=False)
         self.preProcess = database
 
-    def loadDataObject(self, itempath):
+    def loadDataObject(self, itempath, model=None):
         spectra = tool.SDSS_spectrum(itempath) 
         obj_nme = str(itempath)[-21:][:-5]
         l2 = self.preProcess.getFitting(obj_nme)
-        return DataObject(obj_nme,spectra,l2,itempath)  
+        row=model.validationDB.getEntry(obj_nme, None)
+        if model is None or row is None:
+            return DataObject(obj_nme,spectra,l2,itempath)
+        else:
+            return DataObject(obj_nme,spectra,l2,itempath,row['magnitude'],row['magtype'])
 
     def populate(self, path, files=None, objs=[], N=-1):
         if objs == []:

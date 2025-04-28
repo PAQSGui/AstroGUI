@@ -12,11 +12,13 @@ class DataObject:
     category: str
     redshift: float
 
-    def __init__(self, filename, file, fitting = None, path = None):
+    def __init__(self, filename, file, fitting = None, path = None, mag=None, magtype=None):
         self.name = filename
         self.file = file
         self.fitting = fitting
         self.path=path
+        self.mag=mag
+        self.magtype=magtype
         if fitting is not None:
             self.category = fitting['zBestSubType']
             self.redshift = fitting['zBest']
@@ -29,6 +31,12 @@ class DataObject:
     def changeCategory(self, cat):
         self.category = cat
     
+    def changeMagnitude(self, mag, magtype):
+        self.mag=mag
+        self.magtype=magtype 
+        print(self.mag)
+
+    
     def getFile(self):
         return self.file
 
@@ -37,7 +45,11 @@ class DataObject:
         'path': self.path,
         'file' : self.file,
         'category' : self.category,
-        'redshift' : self.redshift}
+        'redshift' : self.redshift,
+        'magnitude' : self.mag,
+        'magtype' : self.magtype
+        
+        }
 
         
         return selfDict
@@ -48,8 +60,10 @@ class DataObject:
         file = dict['file']
         category = dict['category']
         redshift = dict['redshift']
+        mag = dict['magnitude']
+        magtype = dict['magtype']
         
-        object = DataObject(name, file, fitting, path)
+        object = DataObject(name, file, fitting, path, mag, magtype)
         object.changeCategory(category)
         object.changeRedshift(redshift)
 
@@ -61,8 +75,10 @@ class DataObject:
         file = series['file']
         category = series['category']
         redshift = series['redshift']
+        magnitude = series['magnitude']
+        magtype = series['magtype']
 
-        object = DataObject(path, file, fitting)
+        object = DataObject(name, file, fitting, path, mag, magtype)
         object.changeCategory(category)
         object.changeRedshift(redshift)
         return object

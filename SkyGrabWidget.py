@@ -1,6 +1,6 @@
 from astropy.io.fits import getheader
 from matplotlib import pyplot as plt
-from sdss import Region
+from sdss import Region, PhotoObj
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from PySide6.QtCore import QDir, Slot
 from Model import Model
@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
 )
+
+from CSVDatabase import Database
 
 """
 This class is responsible for grabbing an image of the sky from sdss, with the currently viewed object centered
@@ -37,7 +39,14 @@ class SkygrabWindow(QWidget):
         ra,dec=loadCoords(self.model)
         #https://github.com/behrouzz/sdss
         reg = Region(ra, dec, fov=0.033)
-        
+        mag,magtype = self.model.getMagnitude()
+        if mag is None:
+            obj = PhotoObj(reg.nearest_objects().values.tolist()[0][0])
+            obj.download()
+            meanMag=sum(list(obj.mag.values()))/len(obj.mag)
+            print(obj)
+            self.model.getState().changeMagnitude(meanMag,obj.type)
+
         self.Update(reg)
 
         plt.title(file.Objectname)  

@@ -24,7 +24,7 @@ class Model(QObject):
     options: dict
     l2FieldNames = ['name', 'OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     
-    objFieldNames = ['name','categorized', 'category', 'redshift', 'note']
+    objFieldNames = ['name','categorized', 'category', 'redshift', 'magnitude', 'magtype', 'note']
     validationDB : Database
     fitter: Fitter
 
@@ -74,7 +74,7 @@ class Model(QObject):
             #        spectra = tool.SDSS_spectrum(self.path / Path(name))
             #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             #except UnicodeDecodeError:
-                dataObj=self.fitter.loadDataObject(itempath)
+                dataObj=self.fitter.loadDataObject(itempath,self)
                 objs.append(dataObj)
         return objs
 
@@ -100,6 +100,12 @@ class Model(QObject):
     def getOptions(self):
         return self.options
 
+    def getMagnitude(self):
+        obj=self.objects[self.cursor]
+        if obj.mag is not None:
+            return float(obj.mag,),obj.magtype
+        else:
+            return None,None
     def getRedShift(self):
         obj=self.objects[self.cursor]
         if obj.fitting is not None:
@@ -133,7 +139,7 @@ class Model(QObject):
         if note == '':
             note = 'no-note'
 
-        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
+        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift,  object.mag, object.magtype, note])
 
     def getDBEntry(self, name):
         row = self.validationDB.getEntry(name,None)

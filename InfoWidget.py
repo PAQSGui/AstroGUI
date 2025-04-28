@@ -92,9 +92,13 @@ class InfoLayout(QHBoxLayout):
         layout = QGridLayout()
         groupBox = QGroupBox('Metadata')
         groupBox.setLayout(layout)
+        mag, magtype = self.model.getMagnitude()
+        if mag is not None:
+            layout.addWidget(QLabel(f"Mag: {mag:.4f}"), 1, 1)
+        else:
+            layout.addWidget(QLabel(f"Mag: "), 1, 1)
 
-        layout.addWidget(QLabel("Mag"), 1, 1)
-        layout.addWidget(QLabel("MAG Type"), 2, 1)
+        layout.addWidget(QLabel("MAG Type: " + str(magtype)), 2, 1)
         layout.addWidget(QLabel("EBV"), 3, 1)
         ra, dec = loadCoords(self.model)
         layout.addWidget(QLabel(f"RA: {ra:.4f}"), 1, 2)
