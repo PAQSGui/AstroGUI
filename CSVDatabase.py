@@ -58,13 +58,14 @@ class Database():
                 return row.to_dict()
         return default
 
-    def addFitting(self, l2):
+    def addFitting(self, name, l2):
+        l2['name']=name
         self.df = pd.concat([self.df, pd.DataFrame([l2])], ignore_index=True)
         self.write()
 
     def getFitting(self, name):
         for _, row in self.df.iterrows():
-            if row['OBJ_NME'] == name:
+            if row['name'] == name:
                 l2 = row.to_dict()
                 return convert_l2(l2)
         return None
