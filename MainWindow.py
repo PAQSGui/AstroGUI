@@ -25,7 +25,7 @@ from PySide6.QtGui import (
 from xpcaWidget import xpcaWindow
 
 """
-The main window is resposinble for initializing all other classes and linking them.
+The main window is responsible for initializing all other classes and linking them.
 Model is used to share data and state between the different modules.
 Buttons in one class should be linked to methods in other classes via Signals and Slots
 This ensures a low level of coupling neccessary for changing out components
@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
             popup.setText(str(e))
             popup.setIcon(QMessageBox.Icon.Critical)
             popup.exec()
+
     def openFiles(self):
             files = QFileDialog.getOpenFileNames(None, "Select Files")
             self.model.openFiles(files[0])
@@ -114,14 +115,15 @@ class MainWindow(QMainWindow):
         addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
         addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
         
-        mainLayout.addLayout(self.infoLayout)
         tabs = QTabWidget()
         tabs.addTab(self.plotLayout,"Spectrum Plot")
         tabs.addTab(self.skygrabTab,"SDSS Photo")
     
         tabs.tabBarClicked.connect(lambda: self.skygrabTab.LoadPicture(True))
-        mainLayout.addWidget(tabs)
-        mainLayout.addLayout(self.navigator.layout)
+
+        mainLayout.addLayout(self.infoLayout, stretch=0)
+        mainLayout.addWidget(tabs, stretch=5)
+        mainLayout.addLayout(self.navigator.layout, stretch=0)
         
         widget = QWidget()
         widget.setLayout(mainLayout)

@@ -101,13 +101,13 @@ class PlotLayout(QWidget):
         self.dropdown.textActivated.connect(self.dropboxSelect)
         self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
 
-
         self.signoiseButton.clicked.connect(lambda: self.toggleSN())
         self.showskybutton.clicked.connect(lambda: self.toggleSky())
 
         self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
         self.zTextBox.editingFinished.connect(self.zTextInput)
         self.update()
+
     @Slot()
     def shutDownSession(self,files):
         self.zSlider.sliderMoved.disconnect(self.sliderChanged)
