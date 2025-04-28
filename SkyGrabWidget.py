@@ -62,7 +62,7 @@ class SkygrabWindow(QWidget):
 def loadCoords(model):
         dir = QDir(model.path)
         file = model.getState().path
-        header = getheader(dir.absoluteFilePath(file))
+        header = getheader(file)
         ra = header['PLUG_RA']
         dec = header['PLUG_DEC']
         return ra,dec
