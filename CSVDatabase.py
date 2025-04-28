@@ -14,12 +14,12 @@ class Database():
     path : str
 
     def __init__(self, dataFile, fieldNames, path = ''):
-        self.dataFile = dataFile
+        self.dataFile = dataFile+".csv"
         self.fieldNames = fieldNames
         self.path = path
 
-        if not os.path.isfile(dataFile):
-            f = open(dataFile, 'a')
+        if not os.path.isfile(self.dataFile):
+            f = open(self.dataFile, 'a')
             header = ",".join(self.fieldNames)
             f.write(header)
             f.close()
