@@ -46,6 +46,7 @@ class Navigator(QWidget):
 
         buttonLayout.addWidget(self.backButton)
         buttonLayout.addWidget(self.yesButton)
+        buttonLayout.addWidget(self.unsureButton)
         self.layout.addWidget(self.whyInput)
 
         self.filedisplay=QListWidget(self)
@@ -56,7 +57,7 @@ class Navigator(QWidget):
     def setupSession(self,files):
         self.backButton.clicked.connect(lambda: self.NavBtn(msg="Go Back",delta=-1))
         self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Yes",delta=1))
-        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Unsure",delta=1))
+        self.unsureButton.clicked.connect(lambda: self.NavBtn( msg="Unsure",delta=1))
         note = self.model.getNote()
         if note == "":
             self.whyInput.setPlaceholderText("Write your notes here")
@@ -70,7 +71,7 @@ class Navigator(QWidget):
     def shutDownSession(self,files):
         self.backButton.clicked.disconnect(lambda: self.NavBtn(msg="Go Back",delta=-1))
         self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Yes",delta=1))
-        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Unsure",delta=1))
+        self.unsureButton.clicked.disconnect(lambda: self.NavBtn( msg="Unsure",delta=1))
         self.whyInput.setPlainText("")
 
         self.filedisplay.clear()
