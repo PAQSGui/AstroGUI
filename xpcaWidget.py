@@ -57,6 +57,7 @@ class xpcaWindow(QWidget):
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         fullList=pipeline.active_templates[:]
         zaltpars={}
+        redshifts={}
         altpipe = Pipeline(debug=False)
         for i in range(0,len(fullList)):
             altpipe.N_targets=1
@@ -67,8 +68,8 @@ def get_all_fits(pipeline, filePath, spec, src='sdss'):
                 zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
             except ValueError as e:
                 print(e)
-        pipeline.run(filePath, source=src)
-        l2_product=pipeline.catalog_items[0]
+        pipeline.N_targets=1
+        l2_product=pipeline.process_target(createTarget(filePath,spec), 0)[0]
         l2_product['zAltPars']=zaltpars
         return l2_product
 

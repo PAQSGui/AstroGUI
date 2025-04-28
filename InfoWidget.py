@@ -36,7 +36,7 @@ class InfoLayout(QHBoxLayout):
         self.layout.setContentsMargins(margins)
         
         central.setLayout(self.layout)
-        central.setMaximumSize(QSize(9999999, 150))
+        central.setMaximumSize(QSize(9999999, 100))
 
         self.model = model
         self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")

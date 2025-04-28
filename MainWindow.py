@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
-        self.xpcaWindow.close()
+        #self.xpcaWindow.close()
         
     def __init__(self, app):
         super().__init__()
@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
 
         self.skygrabTab = SkygrabWindow(self.model)
 
-        self.xpcaWindow = xpcaWindow(self.model)
+        #self.xpcaWindow = xpcaWindow(self.model)
 
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
 
