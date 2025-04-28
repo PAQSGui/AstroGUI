@@ -61,6 +61,7 @@ class Plotter:
         else:
             handles=[spectra, noise]
 
+        plt.tight_layout()
         plt.title(file.Objectname)         
         plt.legend(handles=handles)
         self.figure.draw()

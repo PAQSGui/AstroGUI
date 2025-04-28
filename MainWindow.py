@@ -114,14 +114,15 @@ class MainWindow(QMainWindow):
         addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
         addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
         
-        mainLayout.addLayout(self.infoLayout)
         tabs = QTabWidget()
         tabs.addTab(self.plotLayout,"Spectrum Plot")
         tabs.addTab(self.skygrabTab,"SDSS Photo")
     
         tabs.tabBarClicked.connect(lambda: self.skygrabTab.LoadPicture(True))
-        mainLayout.addWidget(tabs)
-        mainLayout.addLayout(self.navigator.layout)
+
+        mainLayout.addLayout(self.infoLayout, stretch=0)
+        mainLayout.addWidget(tabs, stretch=5)
+        mainLayout.addLayout(self.navigator.layout, stretch=0)
         
         widget = QWidget()
         widget.setLayout(mainLayout)
