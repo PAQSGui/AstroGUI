@@ -27,6 +27,7 @@ from PySide6.QtGui import (
 from PySide6.QtCore import (
     QSize,
     Slot,
+    QLocale,
 )
 
 """
@@ -69,6 +70,7 @@ class PlotLayout(QWidget):
         sliderLayout.addWidget(QLabel("z ="))
         self.zTextBox=QLineEdit()
         self.zTextBox.setValidator(QDoubleValidator(notation=QDoubleValidator.Notation.StandardNotation))
+        self.zTextBox.validator().setLocale(QLocale.Language.English)
         self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sliderLayout.addWidget(self.zTextBox)
 
@@ -151,7 +153,6 @@ class PlotLayout(QWidget):
 
     def zTextInput(self):
             input = float(self.zTextBox.text())
-            print(f"Input: {input}")
             if input > self.model.getOption('zMax'):
                 input = self.model.getOption('zMax')
                 self.zTextBox.setText(str(input))
