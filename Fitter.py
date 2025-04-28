@@ -31,6 +31,12 @@ class Fitter:
         self.pipe = Pipeline(debug=False)
         self.preProcess = database
 
+    def loadDataObject(self, itempath):
+        spectra = tool.SDSS_spectrum(itempath) 
+        obj_nme = str(itempath)[-21:][:-5]
+        l2 = self.preProcess.getFitting(obj_nme)
+        return DataObject(obj_nme,spectra,l2,itempath)  
+
     def populate(self, files, path):
         objs = []
         for file in files:
@@ -41,16 +47,12 @@ class Fitter:
         return objs
 
     def fitFile(self, path, spectra, dataObj=None):
-        obj_nme = path[-21:][:-5]
         if dataObj is None:
-            l2 = self.preProcess.getFitting(obj_nme)
-            dataObj=DataObject(obj_nme,spectra,l2,path)
-        filePath = Path(path)# / Path(dataObj.name)
-        l2 = self.preProcess.getFitting(dataObj.name)
-        if l2 is None:
+            dataObj=loadDataObject(self, path)
+        if dataObj.fitting is None:
             self.pipe.N_targets=1
-            dataObj.fitting = self.pipe.process_target(createTarget(str(filePath),dataObj.file), 0)[0]
-            self.preProcess.addFitting(obj_nme, dataObj.fitting)
+            dataObj.fitting = self.pipe.process_target(createTarget(dataObj.name,dataObj.file), 0)[0]
+            self.preProcess.addFitting(dataObj.name, dataObj.fitting)
         else:
             dataObj.fitting = l2
         dataObj.category = dataObj.fitting['zBestSubType']

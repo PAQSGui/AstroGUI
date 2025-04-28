@@ -65,17 +65,18 @@ class Model(QObject):
 
     def getEmptydataModel(self,files):
         objs=[]
-        try: #replace with typecheck
-            for item in list(files):
-            
-                dataModel=getdataModelFromDatabase(self.path / Path(item),self.fitter.preProcess)
-                for name in list(dataModel.keys()):
-                    spectra = tool.SDSS_spectrum(self.path / Path(name))
-                    objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
-            return objs
-        except UnicodeDecodeError:
-                
-            return self.fitter.populate(files, Path(self.path))   
+        for item in list(files):
+                itempath=self.path / Path(item)
+            #try: #replace with typecheck
+            #
+            #    dataModel=getdataModelFromDatabase(itempath,self.fitter.preProcess)
+            #    for name in list(dataModel.keys()):
+            #        spectra = tool.SDSS_spectrum(self.path / Path(name))
+            #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
+            #except UnicodeDecodeError:
+                dataObj=self.fitter.loadDataObject(itempath)
+                objs.append(dataObj)
+        return objs
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta

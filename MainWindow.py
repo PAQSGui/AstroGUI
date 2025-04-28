@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
 
         self.skygrabTab = SkygrabWindow(self.model)
 
-        #self.xpcaWindow = xpcaWindow(self.model)
+        self.xpcaWindow = xpcaWindow(self.model)
 
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
 

@@ -20,6 +20,9 @@ class DataObject:
         if fitting is not None:
             self.category = fitting['zBestSubType']
             self.redshift = fitting['zBest']
+        else:
+            self.category = None
+            self.redshift = None
     def changeRedshift(self, val):
         self.redshift = val
 
