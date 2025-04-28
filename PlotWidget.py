@@ -27,6 +27,7 @@ from PySide6.QtGui import (
 from PySide6.QtCore import (
     QSize,
     Slot,
+    QLocale,
 )
 
 """
@@ -69,7 +70,8 @@ class PlotLayout(QWidget):
 
         sliderLayout.addWidget(QLabel("z ="))
         self.zTextBox=QLineEdit()
-        self.zTextBox.setValidator(QDoubleValidator())
+        self.zTextBox.setValidator(QDoubleValidator(notation=QDoubleValidator.Notation.StandardNotation))
+        self.zTextBox.validator().setLocale(QLocale.Language.English)
         self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sliderLayout.addWidget(self.zTextBox)
 
