@@ -22,9 +22,9 @@ class Model(QObject):
     cursor = 0
     objects = []
     options: dict
-    l2FieldNames = ['OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars']
+    l2FieldNames = ['name', 'OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     
-    objFieldNames = ['categorized', 'params', 'validated', 'validators',  'note']
+    objFieldNames = ['name','categorized', 'category', 'redshift', 'note']
     validationDB : Database
     fitter: Fitter
 
@@ -129,7 +129,10 @@ class Model(QObject):
             category = None
             redshift = None
 
-        self.validationDB.addEntry(object.name, self.catFieldNames, [categorised, category, redshift, note])
+        if note == '':
+            note = 'no-note'
+
+        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
 
     def getDBEntry(self, name):
         row = self.validationDB.getEntry(name,None)

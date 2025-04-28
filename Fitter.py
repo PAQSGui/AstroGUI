@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     )
 
-from xpcaWidget import get_all_fits, createTarget
+from xpcaWidget import get_all_fits, xpcaWindow, createTarget
 
 import Spec_tools as tool
 """
@@ -41,8 +41,8 @@ class Fitter:
         return objs
 
     def fitFile(self, path, spectra, dataObj=None):
+        obj_nme = path[-21:][:-5]
         if dataObj is None:
-            obj_nme = path[-21:][:-5]
             l2 = self.preProcess.getFitting(obj_nme)
             dataObj=DataObject(obj_nme,spectra,l2,path)
         filePath = Path(path)# / Path(dataObj.name)
@@ -50,7 +50,7 @@ class Fitter:
         if l2 is None:
             self.pipe.N_targets=1
             dataObj.fitting = self.pipe.process_target(createTarget(str(filePath),dataObj.file), 0)[0]
-            self.preProcess.addFitting(dataObj.fitting)
+            self.preProcess.addFitting(obj_nme, dataObj.fitting)
         else:
             dataObj.fitting = l2
         dataObj.category = dataObj.fitting['zBestSubType']

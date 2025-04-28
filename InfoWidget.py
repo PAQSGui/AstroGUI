@@ -4,8 +4,10 @@ from SkyGrabWidget import loadCoords
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
+    QGridLayout,
     QLabel,
     QWidget,
+    QGroupBox,
 )
 
 from PySide6.QtGui import (
@@ -26,15 +28,20 @@ class InfoLayout(QHBoxLayout):
 
     def __init__(self, model):
         super().__init__()
-        central=QWidget()
+        central = QWidget()
         self.addWidget(central)
+
+        margins = self.layout.contentsMargins()
+        margins.setBottom(0)
+        self.layout.setContentsMargins(margins)
         
         central.setLayout(self.layout)
         central.setMaximumSize(QSize(9999999, 150))
 
         self.model = model
-        self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
+        self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")
         self.targetLayout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.classProbLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.layout.addWidget(self.nbrLabel)
         self.layout.addLayout(self.classProbLayout)
@@ -48,10 +55,14 @@ class InfoLayout(QHBoxLayout):
         self.updateTarget()
 
     def updateNbrLabel(self):
-        self.nbrLabel = QLabel("What is the DELTAMAG of\n-+ 2 neighbors on the CCD")
+        self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")
 
     def updateClassProb(self):
-        self.classProbLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        clearLayout(self.classProbLayout)
+        layout = QVBoxLayout()
+        groupBox = QGroupBox('Class, Probability:')
+        groupBox.setLayout(layout)
+
         data = self.model.getState()
         l2_product = data.fitting
         if l2_product!=None:
@@ -62,28 +73,34 @@ class InfoLayout(QHBoxLayout):
             subTypes = l2_product['zAltSubType']
             probabilities = l2_product['zAltProb']
 
-            clearLayout(self.classProbLayout)
-            self.classProbLayout.addWidget(QLabel(classification + ': %.2f %%' % probability))
+            layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
 
             for i in range(1,len(subTypes)):
                 if probabilities[i]!=None:
                     probability = probabilities[i] * 100
                     if probability > 10:
                         text = subTypes[i] + ': %.2f %%' % probability
-                        self.classProbLayout.addWidget(QLabel(text))
-        else:
-            clearLayout(self.classProbLayout)
-
-        return self.classProbLayout
-    
+                        layout.addWidget(QLabel(text))
+        self.classProbLayout.addWidget(groupBox)
+                        
+    """
+    This is meant to hold information from the current fits-file. 
+    The data should be grabbed from the model, and is organized in a grid
+    """
     def updateTarget(self):
         clearLayout(self.targetLayout)
-        self.targetLayout.addWidget(QLabel("Target metadata:"))
-        self.targetLayout.addWidget(QLabel("Mag"))
-        self.targetLayout.addWidget(QLabel("MAG Type"))
-        self.targetLayout.addWidget(QLabel("EBV"))
-        ra,dec=loadCoords(self.model)
-        self.targetLayout.addWidget(QLabel(f"RA: {ra:.4f}, DEC: {dec:.4f}"))
+        layout = QGridLayout()
+        groupBox = QGroupBox('Metadata')
+        groupBox.setLayout(layout)
+
+        layout.addWidget(QLabel("Mag"), 1, 1)
+        layout.addWidget(QLabel("MAG Type"), 2, 1)
+        layout.addWidget(QLabel("EBV"), 3, 1)
+        ra, dec = loadCoords(self.model)
+        layout.addWidget(QLabel(f"RA: {ra:.4f}"), 1, 2)
+        layout.addWidget(QLabel(f"DEC: {dec:.4f}"), 2, 2)
+
+        self.targetLayout.addWidget(groupBox)
 
 def clearLayout(layout):
     for i in range(layout.count()): layout.itemAt(i).widget().close()
