@@ -58,6 +58,7 @@ class PlotLayout(QWidget):
         self.zSlider = zSlider
 
         self.dropdown = QComboBox()
+        self.dropdown.setMinimumWidth(95)
 
         self.signoiseButton = QCheckBox("Toggle S/N spec")
         self.showskybutton = QCheckBox("Toggle Sky")
