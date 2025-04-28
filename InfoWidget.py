@@ -83,7 +83,10 @@ class InfoLayout(QHBoxLayout):
                         layout.addWidget(QLabel(text))
         self.classProbLayout.addWidget(groupBox)
                         
-    
+    """
+    This is meant to hold information from the current fits-file. 
+    The data should be grabbed from the model, and is organized in a grid
+    """
     def updateTarget(self):
         clearLayout(self.targetLayout)
         layout = QGridLayout()
