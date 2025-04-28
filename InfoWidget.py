@@ -28,8 +28,12 @@ class InfoLayout(QHBoxLayout):
 
     def __init__(self, model):
         super().__init__()
-        central=QWidget()
+        central = QWidget()
         self.addWidget(central)
+
+        margins = self.layout.contentsMargins()
+        margins.setBottom(0)
+        self.layout.setContentsMargins(margins)
         
         central.setLayout(self.layout)
         central.setMaximumSize(QSize(9999999, 150))
