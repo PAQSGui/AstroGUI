@@ -37,21 +37,26 @@ class Fitter:
         l2 = self.preProcess.getFitting(obj_nme)
         return DataObject(obj_nme,spectra,l2,itempath)  
 
-    def populate(self, files, path):
-        objs = []
-        for file in files:
-            spectra = tool.SDSS_spectrum(path / file) 
-            obj = self.fitFile(str(path / file),spectra)
-            dict = obj.toDict()
-            objs.append(obj)
+    def populate(self, path, files=None, objs=[]):
+        if objs == []:
+            print("if objs == []:")
+            for file in files:
+                print("for file in files:")
+                obj = loadDataObject(self, itempath)
+                obj = self.fitFile(obj.path,obj)
+                objs.append(obj)
+        else:
+            print("for obj in objs:")
+            for obj in objs:
+                obj = self.fitFile(obj.path,obj)
         return objs
 
-    def fitFile(self, path, spectra, dataObj=None):
+    def fitFile(self, path, dataObj=None):
         if dataObj is None:
             dataObj=loadDataObject(self, path)
         if dataObj.fitting is None:
             self.pipe.N_targets=1
-            dataObj.fitting = self.pipe.process_target(createTarget(dataObj.name,dataObj.file), 0)[0]
+            dataObj.fitting = self.pipe.process_target(createTarget(dataObj.path,dataObj.file), 0)[0]
             self.preProcess.addFitting(dataObj.name, dataObj.fitting)
         else:
             dataObj.fitting = l2

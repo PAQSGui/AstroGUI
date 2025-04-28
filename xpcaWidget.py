@@ -29,22 +29,17 @@ class xpcaWindow(QWidget):
         self.model = model
 
         layout = QVBoxLayout()
-        saveAll=QCheckBox("Save all template fits")
         self.startbtn=QPushButton("Start")
-        canclbtn=QPushButton("Cancel")
 
-        layout.addWidget(saveAll)
         layout.addWidget(QLabel("Run xpca on all loaded files?"))
         layout.addWidget(self.startbtn)
-        layout.addWidget(canclbtn)
-        canclbtn.clicked.connect(lambda: self.close())
 
         self.setLayout(layout)
 
         self.model.openedSession[list].connect(self.setupSession)
 
     def start(self):
-        #self.model.fileDB.populate()
+        self.model.fitter.populate(self.model.path,objs=self.model.objects)
         self.model.xpcaDone.emit(0)
         self.close()
         
