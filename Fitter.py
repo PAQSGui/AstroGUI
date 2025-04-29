@@ -12,6 +12,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     )
 
+from PySide6.QtCore import (
+    QDir,
+)
+
 from xpcaWidget import get_all_fits, xpcaWindow, createTarget
 
 import Spec_tools as tool
@@ -36,6 +40,15 @@ class Fitter:
         obj_nme = str(itempath)[-21:][:-5]
         l2 = self.preProcess.getFitting(obj_nme)
         return DataObject(obj_nme,spectra,l2,itempath)  
+
+    def openFiles(self,path):
+        self.pipe.run(path,source='sdss')
+        directory = QDir(path)
+        directory.setNameFilters(["([^.]*)","*.fits"])
+        files = directory.entryList()
+        pairs=[(files[i],self.pipe.catalog_items[i]) for i in range(len(files))]
+        for x in pairs:
+            self.preProcess.addFitting(x[0], x[1])
 
     def populate(self, path, files=None, objs=[], N=-1):
         if objs == []:
