@@ -5,6 +5,7 @@ from Model import Model
 from PlotWidget import PlotLayout
 from OptionsWindow import OptionsWindow
 from SkyGrabWidget import SkygrabWindow
+from xpcaWidget import XpcaWindow
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -22,8 +23,6 @@ from PySide6.QtGui import (
     QIcon
 )
 
-from xpcaWidget import xpcaWindow
-
 """
 The main window is responsible for initializing all other classes and linking them.
 Model is used to share data and state between the different modules.
@@ -39,6 +38,7 @@ class MainWindow(QMainWindow):
     infoLayout:     InfoLayout
     optionsWindow:  OptionsWindow
     skygrabTab:     SkygrabWindow
+    xpcaWindow:     XpcaWindow
 
     def openFolder(self):
         try:
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
 
         self.skygrabTab = SkygrabWindow(self.model)
 
-        self.xpcaWindow = xpcaWindow(self.model)
+        self.xpcaWindow = XpcaWindow(self.model)
 
         self.optionsWindow.optionChanged.connect(self.plotLayout.update)
 
