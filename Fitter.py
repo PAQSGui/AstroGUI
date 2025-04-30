@@ -1,10 +1,7 @@
 from xpca.pipeline import Pipeline
 from CSVDatabase import Database
-import numpy as np
+from xpcaWidget import createTarget
 import Spec_tools as tool
-from pathlib import Path
-from os.path import basename
-
 from DataObject import DataObject
 
 from PySide6.QtWidgets import (
@@ -14,11 +11,9 @@ from PySide6.QtWidgets import (
 
 from PySide6.QtCore import (
     QDir,
+    Signal,
 )
 
-from xpcaWidget import get_all_fits, xpcaWindow, createTarget
-
-import Spec_tools as tool
 """
 This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph
 """
@@ -31,6 +26,8 @@ class Fitter:
     layout: QVBoxLayout
     templateInfo: QLabel
 
+    fileFitted = Signal()
+
     def __init__(self, database):
         self.pipe = Pipeline(debug=False)
         self.preProcess = database
@@ -39,10 +36,10 @@ class Fitter:
         spectra = tool.SDSS_spectrum(itempath) 
         obj_nme = str(itempath)[-21:][:-5]
         l2 = self.preProcess.getFitting(obj_nme)
-        return DataObject(obj_nme,spectra,l2,itempath)  
+        return DataObject(obj_nme, spectra, l2, itempath)  
 
     def openFiles(self,path):
-        self.pipe.run(path,source='sdss')
+        self.pipe.run(path, source='sdss')
         directory = QDir(path)
         directory.setNameFilters(["([^.]*)","*.fits"])
         files = directory.entryList()
@@ -54,10 +51,11 @@ class Fitter:
         if objs == []:
             for file in files:
                 if N!=0:
-                    obj = loadDataObject(self, itempath)
+                    obj = self.loadDataObject(path)
                     if obj.fitting is None:
                         N=N-1
                     obj = self.fitFile(obj.path,obj)
+                    self.fileFitted.emit()
                     objs.append(obj)
                 else:
                     break
@@ -73,7 +71,7 @@ class Fitter:
 
     def fitFile(self, path, dataObj=None):
         if dataObj is None:
-            dataObj=loadDataObject(self, path)
+            dataObj = self.loadDataObject(path)
         if dataObj.fitting is None:
             self.pipe.N_targets=1
             dataObj.fitting = self.pipe.process_target(createTarget(dataObj.path,dataObj.file), 0)[0]
@@ -82,8 +80,4 @@ class Fitter:
         dataObj.redshift = dataObj.fitting['zBest']
 
         return dataObj
-
-    def getBestGuess(self):
-        return self.bestdatabase
-
     

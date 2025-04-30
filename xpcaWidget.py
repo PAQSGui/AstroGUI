@@ -11,7 +11,6 @@ from xpca.pipeline import Pipeline
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QCheckBox,
     QLabel,
     QPushButton,
     QLineEdit,
@@ -35,10 +34,10 @@ class xpcaWindow(QWidget):
         self.model = model
 
         layout = QVBoxLayout()
-        self.startbtn=QPushButton("Start")
-        self.selectbtn=QPushButton("Select folder to analyze (slow)")
+        self.startbtn = QPushButton("Start")
+        self.selectbtn = QPushButton("Select folder to analyze (slow)")
 
-        self.NumBox=QLineEdit()
+        self.NumBox = QLineEdit()
         self.NumBox.setValidator(QIntValidator())
         layout.addWidget(self.NumBox)
 
@@ -56,7 +55,7 @@ class xpcaWindow(QWidget):
 
     def start(self):
         num_to_analyze=int(self.NumBox.text())
-        self.model.fitter.populate(self.model.path,objs=self.model.objects,N=int(self.NumBox.text()))
+        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=int(self.NumBox.text()))
         self.model.xpcaDone.emit(0)
         self.close()
         

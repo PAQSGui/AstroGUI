@@ -1,6 +1,4 @@
-import csv
 import Spec_tools as tool
-from DataObject import DataObject
 from PySide6.QtCore import (
     QDir,
 )
@@ -8,13 +6,17 @@ import pandas as pd
 import os.path
 import numpy as np
 
+"""
+CSVDatabase handles reading from and writing to csv-files. 
+They are used to store classifications made by the user as well as fittings made by xpca
+"""
 class Database():
-    dataFile = ""
-    fieldNames = ""
+    dataFile: str
+    fieldNames: str
     path : str
 
     def __init__(self, dataFile, fieldNames, path = ''):
-        self.dataFile = dataFile+".csv"
+        self.dataFile = os.path.join('csv', dataFile+".csv")
         self.fieldNames = fieldNames
         self.path = path
 
@@ -27,8 +29,7 @@ class Database():
         self.df = pd.read_csv(self.dataFile) 
 
     def load(self,dataFile):
-        #load a file and return it as a dict
-        df = pd.read_csv(dataFile)
+        self.df = pd.read_csv(dataFile)
 
     def write(self):
         self.df = self.df.drop_duplicates(subset=[self.fieldNames[0]], keep='last')

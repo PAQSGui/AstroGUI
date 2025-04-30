@@ -1,5 +1,6 @@
 /.venv/
 /spectra/
+/spectra*/
 /__pycache__/
 /pyhammer/
 /gleam/
