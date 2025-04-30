@@ -25,7 +25,7 @@ from PySide6.QtGui import (
 """
 Helper-class for fitter
 """
-class xpcaWindow(QWidget):
+class XpcaWindow(QWidget):
 
     def __init__(self, model):
         super().__init__()
@@ -65,26 +65,26 @@ class xpcaWindow(QWidget):
         self.selectbtn.clicked.connect(lambda: self.openFiles())
 
 
-
-def get_all_fits(pipeline, filePath, spec, src='sdss'):
-        fullList=pipeline.active_templates[:]
-        zaltpars={}
-        redshifts={}
-        altpipe = Pipeline(debug=False)
-        for i in range(0,len(fullList)):
-            altpipe.N_targets=1
-            altpipe.active_templates=[fullList[i]]
-
-            try:
-                l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
-                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
-            except ValueError as e:
-                print(e)
-        pipeline.N_targets=1
-        l2_product=pipeline.process_target(createTarget(filePath,spec), 0)[0]
-        l2_product['zAltPars']=zaltpars
-        return l2_product
-
+#
+#def get_all_fits(pipeline, filePath, spec, src='sdss'):
+#        fullList=pipeline.active_templates[:]
+#        zaltpars={}
+#        redshifts={}
+#        altpipe = Pipeline(debug=False)
+#        for i in range(0,len(fullList)):
+#            altpipe.N_targets=1
+#            altpipe.active_templates=[fullList[i]]
+#
+#            try:
+#                l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
+#                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
+#            except ValueError as e:
+#                print(e)
+#        pipeline.N_targets=1
+#        l2_product=pipeline.process_target(createTarget(filePath,spec), 0)[0]
+#        l2_product['zAltPars']=zaltpars
+#        return l2_product
+#
 
 def createTarget(filename,spec, fscale=1.):
     primary_header = getheader(filename, 0)
