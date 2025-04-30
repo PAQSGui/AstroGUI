@@ -23,6 +23,7 @@ class InfoLayout(QHBoxLayout):
     layout = QHBoxLayout()
     model: Model
     nbrLabel: QLabel
+    validatorsLayout = QVBoxLayout()
     classProbLayout = QVBoxLayout()
     targetLayout = QVBoxLayout()
 
@@ -44,6 +45,7 @@ class InfoLayout(QHBoxLayout):
         self.classProbLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         self.layout.addWidget(self.nbrLabel)
+        self.layout.addLayout(self.validatorsLayout)
         self.layout.addLayout(self.classProbLayout)
         self.layout.addLayout(self.targetLayout)
         self.model.openedSession[list].connect(self.updateAll)
@@ -53,6 +55,7 @@ class InfoLayout(QHBoxLayout):
         self.updateNbrLabel()
         self.updateClassProb()
         self.updateTarget()
+        self.updateValidators()
 
     def updateNbrLabel(self):
         self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")
@@ -82,7 +85,10 @@ class InfoLayout(QHBoxLayout):
                         text = subTypes[i] + ': %.2f %%' % probability
                         layout.addWidget(QLabel(text))
         self.classProbLayout.addWidget(groupBox)
-                        
+    def updateValidators(self):
+        clearLayout(self.classProbLayout)
+        for x in self.model.getState().validators:
+            self.classProbLayout.addWidget(QLabel(x))  
     """
     This is meant to hold information from the current fits-file. 
     The data should be grabbed from the model, and is organized in a grid

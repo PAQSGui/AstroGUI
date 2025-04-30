@@ -4,6 +4,7 @@ from PySide6.QtCore import (
 )
 import pandas as pd
 import os.path
+from os import makedirs
 import numpy as np
 
 """
@@ -21,6 +22,8 @@ class Database():
         self.path = path
 
         if not os.path.isfile(self.dataFile):
+            if not os.path.exists('csv'):
+                makedirs('csv')
             f = open(self.dataFile, 'a')
             header = ",".join(self.fieldNames)
             f.write(header)

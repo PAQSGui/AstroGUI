@@ -34,10 +34,14 @@ class Fitter(QObject):
         self.pipe = Pipeline(debug=False)
         self.preProcess = database
 
-    def loadDataObject(self, itempath, filename):
+    def loadDataObject(self, itempath, filename, fileDict = None):
         spectra = tool.SDSS_spectrum(itempath)
         l2 = self.preProcess.getFitting(filename)
-        return DataObject(filename, spectra, l2, itempath)  
+        if fileDict is None:
+            return DataObject(filename, spectra, l2, itempath)  
+        else:
+            return DataObject(filename, spectra, l2, itempath, fileDict['validators']) 
+
 
     def openFiles(self,path):
         self.pipe.run(path, source='sdss')
@@ -52,7 +56,7 @@ class Fitter(QObject):
         if objs == []:
             for file in files:
                 if N!=0:
-                    obj = self.loadDataObject(path)
+                    obj = self.loadDataObject(path,file)
                     if obj.fitting is None:
                         N=N-1
                     obj = self.fitFile(obj.path,obj)

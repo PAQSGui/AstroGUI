@@ -10,6 +10,8 @@ from PySide6.QtCore import (
 
 from pathlib import Path
 
+from os.path import expanduser
+
 """
 Model interfaces between the UI elements and the databases
 It also maintains a dictionary of 'options', which are used to change behaviours in the program
@@ -21,7 +23,7 @@ class Model(QObject):
     options: dict
     l2FieldNames = ['name', 'OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     
-    objFieldNames = ['name','categorized', 'category', 'redshift', 'note']
+    objFieldNames = ['name','categorized', 'category', 'redshift', 'validators', 'note']
     validationDB : Database
     fitter: Fitter
 
@@ -71,7 +73,8 @@ class Model(QObject):
             #        spectra = tool.SDSS_spectrum(self.path / Path(name))
             #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             #except UnicodeDecodeError:
-                dataObj = self.fitter.loadDataObject(itempath, item)
+
+                dataObj = self.fitter.loadDataObject(itempath, item, self.getDBEntry(item))
                 objs.append(dataObj)
         return objs
 
@@ -123,6 +126,7 @@ class Model(QObject):
         if categorised:
             category = object.category
             redshift = object.redshift
+            object.validators.add(expanduser('~'))
         else:
             category = None
             redshift = None
@@ -130,7 +134,7 @@ class Model(QObject):
         if note == '':
             note = 'no-note'
 
-        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
+        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, list(object.validators), note])
 
     def getDBEntry(self, name):
         row = self.validationDB.getEntry(name, None)

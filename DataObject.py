@@ -1,5 +1,7 @@
 import Spec_tools as tool
 
+from json import loads
+
 """
 auxiliary class used by Model to store data for fits-files
 """
@@ -12,12 +14,19 @@ class DataObject:
     path = str
     category: str
     redshift: float
+    validators: set
 
-    def __init__(self, filename, file, fitting = None, path = None):
+    def __init__(self, filename, file, fitting = None, path = None, validators = set()):
         self.name = filename
         self.file = file
         self.fitting = fitting
         self.path = path
+        if type(validators)==list:
+            self.validators=set(validators)
+        elif type(validators)!=set:
+            raise TypeError("validators is a "+str(type(validators))+", should be a list or set!")
+        else:
+            self.validators = validators
 
         if fitting is not None:
             self.category = fitting['zBestSubType']
@@ -59,7 +68,7 @@ class DataObject:
 #
 #        return object
 #    
-    
+#    method not being used
     def fromSeries(series, fitting):
         path = series['path']
         file = series['file']
