@@ -1,12 +1,11 @@
-from numpy import argsort, concatenate,array
 from xpca.targets import ProvDict, Target
-
 from xpca.spectrum import Spectrum
+from xpca.pipeline import Pipeline
+
 from os.path import basename
 from astropy.io.fits import getheader
+from Model import Model
 from re import search
-
-from xpca.pipeline import Pipeline
 
 from PySide6.QtWidgets import (
     QWidget,
@@ -15,17 +14,24 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QFileDialog,
+    QProgressBar,
 )
 
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Slot
 
 from PySide6.QtGui import (
     QIntValidator,
 )
+
 """
 Helper-class for fitter
 """
 class XpcaWindow(QWidget):
+    model: Model
+    numberBox: QLineEdit
+    startButton: QPushButton
+    selectButton: QPushButton
+    progressBar: QProgressBar
 
     def __init__(self, model):
         super().__init__()
@@ -34,16 +40,19 @@ class XpcaWindow(QWidget):
         self.model = model
 
         layout = QVBoxLayout()
-        self.startbtn = QPushButton("Start")
-        self.selectbtn = QPushButton("Select folder to analyze (slow)")
 
-        self.NumBox = QLineEdit()
-        self.NumBox.setValidator(QIntValidator())
-        layout.addWidget(self.NumBox)
+        self.startButton = QPushButton("Start")
+        self.selectButton = QPushButton("Select folder to analyze (may be slow)")
+        self.progressBar = QProgressBar()
 
-        layout.addWidget(QLabel("Run xpca on this amount of files? (-1 for all)"))
-        layout.addWidget(self.startbtn)
-        layout.addWidget(self.selectbtn)
+        self.numberBox = QLineEdit()
+        self.numberBox.setValidator(QIntValidator())
+
+        layout.addWidget(QLabel("Run xpca on this amount of files"))
+        layout.addWidget(self.numberBox)
+        layout.addWidget(self.startButton)
+        layout.addWidget(self.selectButton)
+        layout.addWidget(self.progressBar)
 
         self.setLayout(layout)
 
@@ -54,37 +63,38 @@ class XpcaWindow(QWidget):
             self.model.fitter.openFiles(folder_path)
 
     def start(self):
-        num_to_analyze=int(self.NumBox.text())
-        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=int(self.NumBox.text()))
+        amount=int(self.numberBox.text())
+        self.progressBar.setMaximum(amount)
+        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=amount)
         self.model.xpcaDone.emit(0)
         self.close()
         
     @Slot()
-    def setupSession(self,list):
-        self.startbtn.clicked.connect(lambda: self.start())
-        self.selectbtn.clicked.connect(lambda: self.openFiles())
+    def setupSession(self, list):
+        self.startButton.clicked.connect(lambda: self.start())
+        self.selectButton.clicked.connect(lambda: self.openFiles())
+        self.model.fitter.fileFitted.connect(self.progressBar.setValue)
+        self.numberBox.setValidator(QIntValidator(0, len(self.model.objects)))
 
+def get_all_fits(pipeline, filePath, spec, src='sdss'):
+        fullList=pipeline.active_templates[:]
+        zaltpars={}
+        redshifts={}
+        altpipe = Pipeline(debug=False)
+        for i in range(0,len(fullList)):
+            altpipe.N_targets=1
+            altpipe.active_templates=[fullList[i]]
 
-#
-#def get_all_fits(pipeline, filePath, spec, src='sdss'):
-#        fullList=pipeline.active_templates[:]
-#        zaltpars={}
-#        redshifts={}
-#        altpipe = Pipeline(debug=False)
-#        for i in range(0,len(fullList)):
-#            altpipe.N_targets=1
-#            altpipe.active_templates=[fullList[i]]
-#
-#            try:
-#                l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
-#                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
-#            except ValueError as e:
-#                print(e)
-#        pipeline.N_targets=1
-#        l2_product=pipeline.process_target(createTarget(filePath,spec), 0)[0]
-#        l2_product['zAltPars']=zaltpars
-#        return l2_product
-#
+            try:
+                l2_product = altpipe.process_target(createTarget(filePath,spec), 0)[0]
+                zaltpars[l2_product['zBestSubType']]=l2_product['zBestPars']
+            except ValueError as e:
+                print(e)
+        pipeline.N_targets=1
+        l2_product=pipeline.process_target(createTarget(filePath,spec), 0)[0]
+        l2_product['zAltPars']=zaltpars
+        return l2_product
+
 
 def createTarget(filename,spec, fscale=1.):
     primary_header = getheader(filename, 0)
