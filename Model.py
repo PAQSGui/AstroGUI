@@ -130,6 +130,10 @@ class Model(QObject):
         else:
             category = None
             redshift = None
+            try:
+                object.validators.remove(expanduser('~'))
+            except KeyError:
+                pass
 
         if note == '':
             note = 'no-note'

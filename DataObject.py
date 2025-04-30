@@ -23,7 +23,10 @@ class DataObject:
         self.path = path
         if type(validators)==list:
             self.validators=set(validators)
+        elif type(validators)==str:
+            self.validators=convertToSet(validators)
         elif type(validators)!=set:
+            print(validators)
             raise TypeError("validators is a "+str(type(validators))+", should be a list or set!")
         else:
             self.validators = validators
@@ -43,6 +46,7 @@ class DataObject:
     
     def getFile(self):
         return self.file
+    
     
 #      method not baing used
  #   def toDict(self):
@@ -79,3 +83,9 @@ class DataObject:
         object.changeCategory(category)
         object.changeRedshift(redshift)
         return object
+def convertToSet(input):
+        temp = input.strip('[]').split()
+        new = set()
+        for i in range(len(temp)):
+            new.add(temp[i].strip("'"))
+        return new
