@@ -26,7 +26,7 @@ from PySide6.QtGui import (
 """
 Helper-class for fitter
 """
-class xpcaWindow(QWidget):
+class XpcaWindow(QWidget):
     model: Model
     numberBox: QLineEdit
     startButton: QPushButton

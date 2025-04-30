@@ -1,8 +1,15 @@
 from xpca.pipeline import Pipeline
 from CSVDatabase import Database
-from xpcaWidget import createTarget
 import Spec_tools as tool
 from DataObject import DataObject
+
+from xpca.targets import ProvDict, Target
+from xpca.spectrum import Spectrum
+from os.path import basename
+from astropy.io.fits import getheader
+from re import search
+
+from xpca.pipeline import Pipeline
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -85,4 +92,29 @@ class Fitter(QObject):
         dataObj.redshift = dataObj.fitting['zBest']
 
         return dataObj
+
+def createTarget(filename,spec, fscale=1.):
+    primary_header = getheader(filename, 0)
+    result=search(f'.*([0-9]+).*', str(primary_header.get('OBJECT', 1)))
+    prov = ProvDict(PROV=basename(filename),
+                    OBID=primary_header.get('OBID1', 1),
+                    PROG_ID=primary_header.get('PROG_ID', 'None'),
+                    MJD_OBS=primary_header.get('MJD-OBS', 0.01),
+                    MJD_END=primary_header.get('MJD-END', 0.02),
+                    SPECUID=primary_header.get('SPECUID', -1),
+                    OBJ_UID=int(result.group(1)),
+                    OBJ_NME=str(primary_header.get('OBJECT', 1)),
+                    )
+    return Target(uid=prov.OBJ_UID,
+                    name=prov.OBJ_NME,
+                    spectrum=Spectrum(spec.Wavelength,
+                                    spec.Flux * fscale,
+                                    spec.Noise * fscale,
+                                    unit_wl='AA',
+                                    unit_flux='erg/(s cm2 AA)',
+                                    ),
+                    provenance=prov.as_dict(),
+                    #meta=row.meta,
+                    info=primary_header,
+                    )
     
