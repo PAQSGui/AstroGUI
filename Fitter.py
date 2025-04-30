@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     )
 
 from PySide6.QtCore import (
+    QObject,
     QDir,
     Signal,
 )
@@ -17,7 +18,7 @@ from PySide6.QtCore import (
 """
 This class interfaces with XPCA and is responisble for retrieving fittings which are used to draw the template over the graph
 """
-class Fitter:
+class Fitter(QObject):
 
     pipe: Pipeline
     preProcess: Database
@@ -26,17 +27,17 @@ class Fitter:
     layout: QVBoxLayout
     templateInfo: QLabel
 
-    fileFitted = Signal()
+    fileFitted = Signal(int)
 
     def __init__(self, database):
+        QObject.__init__(self)
         self.pipe = Pipeline(debug=False)
         self.preProcess = database
 
-    def loadDataObject(self, itempath):
-        spectra = tool.SDSS_spectrum(itempath) 
-        obj_nme = str(itempath)[-25:][:-5]
-        l2 = self.preProcess.getFitting(obj_nme)
-        return DataObject(obj_nme, spectra, l2, itempath)  
+    def loadDataObject(self, itempath, filename):
+        spectra = tool.SDSS_spectrum(itempath)
+        l2 = self.preProcess.getFitting(filename)
+        return DataObject(filename, spectra, l2, itempath)  
 
     def openFiles(self,path):
         self.pipe.run(path, source='sdss')
@@ -55,7 +56,7 @@ class Fitter:
                     if obj.fitting is None:
                         N=N-1
                     obj = self.fitFile(obj.path,obj)
-                    self.fileFitted.emit()
+                    self.fileFitted.emit(1)
                     objs.append(obj)
                 else:
                     break
@@ -65,7 +66,7 @@ class Fitter:
                     if obj.fitting is None:
                         N=N-1
                     obj = self.fitFile(obj.path,obj)
-                    self.fileFitted.emit()
+                    self.fileFitted.emit(1)
                 else:
                     break
         return objs

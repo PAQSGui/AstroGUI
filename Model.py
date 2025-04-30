@@ -71,7 +71,7 @@ class Model(QObject):
             #        spectra = tool.SDSS_spectrum(self.path / Path(name))
             #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             #except UnicodeDecodeError:
-                dataObj = self.fitter.loadDataObject(itempath)
+                dataObj = self.fitter.loadDataObject(itempath, item)
                 objs.append(dataObj)
         return objs
 
