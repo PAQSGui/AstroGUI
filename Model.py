@@ -77,10 +77,10 @@ class Model(QObject):
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta
-        if self.cursor<0:
-            self.cursor=len(self.objects)-1
-        elif self.cursor>=len(self.objects):
-            self.cursor=0
+        if self.cursor < 0:
+            self.cursor = len(self.objects)-1
+        elif self.cursor >= len(self.objects):
+            self.cursor = 0
 
     def setOption(self, opt, val):
         self.options[opt] = val
@@ -98,21 +98,21 @@ class Model(QObject):
         return self.options
 
     def getRedShift(self):
-        obj=self.objects[self.cursor]
+        obj = self.objects[self.cursor]
         if obj.fitting is not None:
             return float(self.objects[self.cursor].redshift)
         else:
             return 0
     
     def getCategory(self):
-        obj=self.objects[self.cursor]
-        if obj.fitting!=None:
+        obj = self.objects[self.cursor]
+        if obj.fitting is not None:
             return self.objects[self.cursor].category
         else:
             return ""
     
     def getState(self):
-            return self.objects[self.cursor]
+        return self.objects[self.cursor]
 
     def getFile(self):
         return self.objects[self.cursor].file
@@ -133,16 +133,19 @@ class Model(QObject):
         self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
 
     def getDBEntry(self, name):
-        row = self.validationDB.getEntry(name,None)
+        row = self.validationDB.getEntry(name, None)
         if row is not None:
             return row
         return None
+        #should just return row anyways no?
     
     def getNote(self):
         name = self.getState().name
         entry = self.getDBEntry(name)
         if entry is not None:
-            return entry['note']
+            note = entry['note']
+            if note != 'no-note':
+                return note
         return ""
 
     def initOptions(self):

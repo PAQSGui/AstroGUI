@@ -44,7 +44,7 @@ class Database():
             path = row['path']
             spectra = tool.SDSS_spectrum(directory.absoluteFilePath(path))
             obj = fitter.fitFile(directory.absoluteFilePath(path), spectra)
-            obj.file = spectra #Why are we even even using file in fromDict if we're changing it here?
+            obj.file = spectra
             files.append(obj)
         return files
 

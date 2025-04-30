@@ -34,6 +34,7 @@ class Fitter:
 
     def loadDataObject(self, itempath):
         spectra = tool.SDSS_spectrum(itempath) 
+        # THISIS WHERE 'spec' gets lost
         obj_nme = str(itempath)[-21:][:-5]
         l2 = self.preProcess.getFitting(obj_nme)
         return DataObject(obj_nme, spectra, l2, itempath)  
@@ -65,6 +66,7 @@ class Fitter:
                     if obj.fitting is None:
                         N=N-1
                     obj = self.fitFile(obj.path,obj)
+                    self.fileFitted.emit()
                 else:
                     break
         return objs
