@@ -49,14 +49,16 @@ class Fitter(QObject):
             self.preProcess.addFitting(x[0], x[1])
 
     def populate(self, path, files=None, objs=[], N=-1):
+        counter = 0
         if objs == []:
             for file in files:
                 if N!=0:
                     obj = self.loadDataObject(path)
                     if obj.fitting is None:
                         N=N-1
+                        counter = counter+1
                     obj = self.fitFile(obj.path,obj)
-                    self.fileFitted.emit(1)
+                    self.fileFitted.emit(counter)
                     objs.append(obj)
                 else:
                     break
@@ -65,8 +67,9 @@ class Fitter(QObject):
                 if N!=0:
                     if obj.fitting is None:
                         N=N-1
+                        counter = counter+1
                     obj = self.fitFile(obj.path,obj)
-                    self.fileFitted.emit(1)
+                    self.fileFitted.emit(counter)
                 else:
                     break
         return objs

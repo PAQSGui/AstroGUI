@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QFileDialog,
+    QProgressBar,
 )
 
 from PySide6.QtCore import Signal, Slot
@@ -34,16 +35,19 @@ class xpcaWindow(QWidget):
         self.model = model
 
         layout = QVBoxLayout()
+
         self.startbtn = QPushButton("Start")
-        self.selectbtn = QPushButton("Select folder to analyze (slow)")
+        self.selectbtn = QPushButton("Select folder to analyze (may be slow)")
+        self.progressBar = QProgressBar()
 
         self.NumBox = QLineEdit()
-        self.NumBox.setValidator(QIntValidator())
-        layout.addWidget(self.NumBox)
+        self.NumBox.setValidator(QIntValidator(0, len(self.model.objects)))
 
-        layout.addWidget(QLabel("Run xpca on this amount of files? (-1 for all)"))
+        layout.addWidget(QLabel("Run xpca on this amount of files"))
+        layout.addWidget(self.NumBox)
         layout.addWidget(self.startbtn)
         layout.addWidget(self.selectbtn)
+        layout.addWidget(self.progressBar)
 
         self.setLayout(layout)
 
@@ -54,8 +58,9 @@ class xpcaWindow(QWidget):
             self.model.fitter.openFiles(folder_path)
 
     def start(self):
-        num_to_analyze=int(self.NumBox.text())
-        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=int(self.NumBox.text()))
+        amount=int(self.NumBox.text())
+        self.progressBar.setMaximum(amount)
+        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=amount)
         self.model.xpcaDone.emit(0)
         self.close()
         
@@ -63,8 +68,7 @@ class xpcaWindow(QWidget):
     def setupSession(self,list):
         self.startbtn.clicked.connect(lambda: self.start())
         self.selectbtn.clicked.connect(lambda: self.openFiles())
-
-
+        self.model.fitter.fileFitted.connect(self.progressBar.setValue)
 
 def get_all_fits(pipeline, filePath, spec, src='sdss'):
         fullList=pipeline.active_templates[:]
