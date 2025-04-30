@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, ev):
         self.optionsWindow.close()
-        #self.xpcaWindow.close()
+        self.xpcaWindow.close()
         
     def __init__(self, app):
         super().__init__()

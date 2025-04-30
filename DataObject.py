@@ -9,6 +9,7 @@ class DataObject:
     file: tool.SDSS_spectrum
     fitting: dict
     userFitting: dict
+    path = str
     category: str
     redshift: float
 
@@ -16,13 +17,15 @@ class DataObject:
         self.name = filename
         self.file = file
         self.fitting = fitting
-        self.path=path
+        self.path = path
+
         if fitting is not None:
             self.category = fitting['zBestSubType']
             self.redshift = fitting['zBest']
         else:
             self.category = None
             self.redshift = None
+
     def changeRedshift(self, val):
         self.redshift = val
 
@@ -31,30 +34,31 @@ class DataObject:
     
     def getFile(self):
         return self.file
-
-    def toDict(self):
-        selfDict = {
-        'path': self.path,
-        'file' : self.file,
-        'category' : self.category,
-        'redshift' : self.redshift}
-
-        
-        return selfDict
     
-    def fromDict(dict, fitting):
-        path = dict['path']
-        name = path[-21:][:-5]  
-        file = dict['file']
-        category = dict['category']
-        redshift = dict['redshift']
-        
-        object = DataObject(name, file, fitting, path)
-        object.changeCategory(category)
-        object.changeRedshift(redshift)
-
-        return object
+#      method not baing used
+ #   def toDict(self):
+ #       selfDict = {
+ #       'path': self.path,
+ #       'file' : self.file,
+ #       'category' : self.category,
+ #       'redshift' : self.redshift}
+#
+ #       return selfDict
     
+#    method not being used
+#    def fromDict(dict, fitting):
+#        path = dict['path'] 
+#        name = path [-21:][:-5]  
+#        file = dict['file']
+#        category = dict['category']
+#        redshift = dict['redshift']
+#        
+#        object = DataObject(name, file, fitting, path)
+#        object.changeCategory(category)
+#        object.changeRedshift(redshift)
+#
+#        return object
+#    
     
     def fromSeries(series, fitting):
         path = series['path']

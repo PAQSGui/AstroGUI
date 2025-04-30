@@ -11,10 +11,10 @@ from xpca.pipeline import Pipeline
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QCheckBox,
     QLabel,
     QPushButton,
     QLineEdit,
+    QFileDialog,
 )
 
 from PySide6.QtCore import Signal, Slot
@@ -34,28 +34,35 @@ class xpcaWindow(QWidget):
         self.model = model
 
         layout = QVBoxLayout()
-        self.startbtn=QPushButton("Start")
+        self.startbtn = QPushButton("Start")
+        self.selectbtn = QPushButton("Select folder to analyze (slow)")
 
-        self.NumBox=QLineEdit()
+        self.NumBox = QLineEdit()
         self.NumBox.setValidator(QIntValidator())
         layout.addWidget(self.NumBox)
 
         layout.addWidget(QLabel("Run xpca on this amount of files? (-1 for all)"))
         layout.addWidget(self.startbtn)
+        layout.addWidget(self.selectbtn)
 
         self.setLayout(layout)
 
         self.model.openedSession[list].connect(self.setupSession)
 
+    def openFiles(self):
+            folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
+            self.model.fitter.openFiles(folder_path)
+
     def start(self):
         num_to_analyze=int(self.NumBox.text())
-        self.model.fitter.populate(self.model.path,objs=self.model.objects,N=int(self.NumBox.text()))
+        self.model.fitter.populate(self.model.path, objs=self.model.objects, N=int(self.NumBox.text()))
         self.model.xpcaDone.emit(0)
         self.close()
         
     @Slot()
     def setupSession(self,list):
         self.startbtn.clicked.connect(lambda: self.start())
+        self.selectbtn.clicked.connect(lambda: self.openFiles())
 
 
 
@@ -103,6 +110,8 @@ def createTarget(filename,spec, fscale=1.):
                     #meta=row.meta,
                     info=primary_header,
                     )
+
+                    
 def findRedshiftForTemplate(templater, l2_product):
     for i in range(len(l2_product['zAlt'])):
             result=search(f'(NEW-)?(.+)', templater.model.getCategory().upper())

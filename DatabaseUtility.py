@@ -1,11 +1,11 @@
 #https://www.pythonguis.com/tutorials/pyside6-dialogs/ 
 from PySide6.QtWidgets import (
-    QFileDialog,
     QDialog,
     QDialogButtonBox,
     QVBoxLayout,
     QLabel
     )
+
 def CreateReplaceDialog(filepath,func,default,exc):
     replaceDialog=QDialog()
     replaceDialog.setWindowTitle(str(type(exc)))

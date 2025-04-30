@@ -1,8 +1,6 @@
 from Fitter import Fitter
 from CSVDatabase import Database
-from DatabaseUtility import getdataModelFromDatabase
 from os.path import dirname
-import DataObject
 
 from PySide6.QtCore import (
     QObject,
@@ -10,7 +8,6 @@ from PySide6.QtCore import (
     QDir,
 )
 
-import Spec_tools as tool
 from pathlib import Path
 
 """
@@ -47,7 +44,7 @@ class Model(QObject):
     def openFolder(self, path):
         directory = QDir(path)
         directory.setNameFilters(["([^.]*)","*.fits"])
-        files = directory.entryList()[0:100]#Currently only analyses the first 5 elements
+        files = directory.entryList()[0:100]
         if len(files)==0:
             raise FileNotFoundError("Folder '%s' does not contain any FITS files" %path)
         self.path = path
@@ -60,7 +57,7 @@ class Model(QObject):
 
     def startup(self):
         self.validationDB = Database('validation', self.objFieldNames, self.path)
-        preProcess = Database("preProcess",self.l2FieldNames, self.path)
+        preProcess = Database('preProcess',self.l2FieldNames, self.path)
         self.fitter = Fitter(preProcess)   
 
     def getEmptydataModel(self,files):
@@ -74,16 +71,16 @@ class Model(QObject):
             #        spectra = tool.SDSS_spectrum(self.path / Path(name))
             #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
             #except UnicodeDecodeError:
-                dataObj=self.fitter.loadDataObject(itempath)
+                dataObj = self.fitter.loadDataObject(itempath, item)
                 objs.append(dataObj)
         return objs
 
     def updateCursor(self, delta):
         self.cursor = self.cursor + delta
-        if self.cursor<0:
-            self.cursor=len(self.objects)-1
-        elif self.cursor>=len(self.objects):
-            self.cursor=0
+        if self.cursor < 0:
+            self.cursor = len(self.objects)-1
+        elif self.cursor >= len(self.objects):
+            self.cursor = 0
 
     def setOption(self, opt, val):
         self.options[opt] = val
@@ -101,21 +98,21 @@ class Model(QObject):
         return self.options
 
     def getRedShift(self):
-        obj=self.objects[self.cursor]
+        obj = self.objects[self.cursor]
         if obj.fitting is not None:
             return float(self.objects[self.cursor].redshift)
         else:
             return 0
     
     def getCategory(self):
-        obj=self.objects[self.cursor]
-        if obj.fitting!=None:
+        obj = self.objects[self.cursor]
+        if obj.fitting is not None:
             return self.objects[self.cursor].category
         else:
             return ""
     
     def getState(self):
-            return self.objects[self.cursor]
+        return self.objects[self.cursor]
 
     def getFile(self):
         return self.objects[self.cursor].file
@@ -136,16 +133,19 @@ class Model(QObject):
         self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
 
     def getDBEntry(self, name):
-        row = self.validationDB.getEntry(name,None)
+        row = self.validationDB.getEntry(name, None)
         if row is not None:
             return row
         return None
+        #should just return row anyways no?
     
     def getNote(self):
         name = self.getState().name
         entry = self.getDBEntry(name)
         if entry is not None:
-            return entry['note']
+            note = entry['note']
+            if note != 'no-note':
+                return note
         return ""
 
     def initOptions(self):
