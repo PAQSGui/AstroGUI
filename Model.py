@@ -103,7 +103,7 @@ class Model(QObject):
             redshift = object.redshift
         else:
             category = None
-            redshift = None
+            redshift = 0
 
         if note == '':
             note = 'no-note'
