@@ -55,7 +55,7 @@ class Plotter:
         plt.ylabel('Flux (erg/s/cm2/Å)')
 
         plt.tight_layout()
-        plt.title(file.Objectname)         
+        plt.title(file.Objectname, y=1.0, pad=-15)        
         plt.legend(handles=plotHandles)
         self.figure.draw()
 

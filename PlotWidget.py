@@ -50,7 +50,6 @@ class PlotLayout(QWidget):
         self.layout = QVBoxLayout()
 
         fig = FigureCanvasQTAgg(figure('k'))
-        #fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
         self.model.openedSession[int].connect(self.setupSession)
