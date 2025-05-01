@@ -1,14 +1,12 @@
 from Fitter import Fitter
 from CSVDatabase import Database
-from os.path import dirname
+import os.path
 
 from PySide6.QtCore import (
     QObject,
     Signal,
     QDir,
 )
-
-from pathlib import Path
 
 """
 Model interfaces between the UI elements and the databases
@@ -25,54 +23,37 @@ class Model(QObject):
     validationDB : Database
     fitter: Fitter
 
-    openedSession = Signal(list)
-    closedSession = Signal(list)
-    xpcaDone = Signal(int)
-
-    def openFiles(self, files):
-        path = dirname(files)
-        if len(files)==0:
-            return
-        self.path = path
-        self.closedSession.emit(files)
-        self.startup()        
-        self.objects = self.getEmptydataModel(files)
-
-        self.initOptions()
-        self.openedSession.emit(files)
+    opened = False
+    openedSession = Signal(int)
+    closedSession = Signal(int)
 
     def openFolder(self, path):
         directory = QDir(path)
-        directory.setNameFilters(["([^.]*)","*.fits"])
+        directory.setNameFilters(['([^.]*)','*.fits'])
         files = directory.entryList()[0:100]
-        if len(files)==0:
-            raise FileNotFoundError("Folder '%s' does not contain any FITS files" %path)
+        if len(files) == 0:
+            raise FileNotFoundError(f'Folder {path} does not contain any FITS files')  
         self.path = path
-        self.closedSession.emit(path)
         self.startup()
-        self.objects = self.getEmptydataModel(files)
-
+        self.objects = self.setupDataModel(files)
         self.initOptions()
-        self.openedSession.emit(files)
+
+        if self.opened:
+            self.closedSession.emit(1)
+        self.openedSession.emit(1)
+        self.opened = True
 
     def startup(self):
         self.validationDB = Database('validation', self.objFieldNames, self.path)
         preProcess = Database('preProcess',self.l2FieldNames, self.path)
         self.fitter = Fitter(preProcess)   
 
-    def getEmptydataModel(self,files):
-        objs=[]
+    def setupDataModel(self, files):
+        objs = []
         for item in list(files):
-                itempath=self.path / Path(item)
-            #try: #replace with typecheck
-            #
-            #    dataModel=getdataModelFromDatabase(itempath,self.fitter.preProcess)
-            #    for name in list(dataModel.keys()):
-            #        spectra = tool.SDSS_spectrum(self.path / Path(name))
-            #        objs.append(DataObject.DataObject(name, spectra, dataModel[name]))
-            #except UnicodeDecodeError:
-                dataObj = self.fitter.loadDataObject(itempath, item)
-                objs.append(dataObj)
+            itempath = os.path.join(self.path, item)
+            dataObj = self.fitter.loadDataObject(itempath, item)
+            objs.append(dataObj)
         return objs
 
     def updateCursor(self, delta):
@@ -82,20 +63,20 @@ class Model(QObject):
         elif self.cursor >= len(self.objects):
             self.cursor = 0
 
-    def setOption(self, opt, val):
-        self.options[opt] = val
-    
-    def changeRedShift(self, val):
-        self.objects[self.cursor].changeRedshift(val)
-    
-    def changeCategory(self, cat):
-        self.objects[self.cursor].changeCategory(cat) 
+    def setOption(self, option, value):
+        self.options[option] = value
 
-    def getOption(self, opt):
-        return self.options[opt]
-    
+    def getOption(self, option):
+        return self.options[option]    
+
     def getOptions(self):
         return self.options
+    
+    def changeRedShift(self, value):
+        self.objects[self.cursor].changeRedshift(value)
+    
+    def changeCategory(self, category):
+        self.objects[self.cursor].changeCategory(category) 
 
     def getRedShift(self):
         obj = self.objects[self.cursor]
@@ -109,13 +90,10 @@ class Model(QObject):
         if obj.fitting is not None:
             return self.objects[self.cursor].category
         else:
-            return ""
+            return ''
     
     def getState(self):
         return self.objects[self.cursor]
-
-    def getFile(self):
-        return self.objects[self.cursor].file
 
     def addDBEntry(self, categorised, note):
         object = self.objects[self.cursor]
@@ -134,10 +112,7 @@ class Model(QObject):
 
     def getDBEntry(self, name):
         row = self.validationDB.getEntry(name, None)
-        if row is not None:
-            return row
-        return None
-        #should just return row anyways no?
+        return row
     
     def getNote(self):
         name = self.getState().name
@@ -146,7 +121,7 @@ class Model(QObject):
             note = entry['note']
             if note != 'no-note':
                 return note
-        return ""
+        return ''
 
     def initOptions(self):
         options = {

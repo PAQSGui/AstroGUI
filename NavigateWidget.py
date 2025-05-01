@@ -4,12 +4,10 @@ from Model import Model
 from PySide6.QtWidgets import (
     QPushButton,
     QHBoxLayout,
-    QVBoxLayout,
     QPlainTextEdit,
     QWidget,
     QListWidget,
-    QCheckBox
-    )
+)
 
 from PySide6.QtCore import QSize, Signal, Slot
 
@@ -21,85 +19,84 @@ class Navigator(QWidget):
     layout: QHBoxLayout
     model: Model
     navigated = Signal(int)
+    noteInput: QPlainTextEdit
+    fileDisplay: QListWidget
+    backButton: QPushButton
+    yesButton: QPushButton
+    unsureButton: QPushButton
 
     def __init__(self, model):
         super().__init__()
         self.model = model
-        self.model.openedSession[list].connect(self.setupSession)
-        self.model.closedSession[list].connect(self.shutDownSession)
+        self.model.openedSession[int].connect(self.setupSession)
+        self.model.closedSession[int].connect(self.shutDownSession)
         self.layout = QHBoxLayout()
 
-        whyInput = QPlainTextEdit()
-        whyInput.setMaximumSize(QSize(9999999, 50))
-        self.whyInput = whyInput
+        self.noteInput = QPlainTextEdit()
+        self.noteInput.setMaximumSize(QSize(9999999, 50))
 
-        evalLayout = QVBoxLayout()
+        self.backButton = QPushButton('Go Back')
+        self.yesButton = QPushButton('Yes')
+        self.unsureButton = QPushButton('Unsure')
+
         buttonLayout = QHBoxLayout()
-        checkboxLayout = QHBoxLayout()
-        self.layout.addLayout(evalLayout)
-        evalLayout.addLayout(buttonLayout)
-        evalLayout.addLayout(checkboxLayout)
-
-        self.backButton = QPushButton("Go Back")
-        self.yesButton = QPushButton("Yes")
-        self.unsureButton = QPushButton("Unsure")
-
         buttonLayout.addWidget(self.backButton)
         buttonLayout.addWidget(self.yesButton)
         buttonLayout.addWidget(self.unsureButton)
-        self.layout.addWidget(self.whyInput)
 
-        self.filedisplay=QListWidget(self)
+        self.fileDisplay = QListWidget(self)
         
-        self.layout.addWidget(self.filedisplay)
+        self.layout.addLayout(buttonLayout)
+        self.layout.addWidget(self.noteInput)
+        self.layout.addWidget(self.fileDisplay)
         
     @Slot()
-    def setupSession(self,files):
-        self.backButton.clicked.connect(lambda: self.NavBtn(msg="Go Back",delta=-1))
-        self.yesButton.clicked.connect(lambda: self.NavBtn( msg="Yes",delta=1))
-        self.unsureButton.clicked.connect(lambda: self.NavBtn( msg="Unsure",delta=1))
+    def setupSession(self, _):
+        self.backButton.clicked.connect(lambda: self.NavBtn('Go Back', -1))
+        self.yesButton.clicked.connect(lambda: self.NavBtn('Yes', 1))
+        self.unsureButton.clicked.connect(lambda: self.NavBtn('Unsure', 1))
         note = self.model.getNote()
-        if note == "":
-            self.whyInput.setPlaceholderText("Write your notes here")
+        if note == '':
+            self.noteInput.setPlaceholderText('Write your notes here')
         else:
-            self.whyInput.setPlainText(note)
+            self.noteInput.setPlainText(note)
         for obj in self.model.objects:
-            self.filedisplay.insertItem(0,obj.name)
+            self.fileDisplay.insertItem(0, obj.name)
         
-        self.filedisplay.itemActivated.connect(self.setSelected)
+        self.fileDisplay.itemActivated.connect(self.setSelected)
+        
     @Slot()
-    def shutDownSession(self,files):
-        self.backButton.clicked.disconnect(lambda: self.NavBtn(msg="Go Back",delta=-1))
-        self.yesButton.clicked.disconnect(lambda: self.NavBtn( msg="Yes",delta=1))
-        self.unsureButton.clicked.disconnect(lambda: self.NavBtn( msg="Unsure",delta=1))
-        self.whyInput.setPlainText("")
+    def shutDownSession(self, _):
+        self.backButton.clicked.disconnect()
+        self.yesButton.clicked.disconnect()
+        self.unsureButton.clicked.disconnect()
+        self.noteInput.setPlainText('')
 
-        self.filedisplay.clear()
-        self.filedisplay.itemActivated.disconnect(self.setSelected)
+        self.fileDisplay.clear()
+        self.fileDisplay.itemActivated.disconnect()
 
-
-    def setSelected(self,item):
-        itemIndex=self.filedisplay.indexFromItem(item).row()
-        self.model.cursor=itemIndex #update cursor
+    def setSelected(self, item):
+        itemIndex = self.fileDisplay.indexFromItem(item).row()
+        self.model.cursor = itemIndex
         note = self.model.getNote()
-        self.whyInput.setPlainText(note)
+        self.noteInput.setPlainText(note)
         self.navigated.emit(itemIndex)
  
     def NavBtn (self, msg, delta):
-        if msg == "Yes":
-            self.model.addDBEntry(True, self.whyInput.toPlainText())
-        elif msg == "Unsure":
-            self.model.addDBEntry(False, self.whyInput.toPlainText())
+        if msg == 'Yes':
+            self.model.addDBEntry(True, self.noteInput.toPlainText())
+        elif msg == 'Unsure':
+            self.model.addDBEntry(False, self.noteInput.toPlainText())
 
         self.model.updateCursor(delta)
-        self.filedisplay.setCurrentRow(self.model.cursor)
+        self.fileDisplay.setCurrentRow(self.model.cursor)
 
         note = self.model.getNote()
-        self.whyInput.setPlainText(note)
+        self.noteInput.setPlainText(note)
 
         self.navigated.emit(delta)
         note = self.model.getNote()
         if note == 'no-note':
-            self.whyInput.setPlaceholderText("Write your notes here")
+            self.noteInput.setPlaceholderText('Write your notes here')
         else:
-            self.whyInput.setPlainText(note)
+            self.noteInput.setPlainText(note)

@@ -40,6 +40,9 @@ class PlotLayout(QWidget):
     plotter: Plotter
     zSlider: QSlider
     zTextBox: QLineEdit
+    signoiseButton: QCheckBox
+    showskyButton: QCheckBox
+    dropdown: QComboBox
 
     def __init__(self, model):
         super().__init__()
@@ -50,8 +53,8 @@ class PlotLayout(QWidget):
         fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
-        self.model.openedSession[list].connect(self.setupSession)
-        self.model.closedSession[list].connect(self.shutDownSession)
+        self.model.openedSession[int].connect(self.setupSession)
+        self.model.closedSession[int].connect(self.shutDownSession)
 
         zSlider = QSlider(Qt.Orientation.Horizontal)
         zSlider.setSingleStep(1)
@@ -61,22 +64,22 @@ class PlotLayout(QWidget):
         self.dropdown = QComboBox()
         self.dropdown.setMinimumWidth(95)
 
-        self.signoiseButton = QCheckBox("Toggle S/N spec")
-        self.showskybutton = QCheckBox("Toggle Sky")
+        self.signoiseButton = QCheckBox('Toggle S/N spec')
+        self.showskyButton = QCheckBox('Toggle Sky')
 
         sliderLayout = QHBoxLayout()
         sliderLayout.addWidget(self.dropdown)
         sliderLayout.addWidget(zSlider)
 
-        sliderLayout.addWidget(QLabel("z ="))
-        self.zTextBox=QLineEdit()
+        sliderLayout.addWidget(QLabel('z ='))
+        self.zTextBox = QLineEdit()
         self.zTextBox.setValidator(QDoubleValidator(notation=QDoubleValidator.Notation.StandardNotation))
         self.zTextBox.validator().setLocale(QLocale.Language.English)
         self.zTextBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sliderLayout.addWidget(self.zTextBox)
 
         sliderLayout.addWidget(self.signoiseButton)
-        sliderLayout.addWidget(self.showskybutton)
+        sliderLayout.addWidget(self.showskyButton)
 
         plotLayout = QHBoxLayout()
         plotLayout.addWidget(fig)
@@ -87,7 +90,7 @@ class PlotLayout(QWidget):
         self.setLayout(self.layout)
 
     @Slot()
-    def setupSession(self,files):
+    def setupSession(self, _):
         redshiftResolution = self.model.getOption('zResolution') 
         redshiftMax = self.model.getOption('zMax')
 
@@ -96,7 +99,7 @@ class PlotLayout(QWidget):
         self.zSlider.sliderMoved.connect(self.sliderChanged)
 
         for file in listdir(config.TEMPLATE_PATH):
-            if file.endswith(".fits"):
+            if file.endswith('.fits'):
                 result = search(f'template-(new-)?(.+).fits', file)
                 text = result[2]
                 self.dropdown.addItem(text)
@@ -104,24 +107,24 @@ class PlotLayout(QWidget):
         self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
 
         self.signoiseButton.clicked.connect(lambda: self.toggleSN())
-        self.showskybutton.clicked.connect(lambda: self.toggleSky())
+        self.showskyButton.clicked.connect(lambda: self.toggleSky())
 
-        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.zTextBox.setText(str(round(self.model.getRedShift(), 4)))
         self.zTextBox.editingFinished.connect(self.zTextInput)
         self.update()
 
     @Slot()
-    def shutDownSession(self,files):
-        self.zSlider.sliderMoved.disconnect(self.sliderChanged)
+    def shutDownSession(self, _):
+        self.zSlider.sliderMoved.disconnect()
 
-        self.dropdown.textActivated.disconnect(self.dropboxSelect)
+        self.dropdown.textActivated.disconnect()
         self.dropdown.clear()
 
-        self.signoiseButton.clicked.disconnect(lambda: self.toggleSN())
-        self.showskybutton.clicked.disconnect(lambda: self.toggleSky())
+        self.signoiseButton.clicked.disconnect()
+        self.showskyButton.clicked.disconnect()
 
         self.zTextBox.setText('')
-        self.zTextBox.editingFinished.disconnect(self.zTextInput)
+        self.zTextBox.editingFinished.disconnect()
 
     @Slot()
     def update(self):
@@ -129,8 +132,8 @@ class PlotLayout(QWidget):
 
     @Slot()
     def newFile(self):
-        self.zSlider.setValue(self.model.getRedShift()*self.model.getOption('zResolution'))
-        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.zSlider.setValue(self.model.getRedShift() * self.model.getOption('zResolution'))
+        self.zTextBox.setText(str(round(self.model.getRedShift(), 4)))
         self.dropdown.setCurrentText(str(self.model.getCategory()).lower())
         self.model.resetYLimit()
         self.update()
@@ -149,7 +152,7 @@ class PlotLayout(QWidget):
         return self.plotter.getYLim()
 
     def sliderChanged(self):
-        self.model.changeRedShift(float(self.zSlider.value())/self.model.getOption('zResolution'))
+        self.model.changeRedShift(float(self.zSlider.value()) / self.model.getOption('zResolution'))
         self.zTextBox.setText(str(self.model.getRedShift()))
         self.plotter.UpdateFigure()
 
@@ -163,12 +166,12 @@ class PlotLayout(QWidget):
                 self.zTextBox.setText(str(input))
 
             self.model.changeRedShift(input)
-            self.zSlider.setValue(int(input*self.model.getOption('zResolution')))
+            self.zSlider.setValue(int(input * self.model.getOption('zResolution')))
             self.update()
 
-    def dropboxSelect(self, s):
+    def dropboxSelect(self, category):
         redshiftResolution = self.model.getOption('zResolution')
-        self.model.changeCategory(s)
+        self.model.changeCategory(category)
         self.update()
-        self.zSlider.setValue(int(self.model.getRedShift()*redshiftResolution))
-        self.zTextBox.setText(str(round(self.model.getRedShift(),4)))
+        self.zSlider.setValue(int(self.model.getRedShift() * redshiftResolution))
+        self.zTextBox.setText(str(round(self.model.getRedShift(), 4)))

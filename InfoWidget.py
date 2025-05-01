@@ -10,11 +10,10 @@ from PySide6.QtWidgets import (
     QGroupBox,
 )
 
-from PySide6.QtGui import (
-    Qt,
-)
+from PySide6.QtGui import Qt
 
 from PySide6.QtCore import QSize, Slot
+
 """
 This component is placed at the top of the window and displays meta-data from the file.
 It should handle files as loaded by Spec_tools.py
@@ -22,7 +21,7 @@ It should handle files as loaded by Spec_tools.py
 class InfoLayout(QHBoxLayout):
     layout = QHBoxLayout()
     model: Model
-    nbrLabel: QLabel
+    neighborLabel: QLabel
     classProbLayout = QVBoxLayout()
     targetLayout = QVBoxLayout()
 
@@ -39,14 +38,14 @@ class InfoLayout(QHBoxLayout):
         central.setMaximumSize(QSize(9999999, 100))
 
         self.model = model
-        self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")
+        self.neighborLabel = QLabel('DELTAMAG of\n-+ 2 neighbors on the CCD')
         self.targetLayout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.classProbLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
-        self.layout.addWidget(self.nbrLabel)
+        self.layout.addWidget(self.neighborLabel)
         self.layout.addLayout(self.classProbLayout)
         self.layout.addLayout(self.targetLayout)
-        self.model.openedSession[list].connect(self.updateAll)
+        self.model.openedSession[int].connect(self.updateAll)
     
     @Slot()
     def updateAll(self):
@@ -55,7 +54,7 @@ class InfoLayout(QHBoxLayout):
         self.updateTarget()
 
     def updateNbrLabel(self):
-        self.nbrLabel = QLabel("DELTAMAG of\n-+ 2 neighbors on the CCD")
+        self.neighborLabel = QLabel('DELTAMAG of\n-+ 2 neighbors on the CCD')
 
     def updateClassProb(self):
         clearLayout(self.classProbLayout)
@@ -65,7 +64,7 @@ class InfoLayout(QHBoxLayout):
 
         data = self.model.getState()
         l2_product = data.fitting
-        if l2_product!=None:
+        if l2_product != None:
 
             classification = l2_product['zBestSubType']
             probability    = l2_product['zBestProb'] * 100
@@ -75,16 +74,15 @@ class InfoLayout(QHBoxLayout):
 
             layout.addWidget(QLabel(classification + ': %.2f %%' % probability))
 
-            for i in range(1,len(subTypes)):
-                if probabilities[i]!=None:
+            for i in range(1, len(subTypes)):
+                if probabilities[i] != None:
                     probability = probabilities[i] * 100
-                    if probability > 10:
-                        text = subTypes[i] + ': %.2f %%' % probability
-                        layout.addWidget(QLabel(text))
+                    text = subTypes[i] + ': %.2f %%' % probability
+                    layout.addWidget(QLabel(text))
         self.classProbLayout.addWidget(groupBox)
                         
     """
-    This is meant to hold information from the current fits-file. 
+    This is meant to hold information from/about the current fits-file. 
     The data should be grabbed from the model, and is organized in a grid
     """
     def updateTarget(self):
@@ -93,12 +91,12 @@ class InfoLayout(QHBoxLayout):
         groupBox = QGroupBox('Metadata')
         groupBox.setLayout(layout)
 
-        layout.addWidget(QLabel("Mag"), 1, 1)
-        layout.addWidget(QLabel("MAG Type"), 2, 1)
-        layout.addWidget(QLabel("EBV"), 3, 1)
         ra, dec = loadCoords(self.model)
-        layout.addWidget(QLabel(f"RA: {ra:.4f}"), 1, 2)
-        layout.addWidget(QLabel(f"DEC: {dec:.4f}"), 2, 2)
+        layout.addWidget(QLabel('Mag'), 1, 1)
+        layout.addWidget(QLabel('MAG Type'), 2, 1)
+        layout.addWidget(QLabel('EBV'), 3, 1)
+        layout.addWidget(QLabel(f'RA: {ra:.4f}'), 1, 2)
+        layout.addWidget(QLabel(f'DEC: {dec:.4f}'), 2, 2)
 
         self.targetLayout.addWidget(groupBox)
 

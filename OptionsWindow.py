@@ -13,9 +13,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
 )
 
-from PySide6.QtGui import (
-    QIntValidator,
-)
+from PySide6.QtGui import QIntValidator
 
 """
 The option dialog opens in a new window so it's possible to see changes to the graph as they are made
@@ -24,9 +22,9 @@ This class should only update the options by calling the setOption() method from
 class OptionsWindow(QWidget):
     optionChanged = Signal()
     model: Model
-    colors = ['Grey', 'Black','Purple', 'Blue', 'Green', 'Yellow', 'Orange', 'Red',]
+    colors = ['Grey', 'Black','Purple', 'Blue', 'Green', 'Yellow', 'Orange', 'Red']
 
-    lwEdit: QLineEdit
+    lineWidthEdit: QLineEdit
     minEdit: QLineEdit
     maxEdit: QLineEdit
     colorLayout = QHBoxLayout()
@@ -34,17 +32,17 @@ class OptionsWindow(QWidget):
     def __init__(self, model):
         super().__init__()
 
-        self.setWindowTitle("Options")
+        self.setWindowTitle('Options')
         self.model = model
 
-        lineWidth = QHBoxLayout()
-        lineWidth.addWidget(QLabel('Line width'))
+        lineWidthLayout = QHBoxLayout()
+        lineWidthLayout.addWidget(QLabel('Line width'))
 
-        self.lwEdit = QLineEdit()
-        self.lwEdit.setValidator(QIntValidator(0, 9))
-        self.lwEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(self.lwEdit.text())/10))
+        self.lineWidthEdit = QLineEdit()
+        self.lineWidthEdit.setValidator(QIntValidator(0, 9))
+        self.lineWidthEdit.editingFinished.connect(lambda: self.updateOption('LineWidth', float(self.lineWidthEdit.text())/10))
 
-        lineWidth.addWidget(self.lwEdit)
+        lineWidthLayout.addWidget(self.lineWidthEdit)
 
         graphHeight = QHBoxLayout()
 
@@ -65,7 +63,7 @@ class OptionsWindow(QWidget):
 
         layout = QVBoxLayout()
 
-        layout.addLayout(lineWidth)
+        layout.addLayout(lineWidthLayout)
         layout.addWidget(QLabel('Colors'))
         layout.addLayout(self.colorLayout)
         layout.addLayout(graphHeight)
@@ -73,20 +71,20 @@ class OptionsWindow(QWidget):
         self.setLayout(layout)
         
     @Slot()
-    def setupSession(self,list):
-        self.lwEdit.setText(str(self.model.getOption('LineWidth')*10))
+    def setupSession(self,_):
+        self.lineWidthEdit.setText(str(self.model.getOption('LineWidth')*10))
         self.minEdit.setText(str(self.model.getOption('ymin')))
         self.maxEdit.setText(str(self.model.getOption('ymax')))
 
-        self.colorLayout.addWidget(self.colorChooser("Graph:",'GraphColor'))
-        self.colorLayout.addWidget(self.colorChooser("Template:",'TemplateColor'))
-        self.colorLayout.addWidget(self.colorChooser("Noise:",'NoiseColor'))
-        self.colorLayout.addWidget(self.colorChooser("S/N:", 'SNColor'))
-        self.colorLayout.addWidget(self.colorChooser("Sky:", 'SkyColor'))
+        self.colorLayout.addWidget(self.colorChooser('Graph:', 'GraphColor'))
+        self.colorLayout.addWidget(self.colorChooser('Template:', 'TemplateColor'))
+        self.colorLayout.addWidget(self.colorChooser('Noise:', 'NoiseColor'))
+        self.colorLayout.addWidget(self.colorChooser('S/N:', 'SNColor'))
+        self.colorLayout.addWidget(self.colorChooser('Sky:', 'SkyColor'))
 
     @Slot()
-    def shutDownSession(self,list):
-        self.ltEdit.setText("")
+    def shutDownSession(self, _):
+        self.lineWidthEdit.setText('')
         self.colorLayout.clearLayout()
     
     def colorChooser(self, text, key):
@@ -108,8 +106,6 @@ class OptionsWindow(QWidget):
         colorGroup.buttonClicked.connect(lambda button: self.updateOption(key, button.text()))
         return box
 
-    def updateOption(self, opt, val):
-        self.model.setOption(opt, val)
+    def updateOption(self, option, value):
+        self.model.setOption(option, value)
         self.optionChanged.emit()
-
-

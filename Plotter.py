@@ -1,20 +1,20 @@
-import numpy as np
+from numpy import max
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from Model import Model
 from Templater import Templater
 
 """
-plotter is more tightly bound to the fits file format.
+Plotter is more tightly bound to the fits file format.
 It should be able to plot files loaded by Spec_tools.py
 The template is drawn by another class to achieve a level of modularity
 """
 class Plotter:
-    model:  Model   
-    figure: FigureCanvasQTAgg  
-    templater: Templater 
+    model:  Model
+    templater: Templater
+    figure: FigureCanvasQTAgg
 
-    def __init__(self, model, figure ):
+    def __init__(self, model, figure):
         self.model = model
         self.templater = Templater(model)
         self.figure = figure
@@ -27,42 +27,35 @@ class Plotter:
         options = self.model.getOptions()
         lineWidth = options['LineWidth']
 
-        plt.figure('k', clear = True)
+        plt.figure('k', clear=True)
 
         if options['yLimit']:
             plt.ylim(int(options['ymin']), int(options['ymax']))        
         else:
-            plt.ylim([0,np.max(file.Flux)])
+            plt.ylim([0, max(file.Flux)])
 
-        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
-        spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
-        template, = self.templater.plotTemplate()
+        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color=options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
+        spectra, = plt.plot(file.Wavelength, file.Flux, color=options['GraphColor'], linewidth=lineWidth, label='Spectra')
 
-        handles = [spectra, template, noise]
+        if self.model.getState().fitting is not None:
+            template, = self.templater.plotTemplate()
+            plotHandles = [spectra, template, noise]
+        else:
+            plotHandles = [spectra, noise]
 
         if options['ShowSN']:
-            snPlot, = plt.step(file.Wavelength, file.Flux/file.Noise, color = options['SNColor'], label="Signal / Noise",  alpha=0.25, linewidth=lineWidth)
-            handles.append(snPlot)
+            snPlot, = plt.step(file.Wavelength, file.Flux/file.Noise, color=options['SNColor'], label='Signal / Noise', alpha=0.25, linewidth=lineWidth)
+            plotHandles.append(snPlot)
 
         if options['ShowSky']:
-            skyPlot, = plt.step(file.Wavelength, file.Skybackground, color = options['SkyColor'], label="Sky Background",  alpha=0.25, linewidth=lineWidth)
-            handles.append(skyPlot)
+            skyPlot, = plt.step(file.Wavelength, file.Skybackground, color=options['SkyColor'], label='Sky Background', alpha=0.25, linewidth=lineWidth)
+            plotHandles.append(skyPlot)
 
         plt.xlabel('Wavelength (Å)')
         plt.ylabel('Flux (erg/s/cm2/Å)')
 
-        noise, = plt.plot(file.Wavelength, file.Noise, label='Noise', color = options['NoiseColor'], alpha=0.5, linewidth=lineWidth)
-        spectra, = plt.plot(file.Wavelength, file.Flux, color = options['GraphColor'], linewidth=lineWidth, label = 'Spectra')
-
-        if self.model.getState().fitting is not None:
-
-            template, = self.templater.plotTemplate()
-            handles=[spectra, template, noise]
-        else:
-            handles=[spectra, noise]
-
         plt.tight_layout()
         plt.title(file.Objectname)         
-        plt.legend(handles=handles)
+        plt.legend(handles=plotHandles)
         self.figure.draw()
 

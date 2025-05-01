@@ -5,7 +5,7 @@ from Model import Model
 from PlotWidget import PlotLayout
 from OptionsWindow import OptionsWindow
 from SkyGrabWidget import SkygrabWindow
-from xpcaWidget import XpcaWindow
+from xpcaWidget import XpcaWidget
 
 from PySide6.QtWidgets import (
     QMainWindow, 
@@ -19,7 +19,6 @@ from PySide6.QtWidgets import (
     )
 from PySide6.QtGui import (
     QAction,
-    QFont,
     QIcon
 )
 
@@ -30,67 +29,39 @@ Buttons in one class should be linked to methods in other classes via Signals an
 This ensures a low level of coupling neccessary for changing out components
 """
 class MainWindow(QMainWindow):
-
     model:          Model
-    navigator:      Navigator
-    plotLayout:     PlotLayout
+    navigateWidget: Navigator
+    plotWidget:     PlotLayout
     fitter:         Fitter
-    infoLayout:     InfoLayout
+    infoWidget:     InfoLayout
     optionsWindow:  OptionsWindow
     skygrabTab:     SkygrabWindow
-    xpcaWindow:     XpcaWindow
-
-    def openFolder(self):
-        try:
-            folder_path = QFileDialog.getExistingDirectory(None, "Select Folder")
-            self.model.openFolder(folder_path)
-        except FileNotFoundError as e:
-            popup = QMessageBox()
-            popup.setWindowTitle("Error")
-            popup.setText(str(e))
-            popup.setIcon(QMessageBox.Icon.Critical)
-            popup.exec()
-
-    def openFiles(self):
-            files = QFileDialog.getOpenFileNames(None, "Select Files")
-            self.model.openFiles(files[0])
-
-    def saveFiles(self):
-            path = QFileDialog.getSaveFileName(None, "Save as...")
-            with open(path[0], 'w') as file:
-                self.model.preProcess.savedataModelToFile(file)
-
-    def closeEvent(self, ev):
-        self.optionsWindow.close()
-        self.xpcaWindow.close()
+    xpcaWindow:     XpcaWidget
         
     def __init__(self, app):
         super().__init__()
         self.model = Model()
-        self.setWindowTitle("AstroGUI")
+        self.setWindowTitle('AstroGUI')
 
-        self.plotLayout = PlotLayout(self.model)
-        self.infoLayout = InfoLayout(self.model)
-        self.infoLayout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+        self.plotWidget = PlotLayout(self.model)
+        self.infoWidget = InfoLayout(self.model)
+        self.infoWidget.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
 
-        self.navigator = Navigator(self.model)
-        self.navigator.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize) 
+        self.navigateWidget = Navigator(self.model)
+        self.navigateWidget.layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize) 
 
         self.optionsWindow = OptionsWindow(self.model)
-
         self.skygrabTab = SkygrabWindow(self.model)
+        self.xpcaWindow = XpcaWidget(self.model)
 
-        self.xpcaWindow = XpcaWindow(self.model)
+        self.optionsWindow.optionChanged.connect(self.plotWidget.update)
 
-        self.optionsWindow.optionChanged.connect(self.plotLayout.update)
+        self.navigateWidget.navigated.connect(lambda: self.skygrabTab.loadPicture(self.skygrabTab.isVisible()))
+        self.navigateWidget.navigated.connect(self.infoWidget.updateAll)
+        self.navigateWidget.navigated.connect(self.plotWidget.newFile)
 
-        self.navigator.navigated.connect(lambda:self.skygrabTab.LoadPicture(self.skygrabTab.isVisible()))
-        self.navigator.navigated.connect(self.infoLayout.updateAll)
-        self.navigator.navigated.connect(self.plotLayout.newFile)
-
-               
-        self.model.xpcaDone.connect(self.infoLayout.updateAll)
-        self.model.xpcaDone.connect(self.plotLayout.newFile)
+        self.xpcaWindow.xpcaDone.connect(self.infoWidget.updateAll)
+        self.xpcaWindow.xpcaDone.connect(self.plotWidget.newFile)
 
         self.model.openedSession.connect(self.optionsWindow.setupSession)
 
@@ -99,32 +70,43 @@ class MainWindow(QMainWindow):
 
         file_menu = self.menuBar()
         file_menu.setNativeMenuBar(False)
-        file_menu.setFont(QFont("",18))
 
-        def addButton(icon,tooltip,func=None):
-            button = QAction(icon,tooltip, self)
+        def auxAddButton(icon, tooltip, func):
+            button = QAction(icon, tooltip, self)
             button.setStatusTip(tooltip)
             button.setToolTip(tooltip) #seemingly not working, at least not on Linux
-            if func != None:
-                button.triggered.connect(func)
+            button.triggered.connect(func)
             file_menu.addAction(button)
 
-        addButton(QIcon("icons/folder.png"),"Open a folder and plot FITS files inside",lambda: self.openFolder())
-        addButton(QIcon("icons/hammer.png"),"Open a window to configure the program",lambda: self.optionsWindow.show())
-    
-        addButton(QIcon("icons/floppy.png"),"Save current workspace",lambda: self.saveFiles())
-        addButton(QIcon("icons/robot.png"),"Open a wizard to process targets using xpca",lambda: self.xpcaWindow.show())
+        auxAddButton(QIcon('icons/folder.png'), 'Open a folder and plot FITS files inside', lambda: self.openFolder())
+        auxAddButton(QIcon('icons/hammer.png'), 'Open a window to configure the program', lambda: self.optionsWindow.show())
+        auxAddButton(QIcon('icons/robot.png'), 'Open a wizard to process targets using xpca', lambda: self.xpcaWindow.show())
         
         tabs = QTabWidget()
-        tabs.addTab(self.plotLayout,"Spectrum Plot")
-        tabs.addTab(self.skygrabTab,"SDSS Photo")
+        tabs.addTab(self.plotWidget,'Spectrum Plot')
+        tabs.addTab(self.skygrabTab,'SDSS Photo')
     
-        tabs.tabBarClicked.connect(lambda: self.skygrabTab.LoadPicture(True))
+        tabs.tabBarClicked.connect(lambda: self.skygrabTab.loadPicture(True))
 
-        mainLayout.addLayout(self.infoLayout, stretch=0)
+        mainLayout.addLayout(self.infoWidget, stretch=0)
         mainLayout.addWidget(tabs, stretch=5)
-        mainLayout.addLayout(self.navigator.layout, stretch=0)
+        mainLayout.addLayout(self.navigateWidget.layout, stretch=0)
         
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
+
+    def openFolder(self):
+        try:
+            folderPath = QFileDialog.getExistingDirectory(None, 'Select Folder')
+            self.model.openFolder(folderPath)
+        except FileNotFoundError as error:
+            popup = QMessageBox()
+            popup.setWindowTitle('Error')
+            popup.setText(str(error))
+            popup.setIcon(QMessageBox.Icon.Critical)
+            popup.exec()
+
+    def closeEvent(self, _):
+        self.optionsWindow.close()
+        self.xpcaWindow.close()
