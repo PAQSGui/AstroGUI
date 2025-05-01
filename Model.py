@@ -98,12 +98,12 @@ class Model(QObject):
     def addDBEntry(self, categorised, note):
         object = self.objects[self.cursor]
 
-        if categorised:
+        if object.fitting is not None:
             category = object.category
             redshift = object.redshift
         else:
-            category = None
-            redshift = None
+            category = 'not-fitted'
+            redshift = -1
 
         if note == '':
             note = 'no-note'

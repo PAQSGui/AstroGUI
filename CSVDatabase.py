@@ -50,8 +50,8 @@ class Database():
         return files
 
     def addEntry(self, fieldnames, fields):
-        new_row ={fieldnames[i]: fields[i] for i in range(len(fieldnames))}
-        self.data = pd.concat([self.dataFrame, pd.DataFrame([new_row])], ignore_index=True)
+        new_row = {fieldnames[i]: fields[i] for i in range(len(fieldnames))}
+        self.dataFrame = pd.concat([self.dataFrame, pd.DataFrame([new_row])], ignore_index=True)
         self.write()
 
     def getEntry(self, name, default):
