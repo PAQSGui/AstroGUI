@@ -19,7 +19,7 @@ class Model(QObject):
     options: dict
     l2FieldNames = ['name', 'OBJ_NME', 'zBest', 'zBestProb', 'zBestType', 'zBestSubType', 'zAltProb', 'zAltType', 'zAltSubType', 'zBestPars', 'zAltPars']
     
-    objFieldNames = ['name','categorized', 'category', 'redshift', 'note']
+    objFieldNames = ['name', 'categorized', 'category', 'redshift', 'note']
     validationDB : Database
     fitter: Fitter
 
@@ -96,11 +96,12 @@ class Model(QObject):
         return self.objects[self.cursor]
 
     def addDBEntry(self, categorised, note):
-        object = self.objects[self.cursor]
+        dataObject = self.objects[self.cursor]
 
-        if object.fitting is not None:
-            category = object.category
-            redshift = object.redshift
+        if dataObject.fitting is not None:
+            category = dataObject.category
+            redshift = dataObject.redshift
+
         else:
             category = 'not-fitted'
             redshift = -1
@@ -108,7 +109,7 @@ class Model(QObject):
         if note == '':
             note = 'no-note'
 
-        self.validationDB.addEntry(self.objFieldNames, [object.name, categorised, category, redshift, note])
+        self.validationDB.addEntry(self.objFieldNames, [dataObject.name, categorised, category, redshift, note])
 
     def getDBEntry(self, name):
         row = self.validationDB.getEntry(name, None)
