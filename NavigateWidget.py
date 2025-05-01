@@ -45,6 +45,7 @@ class Navigator(QWidget):
         buttonLayout.addWidget(self.unsureButton)
 
         self.fileDisplay = QListWidget(self)
+        self.fileDisplay.setMaximumSize(QSize(9999999, 50))
         
         self.layout.addLayout(buttonLayout)
         self.layout.addWidget(self.noteInput)

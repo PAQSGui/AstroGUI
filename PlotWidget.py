@@ -50,7 +50,6 @@ class PlotLayout(QWidget):
         self.layout = QVBoxLayout()
 
         fig = FigureCanvasQTAgg(figure('k'))
-        fig.setMinimumSize(QSize(560, 560))
         self.plotter = Plotter(model, fig)
 
         self.model.openedSession[int].connect(self.setupSession)
@@ -91,6 +90,7 @@ class PlotLayout(QWidget):
 
     @Slot()
     def setupSession(self, _):
+        self.plotter.UpdateFigure()
         redshiftResolution = self.model.getOption('zResolution') 
         redshiftMax = self.model.getOption('zMax')
 
@@ -111,7 +111,7 @@ class PlotLayout(QWidget):
 
         self.zTextBox.setText(str(round(self.model.getRedShift(), 4)))
         self.zTextBox.editingFinished.connect(self.zTextInput)
-        self.update()
+        self.layout.update()
 
     @Slot()
     def shutDownSession(self, _):
