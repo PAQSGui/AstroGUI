@@ -36,6 +36,7 @@ class XpcaWidget(QWidget):
         self.startButton = QPushButton('Start')
         self.selectButton = QPushButton('Select folder to analyze (may be slow)')
         self.progressBar = QProgressBar()
+        self.progressBar.setValue(0)
 
         self.numberBox = QLineEdit()
         self.numberBox.setValidator(QIntValidator())
@@ -61,6 +62,7 @@ class XpcaWidget(QWidget):
         self.model.fitter.populate(objs=self.model.objects, N=amount)
         self.xpcaDone.emit(0)
         self.close()
+        self.progressBar.setValue(0)
         
     @Slot()
     def setupSession(self, _):
